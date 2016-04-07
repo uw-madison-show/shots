@@ -4,10 +4,9 @@
 // require Browsersync
 var Browsersync = require('browser-sync').create();
 
-
 // run the server config
-Browsersync.init({server: "../source",
-                  files: ["../source/*",
-                          "../source/includes/*"
-                          ]
+Browsersync.init({files: ["../source/*",
+                          "../source/lib/*"
+                          ],
+                  proxy: "127.0.0.1:8080"
                   });
