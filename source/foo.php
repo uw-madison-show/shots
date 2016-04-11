@@ -6,9 +6,7 @@
 </head>
 <body>
 
-<p>Hello world!</p>
-
-<p>goodbye</p>
+<?php phpinfo(); ?>
 
 </body>
 </html>
