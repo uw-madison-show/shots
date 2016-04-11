@@ -40,7 +40,7 @@ try {
   echo 'Exception: ' . htmlspecialchars($e->getMessage(), ENT_COMPAT, 'UTF-8');
 }
 
-
+$db = NULL;
 
 echo ' goodbye';
 ?>

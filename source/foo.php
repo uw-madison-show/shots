@@ -1,40 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>hi</title>
-  <link rel="stylesheet" type="text/css" href="lib/shots_styles.css">
-</head>
-<body>
+<?php
 
-<?php 
+include './lib/all_pages.php';
+include './lib/doctype.php';
+include './lib/head.php';
 
-// phpinfo();
-
-try {
-  $db = new PDO('sqlite:database\shots.sq3', NULL, NULL);
-} catch (PDOException $e) {
-  echo 'Exception: ' . htmlspecialchars($e->getMessage(), ENT_COMPAT, 'UTF-8');
-}
-
-$r = $db->query('select * from grants');
-
-echo '<pre>';
-
-print_r($r);
-
-foreach ($r as $row) {
-  print_r($row);
-}
-
-$db = NULL;
-
-print_r(get_defined_vars());
-
-echo '</pre>';
-
+$new_include_path = get_include_path();
 
 
 ?>
 
+<body>
+
+<?php
+
+$dbal_config = new Doctrine\DBAL\Configuration();
+
+$pdo = new PDO( 'sqlite:database\shots.sq3', NULL, NULL );
+
+// $db_connection_settings = array('pdo' => $pdo);
+
+$db_connection_settings = array('driver' => 'pdo_sqlite',
+                                'path' => 'database\shots.sq3'
+                                );
+
+try {
+  $db_conn = \Doctrine\DBAL\DriverManager::getConnection($db_connection_settings,
+                                                         $dbal_config
+                                                         );
+} catch (Exception $e) {
+  echo 'Exception: ' . htmlspecialchars($e->getMessage(), ENT_COMPAT, 'UTF-8');
+}
+
+
+$sql = 'select * from grants';
+$q = $db_conn->query($sql);
+
+while ( $row = $q->fetch() ) {
+  print_r($row);
+}
+
+?>
+
+<!-- TODO put javascript here -->
+
 </body>
-</html>
+
+<?php
+
+include './lib/html_footer.php';
+
+?>
+
+
