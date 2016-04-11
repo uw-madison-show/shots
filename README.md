@@ -14,6 +14,8 @@ Built with PHP and SQLite databases, so it can be installed on most hosts with P
 
 Modular table design allows for additional types of "outputs."
 
+Built on top of [Doctrine Database Abstraction Layer (DBAL)]()
+
 Abstracted security layer. Originally built with a Shibboleth, but can be used with OpenID, LDAP, or even password-less.
 
 
