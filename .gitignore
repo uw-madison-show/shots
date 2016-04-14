@@ -1,3 +1,4 @@
 **/*.sublime-*
 *.sq3
 *.sq3
+source/database/shots.sq3
