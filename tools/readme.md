@@ -22,7 +22,7 @@ If you are deploying shots onto a server, you don't need to worry about anything
 In the windows command prompt:
 
     > cd C:\...\shots
-    > php -S 127.0.0.1:8080 -c .\source\php\built_in_server.ini -t .\shots\source
+    > php -S 127.0.0.1:8080 -c .\source\php\built_in_server.ini -t .\source
 
 Then in the babun prompt:
 

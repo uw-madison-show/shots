@@ -13,27 +13,11 @@ $new_include_path = get_include_path();
 
 <?php
 
-$dbal_config = new Doctrine\DBAL\Configuration();
 
-$pdo = new PDO( 'sqlite:database\shots.sq3', NULL, NULL );
-
-// $db_connection_settings = array('pdo' => $pdo);
-
-$db_connection_settings = array('driver' => 'pdo_sqlite',
-                                'path' => 'database\shots.sq3'
-                                );
-
-try {
-  $db_conn = \Doctrine\DBAL\DriverManager::getConnection($db_connection_settings,
-                                                         $dbal_config
-                                                         );
-} catch (Exception $e) {
-  echo 'Exception: ' . htmlspecialchars($e->getMessage(), ENT_COMPAT, 'UTF-8');
-}
-
+$db->insert( 'grants', array('breed' => 'collie', 'age' => '12') );
 
 $sql = 'select * from grants';
-$q = $db_conn->query($sql);
+$q = $db->query($sql);
 
 while ( $row = $q->fetch() ) {
   print_r($row);

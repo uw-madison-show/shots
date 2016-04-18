@@ -23,6 +23,8 @@ $common_loader->register();
 $dbal_loader = new ClassLoader('Doctrine\DBAL');
 $dbal_loader->register();
 
+require_once('database_connection.php');
+
 
 // TODO session variables
 

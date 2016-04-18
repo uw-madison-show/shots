@@ -19,28 +19,36 @@ $shots_tables = array('shots_settings',
 
 // user input for re/creating new tables, downloading data, etc.
 
-// make a list of 
 
-echo '<pre>';
+include '../lib/all_pages.php';
 
-echo ' hello world';
-
+$dbal_config = new Doctrine\DBAL\Configuration();
+$db_connection_settings = array('driver' => 'pdo_sqlite',
+                                'path' => $_SERVER['DOCUMENT_ROOT'] . '\database\shots.sq3'
+                                );
 try {
-  $db = new PDO( 'sqlite:..\database\shots.sq3', NULL, NULL );
-  $db->exec('create table grants ('.
-            'id integer primary key, '.
-            'breed text, '.
-            'age integer '.
-            ')'
-            );
-  $db->exec('insert into grants (breed, age) values ("husky", 14);'.
-            'insert into grants (breed, age) values ("fido", 2);'
-            );
-} catch (PDOException $e) {
+  $db = \Doctrine\DBAL\DriverManager::getConnection($db_connection_settings,
+                                                    $dbal_config
+                                                    );
+} catch (Exception $e) {
   echo 'Exception: ' . htmlspecialchars($e->getMessage(), ENT_COMPAT, 'UTF-8');
 }
 
-$db = NULL;
+$manager = $db->getSchemaManager();
 
+$tables = $manager->listTables();
+
+foreach ($tables as $table) {
+  echo $table->getName() . " columns: \n\n";
+  foreach ($table->getColumns() as $column) {
+    echo '<div>';
+    print_r($column);
+    echo '</div>';
+  }
+}
+
+
+echo '<pre>';
+print_r(get_defined_vars());
 echo ' goodbye';
 ?>
