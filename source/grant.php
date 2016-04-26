@@ -1,13 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Grant</title>
-</head>
+<?php require '/lib/doctype.php'; ?>
+<?php require '/lib/head.php'; ?>
 
 <!-- database stuff -->
 <?php
 
-include './lib/all_pages.php';
+$this_table = 'grants';
+$this_id    = 1;
+
+// include './lib/all_pages.php';
+include './lib/shots/entities/grants.php';
+
 
 // i did a couple inserts to have some records to play with
 // $ins = $db->insert('grants',
@@ -20,14 +22,7 @@ include './lib/all_pages.php';
 //                          )
 //                    );
 
-$this_table = 'grants';
-$this_id = 1;
 
-
-// get the schema
-$sm = $db->getSchemaManager();
-$columns = $sm->listTableColumns($this_table);
-$primary_key = $sm->listTableIndexes($this_table)['primary']->getColumns()[0];
 
 
 
@@ -47,28 +42,33 @@ $primary_key = $sm->listTableIndexes($this_table)['primary']->getColumns()[0];
 // }
 
 // get data for one row
-$q = $db->createQueryBuilder();
-$q->select('*');
-$q->from($this_table);
-// hmmm DBAL does not seem to want to parameterize the field name
-// this kludge can work and i guess it is trustworthy cause primary key comes
-// out of the database?
-$q->where( $primary_key .' = :key_value' );
-$q->setParameters( array(
-                         ':key_value'   => $this_id
-                         ) 
-                  );
-$r = $q->execute();
+// $q = $db->createQueryBuilder();
+// $q->select('*');
+// $q->from($this_table);
+// // hmmm DBAL does not seem to want to parameterize the field name
+// // this kludge can work and i guess it is trustworthy cause primary key comes
+// // out of the database?
+// $q->where( $primary_key .' = :key_value' );
+// $q->setParameters( array(
+//                          ':key_value'   => $this_id
+//                          ) 
+//                   );
+// $r = $q->execute();
 
-var_dump($r);
 
-while ( $record = $r->fetch() ){
-  var_dump($record);
+
+
+
+$my_grants = fetchGrants( array(2) );
+
+$all_html = '';
+
+foreach ($my_grants as $grant_id => $data) {
+  foreach ($data as $key => $value) {
+    $html = createGrantFieldHtml($key, $value);
+    $all_html .= $html;
+  }
 }
-
-
-
-
 
 
 
@@ -80,18 +80,77 @@ while ( $record = $r->fetch() ){
 
 <!-- view or edit -->
 
+
+
+<?php 
+echo '<div class="record">';
+// echo '<input type="hidden" class="record_id" id="grant_id" name="grant_id" value="'. $my_grants[2]['grant_id'] . '" />';
+echo '<div class="fields">';
+echo $all_html; 
+echo '</div>';
+echo '</div>';
+?>
+
 <!-- errors or expert settings -->
 </body>
 
 
 <pre>
-<?php print_r(get_defined_vars()); ?>
+<?php //print_r(get_defined_vars()); ?>
 </pre>
 
 
 
 
 <!-- include javascript scripts -->
+<script type="text/javascript">
+  
+  $(document).ready(function() {
+    console.log('ready');
+
+    function ajaxChange(e){
+      console.log(this);
+
+      // the ajax handler is going to include the file /lib/shots/entities/{table}.php
+      // then it will use call_user_func() to pass the {params}
+      // into the function named by {action}
+      var req = {};
+      req.action   = 'updateGrant';
+      req.table    = 'grants';
+      req.params   = [];
+
+      // get record id
+      // this requires the html to be marked up in a specific way
+      req.params.push($(this).closest('.record').find('#grant_id').val());
+
+      // field name and new value;
+      req.params.push($(this).attr('id'));
+      req.params.push($(this).val());
+
+      console.log(req);
+
+      $.post('/lib/ajax_handler.php',
+             {
+               q: req
+             })
+             .done( function(d){
+              console.log(d);
+
+             })
+             .fail( 
+               function(d){
+                 console.log('ajax post failed');
+                 console.log(d);
+               }
+             )
+             .always()
+             ;
+    }
+
+    $('input').change( ajaxChange );
+  }); // end document ready
+
+</script>
 
 
 

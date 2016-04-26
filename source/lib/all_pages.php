@@ -3,13 +3,20 @@
 // handle includes paths on multiple dev/test/prod environments
 $old_include_path = get_include_path();
 $doc_root = $_SERVER['DOCUMENT_ROOT'];
+
 $app_include_folder = $doc_root . '/includes';
 $for_preg = '/' . preg_quote($app_include_folder, '/') . '/';
-
 if ( preg_match($for_preg, $old_include_path) !== 1 ){
   set_include_path($old_include_path . ';' . $app_include_folder);
 }
 // $new_include_path = get_include_path();
+
+$old_include_path = get_include_path();
+$app_lib_folder = $doc_root . '/lib';
+$for_preg2 = '/' . preg_quote($app_lib_folder, '/') . '/';
+if ( preg_match($for_preg2, $old_include_path) !== 1 ){
+  set_include_path($old_include_path . ';' . $app_lib_folder);
+}
 
 // Auto class loader for Doctrine stuff
 // http://docs.doctrine-project.org/projects/doctrine-common/en/latest/reference/class-loading.html#usage
@@ -25,6 +32,8 @@ $dbal_loader->register();
 
 require_once('database_connection.php');
 
+// add utility functions
+require_once('utility_functions.php');
 
 // TODO session variables
 
