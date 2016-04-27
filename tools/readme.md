@@ -15,7 +15,9 @@ If you are deploying shots onto a server, you don't need to worry about anything
         > $ cd .../shots/tools
         > $ npm install browser-sync
     * Run it: `browser-sync ... `
-5. 
+5. Node modules used for deploying and moving files:
+    * ncp -- recursive copy
+    * path 
 
 ## Run the system in dev mode
 
