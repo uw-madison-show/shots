@@ -57,7 +57,7 @@ body {
   margin-left: auto;
   margin-right: auto;
   padding: 0;
-  max-width: 1000px;
+  max-width: 1200px;
 }
 
 .no-padding {
@@ -81,6 +81,16 @@ body {
   padding: 5px;
   margin: 0px;
   text-align: center;
+}
+
+.widget-frame .widget-help {
+  position: absolute;
+  left: -999em;
+}
+
+.widge-frame .widget-remove {
+  position: absolute;
+  right: 999em;
 }
 
 .widget-frame .widget-body {
