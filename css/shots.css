@@ -155,8 +155,17 @@ div#main-entity {
   padding-bottom: 15px;
   padding-left: 30px;
   padding-right: 30px;
+  font-size: 1.5em;
 }
 
+div#related-entities {
+  border: 1px solid #ddd;
+  margin: 5px;
+  padding: 5px;
+  font-size: .9em;
+  font-weight: bolder;
+}
+  
 
  
 
