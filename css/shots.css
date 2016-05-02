@@ -116,9 +116,9 @@ body {
 }
 
 .widget-multiple-button {
-  font-size: 2.5em;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  font-size: 4em;
+  padding-top: 15px; 
+  padding-bottom: 15px;
   padding-left: 15px;
   padding-right: 15px;
 }
@@ -133,6 +133,19 @@ body {
   display: block;
   color: #666;
   border-radius: 0;
+}
+
+.widget-frame .quick-list {
+  list-style-type: none;
+}
+
+.widget-frame .quick-list-item {
+  border-top: 1px solid #ddd;
+  margin-right: 15px;
+  margin-left: 15px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  font-weight: bolder;
 }
 
 
