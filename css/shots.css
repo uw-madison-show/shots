@@ -25,6 +25,10 @@ body {
   padding-left: 30px;
 }
 
+.centering {
+  text-align: center;
+}
+
 .page-content {
   padding-top: 30px;
   padding-bottom: 30px;
