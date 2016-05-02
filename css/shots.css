@@ -148,6 +148,15 @@ body {
   font-weight: bolder;
 }
 
+div#main-entity {
+  border: 1px solid #ddd;
+  margin: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
 
  
 
