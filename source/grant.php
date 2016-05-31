@@ -1,14 +1,14 @@
-<?php require '/lib/doctype.php'; ?>
-<?php require '/lib/head.php'; ?>
-
-<!-- database stuff -->
 <?php
+include './lib/all_pages.php';
+
+include 'html_doctype.php';
+include 'html_head.php';
 
 $this_table = 'grants';
 $this_id    = 1;
 
 // include './lib/all_pages.php';
-include './lib/shots/entities/grants.php';
+include 'shots/entities/grants.php';
 
 
 // i did a couple inserts to have some records to play with
@@ -59,7 +59,7 @@ include './lib/shots/entities/grants.php';
 
 
 
-$my_grants = fetchGrants( array(2) );
+$my_grants = fetchGrants( array(1) );
 
 $all_html = '';
 
@@ -92,15 +92,6 @@ echo '</div>';
 ?>
 
 <!-- errors or expert settings -->
-</body>
-
-
-<pre>
-<?php //print_r(get_defined_vars()); ?>
-</pre>
-
-
-
 
 <!-- include javascript scripts -->
 <script type="text/javascript">
@@ -115,6 +106,7 @@ echo '</div>';
       // then it will use call_user_func() to pass the {params}
       // into the function named by {action}
       var req = {};
+      req.target   = 'entity';
       req.action   = 'updateGrant';
       req.table    = 'grants';
       req.params   = [];
@@ -129,21 +121,24 @@ echo '</div>';
 
       console.log(req);
 
-      $.post('/lib/ajax_handler.php',
-             {
-               q: req
-             })
-             .done( function(d){
-              console.log(d);
-
-             })
-             .fail( 
-               function(d){
-                 console.log('ajax post failed');
-                 console.log(d);
-               }
+      $.post('/lib/ajax_handler.php', 
+             { "request": req },
+             "json"
              )
-             .always()
+             .done(
+                   function(d){
+                     console.log('ajax post done');
+                     console.log(d);
+                   }) 
+             .fail(
+                   function(d){
+                     console.log('ajax post fail');
+                     console.log(d);
+                   })
+             .always(
+                     function(d) {
+                       console.log('ajax always');
+                     })
              ;
     }
 
@@ -151,7 +146,6 @@ echo '</div>';
   }); // end document ready
 
 </script>
+</body>
 
-
-
-</html>
+<?php include 'html_footer.php'; ?>

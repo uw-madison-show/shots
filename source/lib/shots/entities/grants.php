@@ -95,11 +95,11 @@ function createGrantFieldHtml( $field_name = FALSE, $field_value = FALSE, $optio
       case 'Decimal':
       case 'String':
       case 'Date':
-        // add a normal input field
+        // add a normal input field for all four types
         $return_html .= '<input type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'"/>';
         break;
       case 'Text':
-        // add a textarea
+        // TODO add a textarea
         break;
       default:
         // TODO add a default

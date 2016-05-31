@@ -1,8 +1,8 @@
 <?php
 
 include './lib/all_pages.php';
-include './lib/doctype.php';
-include './lib/head.php';
+include 'html_doctype.php';
+include 'html_head.php';
 
 $new_include_path = get_include_path();
 
@@ -11,21 +11,37 @@ $new_include_path = get_include_path();
 
 <body>
 
-<?php
+<script type="text/javascript">
+  var req = {};
+  req.target   = 'entity';
+  req.action   = 'updateGrant';
+  req.table    = 'grants';
+  req.params   = [];
 
+  // get record id
+  // this requires the html to be marked up in a specific way
+  // req.params.push($(this).closest('.record').find('#grant_id').val());
 
-$db->insert( 'grants', array('breed' => 'collie', 'age' => '12') );
+  // field name and new value;
+  // req.params.push($(this).attr('id'));
+  // req.params.push($(this).val());
 
-$sql = 'select * from grants';
-$q = $db->query($sql);
+  console.log(req);
 
-while ( $row = $q->fetch() ) {
-  print_r($row);
-}
+  $.post('/lib/ajax_handler.php', { "request": req })
+         .done( function(d){
+          console.log(d);
 
-?>
-
-<!-- TODO put javascript here -->
+         })
+         .fail( 
+           function(d){
+             console.log('ajax post failed');
+             console.log(d);
+           }
+         )
+         .always()
+         ;
+</script>
 
 </body>
 
