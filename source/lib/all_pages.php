@@ -33,7 +33,7 @@ $dbal_loader->register();
 require_once('database_connection.php');
 
 // add utility functions
-require_once('utility_functions.php');
+require_once('functions_utility.php');
 
 // TODO session variables
 

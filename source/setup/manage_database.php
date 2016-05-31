@@ -1,54 +1,55 @@
 <?php
+include '../lib/all_pages.php';
+include 'functions_database.php';
 
+include 'html_doctype.php';
 
-
-// database types supported by shots
-// should be taken from the list of PDO drivers: http://php.net/manual/en/pdo.drivers.php
-// and formatted as the DSN prefix, e.g.: http://php.net/manual/en/ref.pdo-sqlite.connection.php
-$shots_databases = array('sqlite');
 
 // make a list of the tables that go into shots
-$shots_tables = array('shots_settings',
-                      'relationships',
+$shots_tables = array(//'settings_global',
+                      //'settings_shots',
+                      //'relationships',
                       'people',
                       'grants',
-                      'events'
+                      //'events'
                       );
 
 // check if tables exists / how many rows they have
 
 // user input for re/creating new tables, downloading data, etc.
 
+$shots_schema = $db->getSchemaManager();
 
-include '../lib/all_pages.php';
+$shots_database_exists = sqliteDatabaseExists($shots_schema);
 
-$dbal_config = new Doctrine\DBAL\Configuration();
-$db_connection_settings = array('driver' => 'pdo_sqlite',
-                                'path' => $_SERVER['DOCUMENT_ROOT'] . '\database\shots.sq3'
-                                );
-try {
-  $db = \Doctrine\DBAL\DriverManager::getConnection($db_connection_settings,
-                                                    $dbal_config
-                                                    );
-} catch (Exception $e) {
-  echo 'Exception: ' . htmlspecialchars($e->getMessage(), ENT_COMPAT, 'UTF-8');
-}
+var_dump($shots_database_exists);
 
-$manager = $db->getSchemaManager();
+if ( !$shots_database_exists ) {
+  // do something to create the database
 
-$tables = $manager->listTables();
+} else {
+  // present the options for managing tables
 
-foreach ($tables as $table) {
-  echo $table->getName() . " columns: \n\n";
-  foreach ($table->getColumns() as $column) {
-    echo '<div>';
-    print_r($column);
-    echo '</div>';
-  }
-}
+} // end if shots database exists
 
 
-echo '<pre>';
-print_r(get_defined_vars());
-echo ' goodbye';
+// foreach ($shots_tables as $table) {
+//   echo $table . '</br>';
+
+//   $table_exists = $shots_schema->tablesExist($table);
+
+//   var_dump($table_exists);
+
+  // if ( $table_exists ){
+  //   foreach ($table->getColumns() as $column) {
+  //     echo '<div>';
+  //     print_r($column);
+  //     echo '</div>';
+  //   }
+  // } else {
+  //   echo 'does not exist. Create it?';
+  // }
+// }
+
+include 'html_footer.php';
 ?>

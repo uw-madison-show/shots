@@ -31,7 +31,7 @@ Then in the babun prompt:
     $ cd .../shots/tools
     $ node start_dev_server.js &
 
-You know have two command prompts watching for changes. Sigh. I know. I waste 90 minutes of my life trying to make this better but there seems to be some weird bugginess in cygwin and php command line, so whatevs. This works.
+You now have two command prompts watching for changes. Sigh. I know. I wasted 90 minutes of my life trying to make this better but there seems to be some weird bugginess in cygwin and php command line, so whatevs. This works.
 
 
 
