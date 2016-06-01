@@ -1,5 +1,5 @@
 <?php
-include '../lib/all_pages.php';
+include 'lib/all_pages.php';
 include 'functions_database.php';
 
 include 'html_doctype.php';
@@ -71,7 +71,7 @@ if ( !$shots_database_exists ) {
 ?>
 
 <script type="text/javascript">
-  // make some code to listen for button presses
+
   $('button').on('click', function(e){
     e.preventDefault();
     // console.log($(this).data());
@@ -107,7 +107,10 @@ if ( !$shots_database_exists ) {
     } else {
 
     }
-  })
+  });
+
+  // todo code to display the result message from the ajax post
+  // todo code to display errors of ajax post
 
 </script>
 

@@ -52,7 +52,7 @@ if ( $this_request["target"] === 'entity' ){
   // echo 'i am doing page ajax call';
   try {
     ob_start();
-      $i = include('../setup/database/'. $this_request["page"] . '.php');
+      $i = include('shots/setup/database/'. $this_request["page"] . '.php');
       $result = ob_get_contents();
     ob_end_clean();
     $return_array["error"] = FALSE;
