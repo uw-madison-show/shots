@@ -6,7 +6,8 @@ include 'html_head.php';
 
 $new_include_path = get_include_path();
 
-
+$this_request["page"] = 'create_settings_global';
+include('setup/database/'. $this_request['page'] . '.php');
 ?>
 
 <body>

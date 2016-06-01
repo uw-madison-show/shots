@@ -1,4 +1,5 @@
 <?php
+
 include '../../lib/all_pages.php';
 include 'functions_database.php';
 
@@ -9,7 +10,7 @@ include 'functions_database.php';
 $platform = $db->getDatabasePlatform();
 $shots_schema = $db->getSchemaManager();
 
-$table_exists = $shots_schema->tablesExist(array('grants'));
+$table_exists = $shots_schema->tablesExist(array('settings_global'));
 
 echo '<pre>';
 

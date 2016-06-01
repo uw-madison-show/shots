@@ -36,7 +36,7 @@ if ( $this_request["target"] === 'entity' ){
   // this will handle most of the CRUD functions for the database
   try {
     // include the correct entity type
-    require_once('shots/entities/'. $this_request['table'] . '.php');
+    include_once('shots/entities/'. $this_request['table'] . '.php');
     // run the specified function with the provided params
     $result = call_user_func_array($this_request['action'], $this_request['params'] );
     $return_array["error"] = FALSE;
@@ -49,10 +49,15 @@ if ( $this_request["target"] === 'entity' ){
   }
 } elseif ( $this_request["target"] === 'page' ) {
   // this will handle, e.g., the pages that create, export, delete tables
+  // echo 'i am doing page ajax call';
   try {
-    $result = require_once('setup/database/'. $this_request['page'] . '.php');
+    ob_start();
+      $i = include('../setup/database/'. $this_request["page"] . '.php');
+      $result = ob_get_contents();
+    ob_end_clean();
     $return_array["error"] = FALSE;
-    $return_array["results"][] = $result;
+    $return_array["results"]["message"] = $result;
+    $return_array["results"]["include_result"] = $i;
   } catch (Exception $e) {
     $return_array["error"] = TRUE;
     $return_array["error_messages"][] = 'PHP or database error in '. $_SERVER['SCRIPT_NAME'];
