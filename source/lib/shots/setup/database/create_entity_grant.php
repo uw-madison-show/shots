@@ -1,6 +1,6 @@
 <?php
 
-include '../../lib/all_pages.php';
+include '../../../all_pages.php';
 
 $platform = $db->getDatabasePlatform();
 $shots_schema = $db->getSchemaManager();
@@ -55,7 +55,8 @@ if ( $table_exists ){
   }
 }
 
-// echo '<pre>';
-// print_r(get_defined_vars());
+echo '<pre>';
+print_r(get_defined_vars());
 echo '</pre>';
+
 ?>
