@@ -7,18 +7,12 @@ $shots_schema = $db->getSchemaManager();
 
 $table_exists = $shots_schema->tablesExist(array('grants'));
 
-echo '<pre>';
+// echo '<pre>';
 
 if ( $table_exists ){
 
   echo 'Table already exists.';
   echo "\n";
-
-  $table = $shots_schema->listTableDetails('grants');
-
-  // $drop_result = $shots_schema->dropTable('grants');
-
-  print_r($table);
 
 } else {
 
@@ -55,8 +49,8 @@ if ( $table_exists ){
   }
 }
 
-echo '<pre>';
-print_r(get_defined_vars());
-echo '</pre>';
+// echo '<pre>';
+// print_r(get_defined_vars());
+// echo '</pre>';
 
 ?>
