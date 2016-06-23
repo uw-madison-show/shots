@@ -37,6 +37,41 @@ function fetchGrants( $id_array = array() )
   return $return_array;
 }
 
+//fetchAllGrants
+/**
+ * Returns all grants in the database.
+ *
+ * Default return value is a json string.
+ *
+ * @param string $return_format Default is "json". Can be set to "php" or "csv".
+ *
+ * @return string Depending on the `$return_format` this is either a json, serialized php, or csv string.
+ */
+function fetchAllGrants( $return_format = 'json' )
+{
+  global $db, $primary_key;
+
+  $q = $db->createQueryBuilder();
+  $q->select('*');
+  $q->from('grants');
+  $r = $q->execute()->fetchAll();
+
+  if ( !empty($r) ){
+    if ( $return_format === 'json' ){
+      return json_encode($r);
+    } elseif ( $return_format === 'php' ){
+      return serialize($r);
+    } elseif ( $return_format === 'csv' ){
+      // TODO add the csv output support
+      return null;
+    } else {
+      return $r;
+    }
+  }
+
+  return FALSE;
+}
+
 
 //searchGrants
 
