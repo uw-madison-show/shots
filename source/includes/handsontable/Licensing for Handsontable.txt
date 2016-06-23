@@ -1,0 +1,57 @@
+From:	Aleksandra Budnik <support@handsontable.com>
+Sent:	Wednesday, June 01, 2016 3:14 AM
+To:	Matthew Moehr
+Subject:	Re: Licensing for Handsontable
+
+Hi Matt, 
+ 
+Yes, we have two similar products: Handsontable (under MIT license) and Handsontable PRO 
+(the one you saw at https://handsontable.com/pricing.html ). PRO version has many more 
+features but the core is the same for both products. 
+ 
+MIT version is available here https://github.com/handsontable/handsontable and it's totally for 
+free.. 
+ 
+We are planning to add PRO version on Github so the repo may change but the current 0.25.0 
+version will always stay free to use. 
+ 
+ps. I'm really glad you're considering Handsontable to be a part of your University's IT 
+infrastructure and I'd be happy to see the end results of its implementation. 
+ 
+  
+Best Regards,
+ 
+Aleksandra Budnik
+Customer Success Manager
+Handsoncode
+ 
+aleksandra.budnik@handsontable.com
+ 
+Visit us at https://handsontable.com
+
+Please take a second to rate my reply... 
+It was awesome It was OK It was bad 
+Matthew Moehr on May 31, 2016 at 7:15pm wrote:
+Hi,
+ 
+Am I correct in understanding that the code in the Github repo 
+(https://github.com/handsontable/handsontable) is totally free and MIT licensed? I ask because 
+there is a website (https://handsontable.com/pricing.html) where you seem to be selling the same, 
+or similar, software.
+ 
+My university has policies about getting all licenses approved before purchasing or using 
+software, so I want to make sure the version on Github will always be free to use.
+ 
+Thanks,
+Matt
+ 
+ 
+---
+Matt Moehr
+Database Administrator
+Survey of the Health of Wisconsin
+moehr@show.wisc.edu
+608-890-3719
+
+ 
+ 
