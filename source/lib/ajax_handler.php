@@ -1,6 +1,31 @@
 <?php
 header("Content-Type: application/json;charset=utf-8");
 
+/**
+ * This page is basically one big function that handles incoming requests and sends back json results.
+ *
+ * Sometimes ajax_handler.php makes the changes in the database, and other times it calls additional pages to make the changes. E.g. pages like `/lib/shots/setup/database/create_entity_grant.php` has the create table scripts for the grants. All of the params must come in through the $_POST['request'] global var.
+ *
+ * @param string $target This is one of entity, page, report, relationship, setting. The target determines which of the other paramters are optional or required.
+ * @param string $action When target is "entity" then this field is required. It is the name of the function to be called. E.g. "updateGrant".
+ * @param string $table When the target is one of [ entity | report | relationship | setting ] this param is required. It denotes the database table name that will be acted upon.
+ * @param array $params When action is specified, this param is required. It is an arrray of string/number values for paramters of the function specified in action.
+ * @param string $page When targe is "page" this param is required. It should be an URL relative to SHOTS home directory. E.g. "/lib/shots/setup/database/create_entity_grant.php"
+ *
+ * @return string json object of format
+ *           {
+ *            error: boolean,
+ *            error_messages: [ 'string1', ..., 'stringN' ],
+ *            request_params: {action: 'string',
+ *                             page: 'string',
+ *                             table: 'string',
+ *                             target: 'string'
+ *                             },
+ *            results: [ <objects that depend on the request type> ]
+ *           }
+ */
+
+
 require_once 'all_pages.php';
 
 $return_array = array("request_params" => array(),
