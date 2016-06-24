@@ -19,8 +19,12 @@ $json_string = fetchAllGrants( 'json' );
 
 <div id="table-holder"></div>
 
+<!-- TODO add a "Add Row" button -->
+<!-- TODO add a "Delete this Row" button. Maybe use context menu? -->
+
 <div id="autosave-message-holder"></div>
 
+<div id="autosave-error-message-holder"></div>
 
 
 <?php include 'html_footer.php'; ?>
@@ -36,6 +40,7 @@ $json_string = fetchAllGrants( 'json' );
   var autosave_timeout;
 
   function saveChange(change) {
+    // TODO make the autosave message thing work
     clearTimeout(autosave_timeout);
 
     console.log(change);
@@ -69,6 +74,7 @@ $json_string = fetchAllGrants( 'json' );
                      console.log(d);
                    }) 
              .fail(
+                   // TODO if there are db/server errors there should be a notification fro the user and the original value should be set
                    function(d){
                      console.log('ajax post fail');
                      console.log(d);
