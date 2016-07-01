@@ -35,4 +35,24 @@ function convertFieldName( $input_string = FALSE )
   return ucwords(preg_replace('/[\/_\-\.\\+@`~\|]/', ' ', $input_string));
 }
 
+
+/**
+ * Gets a value from _GET or _POST and converts it to string.
+ *
+ * Looks in _GET first then in _POST. Uses filter_input() and applies the FILTER_SANITIZE_STRING filter.
+ *
+ * @param string $variable_name The name of the variable you want.
+ * @return string 
+ */
+function grabString( $variable_name = FALSE )
+{
+  $value = '';
+  if ( !$variable_name ) { return $value; }
+  $value = filter_input(INPUT_GET, $variable_name, FILTER_SANITIZE_STRING);
+  if ( $value === '' ) {
+    $value = filter_input(INPUT_POST, $variable_name, FILTER_SANITIZE_STRING);
+  }
+  return $value;
+}
+
 ?>

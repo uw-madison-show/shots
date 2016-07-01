@@ -20,7 +20,7 @@ $primary_key = $sm->listTableIndexes('grants')['primary']->getColumns()[0];
  *
  * @return array Indexed by IDs with an associative array for each record.
  */
-function fetchGrants( $id_array = array() )
+function grantsFetch( $id_array = array() )
 {
   global $db, $primary_key;
   $return_array = array();
@@ -47,7 +47,7 @@ function fetchGrants( $id_array = array() )
  *
  * @return string Depending on the `$return_format` this is either a json, serialized php, or csv string.
  */
-function fetchAllGrants( $return_format = 'json' )
+function grantsFetchAll( $return_format = 'json' )
 {
   global $db, $primary_key;
 
@@ -91,7 +91,7 @@ function fetchAllGrants( $return_format = 'json' )
  *
  * @return string
  */
-function createGrantFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
+function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
 {
   global $db, $fields;
   if ($field_name === FALSE or $field_value === FALSE) return FALSE; 
@@ -152,7 +152,24 @@ function createGrantFieldHtml( $field_name = FALSE, $field_value = FALSE, $optio
 
 //viewGrant
 
-//addGrants
+//addGrant
+function grantsAdd( $field_name = FALSE, $field_value = FALSE )
+{
+ global $db, $fields;
+ 
+ if ($field_name === FALSE or $field_value === FALSE) { return FALSE; }
+
+ if ( !in_array($field_name, array_keys($fields)) ) { return FALSE;  } 
+
+ $affected_rows = $db->insert('grants',
+                              array($field_name => $field_value)
+                              );
+
+ if ( $affected_rows > 0 ) { return TRUE; }
+
+ return FALSE;
+
+}
 
 //updateGrant
 /**
@@ -166,7 +183,7 @@ function createGrantFieldHtml( $field_name = FALSE, $field_value = FALSE, $optio
  *
  * @return boolean
  */
-function updateGrant( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
+function grantsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
   global $db, $fields;
 

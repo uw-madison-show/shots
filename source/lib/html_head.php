@@ -12,11 +12,13 @@ echo '
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
     
-    <link rel="stylesheet" type="text/css" href="/lib/css/shots.css">
 
     <script src="/includes/handsontable/handsontable.full.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/includes/handsontable/handsontable.full.min.css">
 
+    
+    <script src="/lib/js/shots.js"></script>
+    <link rel="stylesheet" type="text/css" href="/lib/css/shots.css">
   </head>
   ';
 
