@@ -248,11 +248,6 @@ function addRow(e) {
                   console.log(d);
                 })
          ;
-
-
-
-
-
 }
 
 

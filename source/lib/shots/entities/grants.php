@@ -1,6 +1,7 @@
 <?php
 
 include_once './lib/all_pages.php';
+include_once 'functions_database.php';
 
 
 $sm = $db->getSchemaManager();

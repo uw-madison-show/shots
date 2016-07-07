@@ -25,6 +25,39 @@ include 'shots/entities/grants.php';
 
 <div id="autosave-error-message-holder"></div>
 
+<?php
+$table_name = 'grants';
+$edits = array('title' => 'my new title',
+               'status' => 'done'
+               );
+$key_field = 'grant_id';
+$id = '12';
+
+$key_field = $db->quoteIdentifier($key_field);
+
+$results = array();
+
+foreach ($edits as $field => $value) {
+    $f = $db->quoteIdentifier($field);
+    $qb = $db->createQueryBuilder();
+    $qb
+      ->select($field)
+      ->from($table_name)
+      ->where($key_field . ' = ?' )
+      // ->setParameter(0, $key_field)
+      ->setParameter(0, $id)
+      ;
+    $stmt = $qb->execute();
+    $res = $stmt->fetchColumn(0);
+    $results[] = $res;
+}
+
+print($foobar);
+
+$foobar = 22 / 0;
+print($foobar);
+
+?>
 
 <?php include 'html_footer.php'; ?>
 
