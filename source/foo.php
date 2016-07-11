@@ -55,7 +55,13 @@ foreach ($edits as $field => $value) {
 print($foobar);
 
 $foobar = 22 / 0;
-print($foobar);
+// print($foobar);
+
+try {
+    $db->query('select * from foobar;');
+} catch (Exception $e) {
+    custom_exception_handler($e);
+}
 
 ?>
 

@@ -3,19 +3,41 @@
 
 /**********************************************************/
 
-// Global Vars
+// "Global" Vars
 
 /**********************************************************/
 
 var autosave_timeout, table_data, table_handsontable, table_data_key_field;
 
 
+/**********************************************************/
+
+// On page load
+
+/**********************************************************/
+
+jQuery(document).ready(function(){
+  // handle an error message coming from the server/db
+  if( $('.server-side-error-message').length ){
+    $('.server-side-error-message').each(function(){
+      $('footer .message-holder').append(this);
+      toggleErrorMessageVisiblity(this);
+    });
+  }
+});
 
 /**********************************************************/
 
 // Functions
 
 /**********************************************************/
+
+function toggleErrorMessageVisiblity(message){
+  // console.log(message);
+  $(message).toggle();
+
+}
+
 
 function ajaxChange(e){
   console.log($(this).parents('.record').data('entityName'));
@@ -249,5 +271,6 @@ function addRow(e) {
                 })
          ;
 }
+
 
 

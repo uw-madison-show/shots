@@ -29,7 +29,7 @@ function sqliteDatabaseExists( $schema_manager = NULL )
 /**
  * A custom error handler for php, database, and DBAL code.
  *
- * The goal is to grab all exceptions, errors, warnings, and notices and write a nice looking message that is hidden in the footer of the app pages. All parameters are defined by PHP for errors. The custom_exception_handler() just reformats the exception to look like an error and passes it to this function. Borrowing heavily from SO:
+ * The goal is to grab all exceptions, errors, warnings, and notices and write a nice looking message that is hidden in the footer of the app pages. All parameters are defined by PHP for errors. The custom_exception_handler() just reformats the exception to look like an error and passes it to this function. Uncaught exceptions will also get passed in to here, but if you want the script to keep executing you will still need to catch exceptions and explicietly call custom_exception_handler(). Borrowing heavily from SO:
  * http://stackoverflow.com/questions/29522915/error-handling-in-doctrine-dbal-with-comparison-to-php-pdo
  *
  * @param integer $error_code PHP defined error codes that correspond to predefined constants (http://php.net/manual/en/errorfunc.constants.php).
@@ -49,7 +49,7 @@ function custom_error_handler($error_code, $message, $file, $line, $context)
                           E_STRICT            => 'Strict PHP Notice',
                           E_DEPRECATED        => 'Deprecated PHP Notice',
                           E_USER_DEPRECATED   => 'Custom Deprecated PHP Notice',
-                          'EXCEPTION'         => 'Uncaught Exception'
+                          'EXCEPTION'         => 'Exception'
                           );
   $html_output = '';
 
@@ -102,12 +102,22 @@ function custom_error_handler($error_code, $message, $file, $line, $context)
     }
   }
 
-  echo '<div class="server-side-error-message">';
-  echo '<h2>' . $error_label . '</h2>';
+  $random_number = rand(100, 1000);
+
+  echo '<div class="panel-group  server-side-error-message">';
+  echo '<div class="panel panel-default">';
+  echo '<div class="panel-heading">';
+  echo '<h4 class="panel-title"><a data-toggle="collapse" href="#e'. $random_number .'">' . $error_label . '...</a></h4>';
+  echo '</div>';
+  echo '<div id="e'. $random_number .'" class="panel-collapse collapse">';
+  echo '<div class="panel-body">';
   echo '<p>' . $output_message . '</p>';
   echo '<p>' . $output_file . '</p>';
   echo '<p>' . $output_line . '</p>';
   echo '<pre>'. $stacktrace . '</p>';
+  echo '</div>';
+  echo '</div>';
+  echo '</div>';
   echo '</div>';
 
   return TRUE;
