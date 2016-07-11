@@ -63,19 +63,27 @@ foreach ($my_grants as $grant_id => $data) {
 
 <body>
 
-<!-- view or edit -->
+<?php include 'html_navbar.php'; ?>
+
+<div class="container-fluid">
+  <div class="row">
+    <div id="main-entity" class="col-md-8">
+      <div class="record" data-entity-name="grants">
+        <div class="fields">
+        <?php echo $all_html; ?>
+        </div>
+      </div>
+    </div>
+    <div id="related-entities" class="col-md-3">
+      related things
+    </div>
+  </div>
+</div>
 
 
 
-<?php 
-// the data-entity-name attribute is required for the ajaxChange function to know which table to update
-echo '<div class="record" data-entity-name="grants">';
-// echo '<input type="hidden" class="record_id" id="grant_id" name="grant_id" value="'. $my_grants[2]['grant_id'] . '" />';
-echo '<div class="fields">';
-echo $all_html; 
-echo '</div>';
-echo '</div>';
-?>
+
+<?php include 'html_footer.php'; ?>
 
 <!-- errors or expert settings -->
 
@@ -90,5 +98,4 @@ echo '</div>';
 
 </script>
 </body>
-
-<?php include 'html_footer.php'; ?>
+</html>

@@ -146,6 +146,7 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
   // apply options
 
   // close the divs and spans
+  $return_html .= '</div>'; // end of class field;
 
   return $return_html;
 
