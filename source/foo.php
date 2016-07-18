@@ -9,88 +9,46 @@ include 'shots/entities/grants.php';
 
 ?>
 
-
-
 <body>
+  <div id="table-holder" data-entity-name="grants"></div>
 
-<div id="table-holder" data-entity-name="grants"></div>
+  <button id="button-add-row" type="button" class="btn btn-default" data-ajax="false">+ Add Row</button>
 
-<button id="button-add-row" type="button" class="btn btn-default" data-ajax="false">+ Add Row</button>
-
-<!-- TODO add a "Delete this Row" button. Maybe use context menu? -->
-
+  <!-- TODO add a "Delete this Row" button. Maybe use context menu? -->
 
 
-<div id="autosave-message-holder"></div>
 
-<div id="autosave-error-message-holder"></div>
+  <div id="autosave-message-holder"></div>
 
-<?php
-$table_name = 'grants';
-$edits = array('title' => 'my new title',
-               'status' => 'done'
-               );
-$key_field = 'grant_id';
-$id = '12';
-
-$key_field = $db->quoteIdentifier($key_field);
-
-$results = array();
-
-foreach ($edits as $field => $value) {
-    $f = $db->quoteIdentifier($field);
-    $qb = $db->createQueryBuilder();
-    $qb
-      ->select($field)
-      ->from($table_name)
-      ->where($key_field . ' = ?' )
-      // ->setParameter(0, $key_field)
-      ->setParameter(0, $id)
-      ;
-    $stmt = $qb->execute();
-    $res = $stmt->fetchColumn(0);
-    $results[] = $res;
-}
-
-print($foobar);
-
-$foobar = 22 / 0;
-// print($foobar);
-
-try {
-    $db->query('select * from foobar;');
-} catch (Exception $e) {
-    custom_exception_handler($e);
-}
-
-?>
-
-<?php include 'html_footer.php'; ?>
-
-<script type="text/javascript">
-
-  $(document).ready(function() {
-    
+  <div id="autosave-error-message-holder"></div>
 
 
-    /**********************************************************/
+  <?php include 'html_footer.php'; ?>
 
-    // Page Setup Code
+  <script type="text/javascript">
 
-    /**********************************************************/
+    $(document).ready(function() {
+      
 
-    initializeTable('grants', 'grant_id');
 
-    /**********************************************************/
+      /**********************************************************/
 
-    // Event Listeners
+      // Page Setup Code
 
-    /**********************************************************/
+      /**********************************************************/
 
-    $("#button-add-row").on( 'click', addRow );
+      initializeTable('grants', 'grant_id');
 
-  });
-</script>
+      /**********************************************************/
+
+      // Event Listeners
+
+      /**********************************************************/
+
+      $("#button-add-row").on( 'click', addRow );
+
+    });
+  </script>
 
 </body>
 </html>

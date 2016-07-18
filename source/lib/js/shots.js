@@ -170,7 +170,7 @@ function keyFieldRenderer(instance, td, row, col, prop, value, cellProperties){
   // console.log(instance.rootElement.getAttribute('data-entity-name'));
   var entity = instance.rootElement.getAttribute('data-entity-name');
   var id = Handsontable.helper.stringify(value);
-  td.innerHTML = '<a href="/views/' + entity + '.php?id=' + id + '">' + id + '</a>';
+  td.innerHTML = '<a href="/views/one_' + entity + '.php?id=' + id + '">' + id + '</a>';
   return td;
 }
 

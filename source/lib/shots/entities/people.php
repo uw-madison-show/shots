@@ -5,31 +5,30 @@ include_once 'functions_database.php';
 
 
 $sm = $db->getSchemaManager();
-$grants_fields = $sm->listTableColumns('grants');
-$grants_primary_key = $sm->listTableIndexes('grants')['primary']->getColumns()[0];
+$people_fields = $sm->listTableColumns('people');
+$people_primary_key = $sm->listTableIndexes('people')['primary']->getColumns()[0];
 
 
 
-//fetchGrants
 /**
- * Returns all grants that match the IDs in the array.
+ * Returns all people that match the emails in the array.
  *
- * Feed in an array of IDs to matche the grant_id field and this passes back an
+ * Feed in an array of IDs to match the email field and this passes back an
  * array of DBAL Statements
  *
  * @param array $id_array The array of ids to fetch. Can be integer or string (guid).
  *
  * @return array Indexed by IDs with an associative array for each record.
  */
-function grantsFetch( $id_array = array() )
+function peopleFetch( $id_array = array() )
 {
-  global $db, $grants_primary_key;
+  global $db, $people_primary_key;
   $return_array = array();
   foreach ($id_array as $this_id) {
     //echo $this_id;
     $q = $db->createQueryBuilder();
     $q->select('*');
-    $q->from('grants');
+    $q->from('people');
     $q->where( $grants_primary_key .' = :key_value' );
     $q->setParameters( array(':key_value' => $this_id) );
     $r = $q->execute()->fetchAll()[0];

@@ -68,9 +68,11 @@ foreach ($my_grants as $grant_id => $data) {
 <div class="container-fluid">
   <div class="row">
     <div id="main-entity" class="col-md-8">
-      <div class="record" data-entity-name="grants">
-        <div class="fields">
-        <?php echo $all_html; ?>
+      <div class="form-horizontal">
+        <div class="record" data-entity-name="grants">
+          <div class="fields">
+          <?php echo $all_html; ?>
+          </div>
         </div>
       </div>
     </div>

@@ -35,14 +35,14 @@ $all_grants = $db->fetchAll($all_grants_sql);
                           for ($i = 0; $i <= 3 ; $i++) { 
                             $g = $all_grants[$i];
                             echo '<li class="quick-list-item centering">';
-                            echo '<a id="grants-' . $g['grant_id'] . '" href="/views/grants.php?id=' . $g['grant_id'] .'"">' . $g['title'] . '</a>';
+                            echo '<a id="grants-' . $g['grant_id'] . '" href="/views/one_grants.php?id=' . $g['grant_id'] .'"">' . $g['title'] . '</a>';
                             echo '</li>';
                           }
                         ?>
                       </ul>
                     </div>
                   </div>
-                  <button class="btn btn-default launch-app-button">All Grants</button>
+                  <a href="/views/table_all_grants.php" class="btn btn-default launch-app-button">All Grants</a>
                 </div>
               </widget>
             </li>
