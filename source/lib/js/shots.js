@@ -9,6 +9,18 @@
 
 var autosave_timeout, table_data, table_handsontable, table_data_key_field;
 
+var key_field_mapping = { 
+                          "grants": "grant_id",
+                          "people": "person_id"
+                        }
+
+// these fields are set to empty for the addRow function
+// just need to be string field with no constraints
+var empty_field_mapping = {
+                            "grants": "title",
+                            "people": "name" 
+                          }            
+
 
 /**********************************************************/
 
@@ -237,17 +249,31 @@ function initializeTable( entity, key_field ) {
 }
 
 function addRow(e) {
-  // console.log(e);
-  // console.log(this);
-  // console.log($(this));
+  // console.log('addRow has begun');
+  // console.log(e);       // the event
+  // console.log(this);    // the html object
+  // console.log($(this)); // the jQuery object
 
-  // TODO change the action and table parameters to dynamically use the entity name, e.g. 'grants', 'people'
+  // get the table name from the html data- attribute
+  var this_table_data = $(this).parent('div').data();
+  var tbl = this_table_data.entityName;
+  var empty_field = empty_field_mapping[tbl];
+  if ( !tbl || !empty_field ){
+    console.log('addRow function can not get the meta-data out of the table-holder div');
+    console.log('this = ' + this);
+    console.log('$(this).parent(\'div\') = ' + $(this).parent('div'));
+    console.log('tbl = ' + tbl);
+    console.log('empty_field = ' + empty_field)
+    return false;
+  }
+
+  // make the request object
   var req = {};
   req.target = 'entity';
-  req.action = 'addGrant';
-  req.table = 'grants';
-  // adding a blank title makes a new blank record
-  req.params = ['title', ''];
+  req.action = tbl + 'Add';
+  req.table  = tbl;
+  // adding a blank field makes a new blank record
+  req.params = [empty_field, ''];
 
   console.log(req);
 
@@ -258,16 +284,16 @@ function addRow(e) {
          .done( function(d) {
                   console.log('ajax post done');
                   console.log(d);
-                  // TODO update table_data and use HoT .render()
-                  // table_data = getTableData();
-                  // console.log(table_data);
-                  // why doesn't this work?
-                  // table_handsontable.render();
-                  location.reload();
+                  if (d.error === false){
+                    location.reload();
+                  } else {
+                    // TODO display PHP/db error message
+                  }
                })
          .fail( function(d){
                   console.log('ajax post fail');
                   console.log(d);
+                  // TODO display jQuery/js/http error message
                 })
          ;
 }
