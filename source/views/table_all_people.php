@@ -1,23 +1,27 @@
 <?php
 
-include '../lib/all_pages.php';
+include_once '../lib/all_pages.php';
 include 'html_doctype.php';
 include 'html_head.php';
 
 // query a table and get all the data in json;
-include 'shots/entities/grants.php';
+include_once 'shots/entities/people.php';
 
 ?>
 
-
-
 <body>
 
-<div id="table-holder" data-entity-name="grants">
-  
-  <button id="button-add-row" type="button" class="btn btn-default" data-ajax="false">+ Add Row</button>
 
+<!-- This div will eventually hold the table.
+     The Add Row button must go inside the table-holder div.
+     You can use as many data- attributes as you want for meta-data or parameters or whathave you.
+     The data-entity-name attribute is required, so js functions know which table to manipulate.
+-->
+
+<div id="table-holder" data-entity-name="people" data-key-field="email">
+  <button id="button-add-row" type="button" class="btn btn-default" data-ajax="false">+ Add Row</button>
 </div>
+
 
 
 <!-- TODO add a "Delete this Row" button. Maybe use context menu? -->
@@ -27,35 +31,6 @@ include 'shots/entities/grants.php';
 <div id="autosave-message-holder"></div>
 
 <div id="autosave-error-message-holder"></div>
-
-<?php
-// $table_name = 'grants';
-// $edits = array('title' => 'my new title',
-//                'status' => 'done'
-//                );
-// $key_field = 'grant_id';
-// $id = '12';
-
-// $key_field = $db->quoteIdentifier($key_field);
-
-// $results = array();
-
-// foreach ($edits as $field => $value) {
-//     $f = $db->quoteIdentifier($field);
-//     $qb = $db->createQueryBuilder();
-//     $qb
-//       ->select($field)
-//       ->from($table_name)
-//       ->where($key_field . ' = ?' )
-//       // ->setParameter(0, $key_field)
-//       ->setParameter(0, $id)
-//       ;
-//     $stmt = $qb->execute();
-//     $res = $stmt->fetchColumn(0);
-//     $results[] = $res;
-}
-
-?>
 
 <?php include 'html_footer.php'; ?>
 
@@ -71,7 +46,7 @@ include 'shots/entities/grants.php';
 
     /**********************************************************/
 
-    initializeTable('grants', 'grant_id');
+    initializeTable('people', 'person_id');
 
     /**********************************************************/
 

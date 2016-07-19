@@ -3,9 +3,9 @@
 include_once 'all_pages.php';
 include_once 'functions_database.php';
 
-
-$sm = $db->getSchemaManager();
-$people_fields = $sm->listTableColumns('people');
+// get schema info
+$sm                 = $db->getSchemaManager();
+$people_fields      = $sm->listTableColumns('people');
 $people_primary_key = $sm->listTableIndexes('people')['primary']->getColumns()[0];
 
 
@@ -29,7 +29,7 @@ function peopleFetch( $id_array = array() )
     $q = $db->createQueryBuilder();
     $q->select('*');
     $q->from('people');
-    $q->where( $grants_primary_key .' = :key_value' );
+    $q->where( $people_primary_key .' = :key_value' );
     $q->setParameters( array(':key_value' => $this_id) );
     $r = $q->execute()->fetchAll()[0];
     $return_array[$this_id] = $r;
@@ -47,13 +47,13 @@ function peopleFetch( $id_array = array() )
  *
  * @return string Depending on the `$return_format` this is either a json, serialized php, or csv string.
  */
-function grantsFetchAll( $return_format = 'json' )
+function peopleFetchAll( $return_format = 'json' )
 {
-  global $db, $grants_primary_key;
+  global $db, $people_primary_key;
 
   $q = $db->createQueryBuilder();
   $q->select('*');
-  $q->from('grants');
+  $q->from('people');
   $r = $q->execute()->fetchAll();
 
   if ( !empty($r) ){
@@ -91,15 +91,12 @@ function grantsFetchAll( $return_format = 'json' )
  *
  * @return string
  */
-function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
+function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
 {
-  global $db, $grants_fields;
+  global $db, $people_fields;
   if ($field_name === FALSE or $field_value === FALSE) return FALSE; 
 
-  // print_r($grants_fields);
-  // echo $field_name;
-
-  if ( !in_array($field_name, array_keys($grants_fields)) ){
+  if ( !in_array($field_name, array_keys($people_fields)) ){
     // TODO error message 
     return FALSE;
   }
@@ -123,7 +120,7 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
     $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
     // figure out if i have integer, string, text, date, etc.
     // based on the DBAL Types
-    $field_type = $grants_fields[$field_name]->getType();
+    $field_type = $people_fields[$field_name]->getType();
 
     // echo "my field type: ";
     // echo $field_type;
@@ -162,22 +159,25 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
 //viewGrant
 
 //addGrant
-function grantsAdd( $field_name = FALSE, $field_value = FALSE )
+function peopleAdd( $field_name = FALSE, $field_value = FALSE )
 {
- global $db, $grants_fields;
- 
- if ($field_name === FALSE or $field_value === FALSE) { return FALSE; }
+  global $db, $people_fields;
 
- if ( !in_array($field_name, array_keys($grants_fields)) ) { return FALSE;  } 
+  if ($field_name === FALSE or $field_value === FALSE) { 
+    return FALSE; 
+  }
 
- $affected_rows = $db->insert('grants',
+  if ( !in_array($field_name, array_keys($people_fields)) ) { 
+    return FALSE;
+  } 
+
+  $affected_rows = $db->insert('people',
                               array($field_name => $field_value)
                               );
 
- if ( $affected_rows > 0 ) { return TRUE; }
+  if ( $affected_rows > 0 ) { return TRUE; }
 
- return FALSE;
-
+  return FALSE;
 }
 
 //updateGrant
@@ -192,36 +192,40 @@ function grantsAdd( $field_name = FALSE, $field_value = FALSE )
  *
  * @return boolean
  */
-function grantsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
+function peopleUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
-  global $db, $grants_fields;
+  global $db, $people_fields;
 
   if ($id_value === FALSE
       or $field_name === FALSE
       or $new_value === NULL
       ){
     // TODO error message
-    echo 'missing params for updateGrant';
+    echo 'missing params for peopleUpdate';
     return FALSE;
   }
 
   $return_bool = FALSE;
 
-  if ( !in_array($field_name, array_keys($grants_fields)) ){
+  if ( !in_array($field_name, array_keys($people_fields)) ){
     // TODO error message
     return FALSE;
   }
 
-
   // TODO coerce $new_value into the appropriate data type for the column
 
+  $check = updateRecord('people',
+                         array($field_name => $new_value),
+                         'email',
+                         $id_value
+                         );
 
-  $affected_rows = $db->update('grants', 
-                               array($field_name => $new_value), 
-                               array('grant_id' => $id_value)
-                               );
+                    // $db->update('grants', 
+                    //            array($field_name => $new_value), 
+                    //            array('grant_id' => $id_value)
+                    //            );
 
-  if ($affected_rows > 0) $return_bool = TRUE;
+  if ($check > 0) $return_bool = TRUE;
 
   return $return_bool;
 }
