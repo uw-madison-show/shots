@@ -91,13 +91,11 @@ foreach ($my_grants as $grant_id => $data) {
 
 <!-- include javascript scripts -->
 <script type="text/javascript">
-  
   $(document).ready(function() {
     console.log('ready');
 
     $('input').change( ajaxChange );
   }); // end document ready
-
 </script>
 </body>
 </html>
