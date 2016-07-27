@@ -53,7 +53,7 @@ include 'shots/entities/grants.php';
 //     $stmt = $qb->execute();
 //     $res = $stmt->fetchColumn(0);
 //     $results[] = $res;
-}
+// }
 
 ?>
 
