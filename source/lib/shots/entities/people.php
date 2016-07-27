@@ -140,6 +140,12 @@ function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
         $return_html .= '<textarea class="form-control" rows="2" id="'. $field_name . '" name="'. $field_name . '">' . $field_value . '</textarea>';
         $return_html .= '</div>';
         break;
+      case 'Boolean':
+        $return_html .= '<div class="col-xs-2">';
+        $return_html .= '<input class="form-control" type="checkbox" value="" id="' . $field_name . '" name="' . $field_name . '" ';
+        if ($field_value == true) $return_html .= ' checked ';
+        $return_html .= '/>';
+        $return_html .= '</div>';
       default:
         // TODO add a default
         break;
@@ -214,16 +220,17 @@ function peopleUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
 
   // TODO coerce $new_value into the appropriate data type for the column
 
+  // $check = $db->update('people', 
+  //                      array($field_name => $new_value), 
+  //                      array('person_id' => $id_value)
+  //                      );
   $check = updateRecord('people',
-                         array($field_name => $new_value),
-                         'email',
-                         $id_value
-                         );
+                        array($field_name => $new_value),
+                        'person_id',
+                        $id_value
+                        );
 
-                    // $db->update('grants', 
-                    //            array($field_name => $new_value), 
-                    //            array('grant_id' => $id_value)
-                    //            );
+           
 
   if ($check > 0) $return_bool = TRUE;
 

@@ -61,7 +61,7 @@ $all_grants = $db->fetchAll($all_grants_sql);
                         <span class="fa fa-users"></span>
                       </div>
                     </a>
-                    <button class="btn btn-default launch-app-button">All People</button>
+                    <a href="/views/table_all_people.php" class="btn btn-default launch-app-button">All People</a>
                   </div>
                 </div>
               </widget>
