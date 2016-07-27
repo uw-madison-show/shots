@@ -52,7 +52,7 @@ function toggleErrorMessageVisiblity(message){
 
 
 function ajaxChange(e){
-  console.log($(this).parents('.record').data('entityName'));
+  var html_input_type = $(this).attr('type');
   var entity_name = $(this).parents('.record').data('entityName');
   // the ajax handler is going to include the file /lib/shots/entities/{table}.php
   // then it will use call_user_func() to pass the {params}
@@ -64,12 +64,18 @@ function ajaxChange(e){
   req.params   = [];
 
   // get record id
-  // this requires the html to be marked up in a specific way
-  req.params.push($(this).closest('.record').find('#grant_id').val());
+  // this requires knowing the key_field
+  var key_field = '#' + key_field_mapping[entity_name];
+  var key_value = $(this).closest('.record').find(key_field).val();
+  console.log(key_field + ' = ' + key_value);
+  req.params.push(key_value);
 
-  // field name and new value;
+  // field name
   req.params.push($(this).attr('id'));
-  req.params.push($(this).val());
+
+  // get the field value 
+  var html_input = getFormInputValue($(this));
+  req.params.push(html_input.value);
 
   console.log(req);
 
@@ -79,6 +85,7 @@ function ajaxChange(e){
          )
          .done(function(d){
                  console.log('ajaxChange post done');
+                 console.log(d);
                }) 
          .fail(function(d){
                  console.log('ajaxChange post fail');
@@ -298,5 +305,70 @@ function addRow(e) {
          ;
 }
 
+/**
+ * I got tired or writing code for checkboxes so I made this function to standardize the values of html form elements.
+ *
+ * @param object a jQuery object, usually the result of calling it with $(this) from an event handler.
+ *
+ * @return object with type, key, and value properties.
+ */
+function getFormInputValue(object) {
+  // e.preventDefault();
+  console.log(object);
+  var input = {};
 
+  var type = object.attr('type');
+  var key = object.attr('name') ? object.attr('name') : object.attr('id');
+  
+  // console.log(type);
+  // console.log($(this).prop('name'));
+  // console.log($(this).prop('id'));
+  // console.log($(this).prop('checked'));
+  // console.log($(this).prop('value'));
+
+  if (!key || !type) {
+    // TODO return something?
+    console.log('getFormInputValue is missing key or type.');
+  } else {
+    input.type = type;
+    input.key = key;
+  
+    // switch statement to get the value;
+    switch(type){
+      case 'hidden':
+      case 'text':
+      case 'search':
+      case 'tel':
+      case 'url':
+      case 'email':
+      case 'password':
+      case 'number':
+      case 'range':
+      case 'color':
+      case 'date':
+      case 'datetime-local':
+      case 'time':
+      case 'file':
+      case 'radio':
+      case 'image':
+        input.value = object.prop('value');
+        break;
+      case 'checkbox':
+        input.value = object.prop('checked') ? 1 : 0;
+        break;
+      case 'submit':
+      // case 'reset':
+      case 'button':
+        input.value = 1;
+        break;
+      default:
+        input.value = object.prop('value');
+        break;
+    } // end switch
+    // TODO capture other stuff, e.g. html classes or data-* attributes
+    // TODO expand to deal with textarea, select, and button elements
+  } // end if key and type exists
+  // console.log(input);
+  return input;
+}
 
