@@ -21,9 +21,10 @@ $grants_primary_key = $sm->listTableIndexes('grants')['primary']->getColumns()[0
  *
  * @return array Indexed by IDs with an associative array for each record.
  */
-function grantsFetch( $id_array = array() )
+function grantsFetch( $id = false, $return_format = 'php' )
 {
   global $db, $grants_primary_key;
+  $id_array = (array) $id;
   $return_array = array();
   foreach ($id_array as $this_id) {
     //echo $this_id;
@@ -35,7 +36,16 @@ function grantsFetch( $id_array = array() )
     $r = $q->execute()->fetchAll()[0];
     $return_array[$this_id] = $r;
   }
-  return $return_array;
+  if ( $return_format === 'json' ){
+    return json_encode($return_array);
+  } elseif ( $return_format === 'php' ){
+    return $return_array;
+  } elseif ( $return_format === 'csv' ){
+    // TODO add the csv output support
+    return null;
+  } else {
+    return $return_array;
+  }
 }
 
 //fetchAllGrants

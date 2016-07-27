@@ -48,13 +48,14 @@ $my_grants = grantsFetch( array($this_id) );
 
 $all_html = '';
 
-foreach ($my_grants as $grant_id => $data) {
-  foreach ($data as $key => $value) {
-    $html = grantsCreateFieldHtml($key, $value);
-    $all_html .= $html;
+if (!empty($my_grants)){
+  foreach ($my_grants as $grant_id => $data) {
+    foreach ($data as $key => $value) {
+      $html = grantsCreateFieldHtml($key, $value);
+      $all_html .= $html;
+    }
   }
 }
-
 
 
 ?>

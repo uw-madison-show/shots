@@ -372,3 +372,55 @@ function getFormInputValue(object) {
   return input;
 }
 
+function getData(entity_name, id){
+  var req = {};
+  req.target   = 'entity';
+  req.action   = entity_name + 'Fetch';
+  req.table    = entity_name;
+  req.params   = [];
+
+  // entity id to return
+  req.params.push(id);
+  // set return format to json
+  req.params.push('json');
+
+  console.log(req);
+
+  $.post('/lib/ajax_handler.php', 
+         { "request": req },
+         "json"
+         )
+         .done(function(d){
+                 console.log('getData post done');
+                 var return_data = $.parseJSON(d['results'][0]);
+                 console.log(return_data);
+                 // TODO figure out how to make this a callback
+                 // or otherwise deal with the ajax nature of this workflow
+                 return '2';
+               }) 
+         .fail(function(d){
+                 console.log('getData post fail');
+                 console.log(d);
+                 // TODO handle error message
+               })
+         .always(function(d) {
+                   console.log('getData always');
+                   // TODO check if the result object has error messages from php/db
+                 })
+         ;
+}
+
+function revealRelatedEntities(e) {
+  // console.log($(this));
+
+  var list_items = $(this).find('li');
+
+  list_items.each( function(id, this_li){
+    console.log();
+    var this_li_data = $(this_li).data()
+    var this_entity_results = getData(this_li_data.entity, this_li_data.entityId);
+    console.log(this_entity_results);
+  });
+
+
+}
