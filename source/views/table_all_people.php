@@ -37,8 +37,6 @@ include_once 'shots/entities/people.php';
 <script type="text/javascript">
 
   $(document).ready(function() {
-    
-
 
     /**********************************************************/
 
