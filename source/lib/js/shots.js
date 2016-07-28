@@ -21,6 +21,14 @@ var empty_field_mapping = {
                             "people": "name" 
                           }            
 
+// these are the fields that most humans would want to read
+// when they want to see a "list" of the entities
+// i'm calling these fields, "titles" but i am not married to that term
+// must be an array of variable names. array of 1 is ok.
+var title_field_mapping = {
+                            "grants": ["title", "grant_body"],
+                            "people": ["name", "affiliation"]
+                          }
 
 /**********************************************************/
 
@@ -372,54 +380,85 @@ function getFormInputValue(object) {
   return input;
 }
 
-function getData(entity_name, id){
-  var req = {};
-  req.target   = 'entity';
-  req.action   = entity_name + 'Fetch';
-  req.table    = entity_name;
-  req.params   = [];
-
-  // entity id to return
-  req.params.push(id);
-  // set return format to json
-  req.params.push('json');
-
-  console.log(req);
-
-  $.post('/lib/ajax_handler.php', 
-         { "request": req },
-         "json"
-         )
-         .done(function(d){
-                 console.log('getData post done');
-                 var return_data = $.parseJSON(d['results'][0]);
-                 console.log(return_data);
-                 // TODO figure out how to make this a callback
-                 // or otherwise deal with the ajax nature of this workflow
-                 return '2';
-               }) 
-         .fail(function(d){
-                 console.log('getData post fail');
-                 console.log(d);
-                 // TODO handle error message
-               })
-         .always(function(d) {
-                   console.log('getData always');
-                   // TODO check if the result object has error messages from php/db
-                 })
-         ;
+/*
+ * Take a result object from ajax_handler.php and return a short text "list" for the entity.
+ *
+ * Used the most for making human-readable lists in the related entity sidebar.
+ * 
+ * @param string entity_name The name of the table.
+ * @param object data The data object for one entity. Expected to be in the format of field_name: field_value.
+ *
+ * @return string.
+ */
+function formatEntityResultAsShortText(entity_name, data){
+  console.log(data);
+  var return_array = [];
+  var title_vars = title_field_mapping[entity_name];
+  for (var ii = 0; ii < title_vars.length; ii++) {
+    var this_title_var = title_vars[ii];
+    var this_string = data[this_title_var];
+    if ( this_string.length > 18 ){
+      this_string = this_string.substr(0,16) + '...';
+    }
+    return_array.push(this_string);
+  }
+  return return_array.join(', ');
 }
 
 function revealRelatedEntities(e) {
   // console.log($(this));
 
-  var list_items = $(this).find('li');
+  // TODO throbber
+
+  var list_items = $(this).find('.related-list-item');
 
   list_items.each( function(id, this_li){
-    console.log();
+    console.log( $(this_li).children('a').first() );
     var this_li_data = $(this_li).data()
-    var this_entity_results = getData(this_li_data.entity, this_li_data.entityId);
-    console.log(this_entity_results);
+    console.log(this_li_data);
+
+    // do an ajax data request to get the data
+    // prepar the request object
+    var req = {};
+    req.target   = 'entity';
+    req.action   = this_li_data.entity + 'Fetch';
+    req.table    = this_li_data.entity;
+    req.params   = [];
+    // entity id to return
+    req.params.push(this_li_data.entityId);
+    // set return format to json
+    req.params.push('json');
+    console.log(req);
+
+    // do the request
+    // use the handlers to finish the UI updates
+    $.post('/lib/ajax_handler.php', 
+           { "request": req },
+           "json"
+           )
+           .done(function(d){
+                   // console.log('getData post done');
+                   var return_data = $.parseJSON(d['results'][0]);
+                   console.log(return_data);
+                   var new_text = formatEntityResultAsShortText(this_li_data.entity, return_data[this_li_data.entityId]);
+                   $(this_li).children('a').first().html(new_text);
+                 }) 
+           .fail(function(d){
+                   console.log('Ajax data load has failed.');
+                   console.log(d);
+                   $('footer .message-holder').append(d.responseText);
+                   $('.server-side-error-message').each(function(){
+                     toggleErrorMessageVisiblity(this);
+                   });
+                   // TODO handle error message
+                 })
+           .always(function(d) {
+                     // console.log('getData always');
+                     // TODO update the ui with the best available info
+                     // TODO remove throbber
+                   })
+           ;
+    return true;   
   });
 
 

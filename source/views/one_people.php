@@ -43,35 +43,13 @@ $related_entities = relationshipsFetch('people', $people_id, 'php');
     </div>
     <div id="related-entities" class="col-md-3">
       <div id="related-entities-accordian" class="panel-group">
-      <?php
-        foreach ($related_entities as $entity_type => $relationships){
-          echo '<div class="panel panel-default">
-                  <div class="panel-heading">
-                    <h4 class="panel-title">
-                      <a class="toggle-related-entities" data-toggle="collapse" data-parent="#related-entities-accordion" href="#collapse-' . $entity_type .'">
-                      ' . $entity_type . '</a>
-                    </h4>
-                  </div>
-                  <div id="collapse-'. $entity_type .'" class="related-entities panel-collapse collapse">
-                    <div class="panel-body">
-                ';
-
-          echo '<ul id="related-'. $entity_type .'-list">';
-          foreach ($relationships as $key => $rel) {
-            echo '<li id="related-'. $entity_type . '-list-item-'. $key .'" data-entity="'. $entity_type .'" data-entity-id="'.$rel['id'] .'"><a href="/views/one_'. $entity_type .'.php?id='. $rel['id'] .'">'. $rel['id'] . '</a></li>';
-          }
-          echo '</ul>';
-
-          echo '</div>'; // close panel-body;
-          echo '</div>'; // close panel-collapse;
-          echo '</div>'; // close panel
-        }
-      ?>
+        <?php include 'widget_related_entities.php' ?>
+      </div>
     </div>
   </div>
-</div>
 
 <?php include 'html_footer.php'; ?>
+</div> <!-- close container-fluid -->
 
 <script type="text/javascript">
   $(document).ready(function() {

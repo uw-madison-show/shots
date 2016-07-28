@@ -57,6 +57,9 @@ if (!empty($my_grants)){
   }
 }
 
+include_once 'shots/relationships/relationships.php';
+
+$related_entities = relationshipsFetch('grants', $grant_id, 'php');
 
 ?>
 
@@ -78,17 +81,14 @@ if (!empty($my_grants)){
       </div>
     </div>
     <div id="related-entities" class="col-md-3">
-      related things
+      <div id="related-entities-accordian" class="panel-group">
+        <?php include 'widget_related_entities.php' ?>
+      </div>
     </div>
   </div>
-</div>
-
-
-
 
 <?php include 'html_footer.php'; ?>
-
-<!-- errors or expert settings -->
+</div>
 
 <!-- include javascript scripts -->
 <script type="text/javascript">
@@ -96,6 +96,9 @@ if (!empty($my_grants)){
     console.log('ready');
 
     $('input').change( ajaxChange );
+
+    $('.related-entities.panel-collapse').on('show.bs.collapse', revealRelatedEntities );
+
   }); // end document ready
 </script>
 </body>
