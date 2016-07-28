@@ -10,16 +10,13 @@ $grants_primary_key = $sm->listTableIndexes('grants')['primary']->getColumns()[0
 
 
 
-//fetchGrants
 /**
- * Returns all grants that match the IDs in the array.
+ * Returns all grants that match the ID(s).
  *
- * Feed in an array of IDs to matche the grant_id field and this passes back an
- * array of DBAL Statements
+ * @param mixed $id Either a string with a single id, e.g. '2', or an array of ids to fetch. Almost always an integer.
+ * @param string $return_format A string to denote how the function should return the results. One of 'php', 'json'. Support of 'csv', 'serialzed' coming soon.
  *
- * @param array $id_array The array of ids to fetch. Can be integer or string (guid).
- *
- * @return array Indexed by IDs with an associative array for each record.
+ * @return mixed The results come out of the database as an array indexed by IDs with an associative array formated as field_name => value. Depending on $return_format the array may be post-processed into a json string, a serialized php string, or a csv string.
  */
 function grantsFetch( $id = false, $return_format = 'php' )
 {
