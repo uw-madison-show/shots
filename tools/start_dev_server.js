@@ -9,7 +9,8 @@ Browsersync.init({files: ["../source/*",
                           "../source/lib/*",
                           "../source/setup/*",
                           "../source/setup/database/*",
-                          "../source/php/*"
+                          "../source/php/*",
+                          "../source/views/*"
                           ],
                   proxy: "127.0.0.1:8080"
                   });
