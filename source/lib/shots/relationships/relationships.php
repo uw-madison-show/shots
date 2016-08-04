@@ -21,12 +21,12 @@ $relationships_primary_key = $sm->listTableIndexes('relationships')['primary']->
  */
 function relationshipsFetch( $entity_type = false, $entity_id = false, $format = 'php' )
 {
-  global $db, $relationship_primary_key;
+  global $db, $relationships_primary_key;
   $return_array = array();
   
   // look for parent relationships
   $q1 = $db->createQueryBuilder();
-  $q1->select('relationship_type', 'from_entity_type', 'from_entity_id');
+  $q1->select($relationships_primary_key, 'relationship_type', 'from_entity_type', 'from_entity_id');
   $q1->from('relationships');
   $q1->where( 'to_entity_type = :type' );
   $q1->andWhere( 'to_entity_id = :id' );
@@ -42,13 +42,14 @@ function relationshipsFetch( $entity_type = false, $entity_id = false, $format =
     }
     $return_array[$rel['from_entity_type']][] = array('id'        => $rel['from_entity_id'],
                                                       'type'      => $rel['relationship_type'],
-                                                      'direction' => 'parents'
+                                                      'direction' => 'parents',
+                                                      'relationship_id' => $rel[$relationships_primary_key]
                                                       );
   }
 
   // look for child relationships
   $q2 = $db->createQueryBuilder();
-  $q2->select('relationship_type', 'to_entity_type', 'to_entity_id');
+  $q2->select($relationships_primary_key, 'relationship_type', 'to_entity_type', 'to_entity_id');
   $q2->from('relationships');
   $q2->where( 'from_entity_type = :type' );
   $q2->andWhere( 'from_entity_id = :id' );
@@ -65,6 +66,7 @@ function relationshipsFetch( $entity_type = false, $entity_id = false, $format =
     $return_array[$rel['to_entity_type']][] = array('id'        => $rel['to_entity_id'],
                                                     'type'      => $rel['relationship_type'],
                                                     'direction' => 'children',
+                                                    'relationship_id' => $rel[$relationships_primary_key]
                                                     );
   }
 

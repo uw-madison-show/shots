@@ -1,7 +1,6 @@
 <?php
 
-include '../../lib/all_pages.php';
-include 'functions_database.php';
+include_once '../../../all_pages.php';
 
 // we will consider the settings_global table to be the master table
 // if there is no existing sqlite database, it will be initialized
@@ -19,7 +18,7 @@ if ( $table_exists ){
   echo 'Table already exists.';
   echo "\n";
 
-  $table = $shots_schema->listTableDetails('grants');
+  $table = $shots_schema->listTableDetails('settings_global');
 
   print_r($table);
 
@@ -33,7 +32,7 @@ if ( $table_exists ){
 
   $table->addColumn('setting_id',         'integer', array('notnull' => true, 'autoincrement' => true));  
   $table->addColumn('setting_name',       'string',  array('notnull' => false));
-  $table->addColumn('setting_value',      'string',  array('notnull' => false));
+  $table->addColumn('setting_value',      'text',  array('notnull' => false));
   $table->addColumn('setting_active',     'boolean');
 
   $table->setPrimaryKey(array('setting_id'));

@@ -178,13 +178,10 @@ function grantsAdd( $field_name = FALSE, $field_value = FALSE )
 
  if ( !in_array($field_name, array_keys($grants_fields)) ) { return FALSE;  } 
 
- $affected_rows = $db->insert('grants',
-                              array($field_name => $field_value)
-                              );
-
- if ( $affected_rows > 0 ) { return TRUE; }
-
- return FALSE;
+ return addRecord('grants',
+                  $field_name,
+                  $field_value
+                  );
 
 }
 
@@ -202,36 +199,26 @@ function grantsAdd( $field_name = FALSE, $field_value = FALSE )
  */
 function grantsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
-  global $db, $grants_fields;
+  global $db, $grants_fields, $grants_primary_key;
 
   if ($id_value === FALSE
       or $field_name === FALSE
       or $new_value === NULL
       ){
-    // TODO error message
-    echo 'missing params for updateGrant';
+    trigger_error('Missing params for grantsUpdate().');
     return FALSE;
   }
-
-  $return_bool = FALSE;
 
   if ( !in_array($field_name, array_keys($grants_fields)) ){
-    // TODO error message
+    trigger_error($field_name .' not in grants table.');
     return FALSE;
   }
 
-
-  // TODO coerce $new_value into the appropriate data type for the column
-
-
-  $affected_rows = $db->update('grants', 
-                               array($field_name => $new_value), 
-                               array('grant_id' => $id_value)
-                               );
-
-  if ($affected_rows > 0) $return_bool = TRUE;
-
-  return $return_bool;
+  return updateRecord('grants',
+                      array($field_name => $new_value),
+                      $grants_primary_key,
+                      $id_value
+                      );
 }
 
 //deleteGrants

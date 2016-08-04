@@ -58,6 +58,22 @@ function toggleErrorMessageVisiblity(message){
 
 }
 
+function ajaxFailed(d) {
+  console.log('Ajax data load has failed.');
+  console.log(d);
+  console.log(d.hasOwnProperty("responseText"));
+  if (d.hasOwnProperty("responseText")) {
+    $('footer .message-holder').append(d.responseText);
+  } else if (d.hasOwnProperty("error_messages")) {
+    $.each(d.error_messages, function(index, msg){
+        // TODO append the rest of the html markup so it looks nice.
+        $('footer .message-holder').append(msg);
+    }); 
+  }
+  $('.server-side-error-message').each(function(){
+    toggleErrorMessageVisiblity(this);
+  });
+}
 
 function ajaxChange(e){
   var html_input_type = $(this).attr('type');
@@ -105,6 +121,157 @@ function ajaxChange(e){
                    // TODO check if the result object has error messages from php/db
                  })
          ;
+}
+
+// opens the modal dialog box to confirm deletions
+function openDeleteModal(e){
+  console.log('openDeleteModal');
+  console.log($(this));
+
+  var modal_message_html, delete_array;
+
+  var entity_name = $(this).closest('.record').data('entityName');
+  var key_field = key_field_mapping[entity_name];
+  var key_html_id = '#' + key_field;
+  var key_value = $(this).closest('.record').find(key_html_id).val();
+
+  // search the entity table
+  // do an ajax data request to get the data
+  // prepar the request object
+  var req = {};
+  req.target   = 'entity';
+  req.action   = entity_name + 'Fetch';
+  req.table    = entity_name;
+  req.params   = [];
+  // entity id to return
+  req.params.push(key_value);
+  // set return format to json
+  req.params.push('json');
+  console.log(req);
+
+  // do the request
+  // use the handlers to finish the UI updates
+  $.post('/lib/ajax_handler.php', 
+         { 
+          "request": req 
+         },
+         "json"
+         )
+         .done() 
+         .fail( ajaxFailed )
+         .always(function(r){ 
+                   console.log(r);
+                   if (r.error === false) {
+                     openDeleteModal_f1(r) 
+                   } else {
+                     ajaxFailed(r);
+                   }
+                }) 
+         ;
+
+  // search the relationship table
+  function openDeleteModal_f1(data){
+    var entity_result = $.parseJSON(data.results[0])[key_value];
+    console.log(entity_result);
+
+    // search the relationship table
+    var req = {};
+    req.target   = 'relationships';
+    req.action   = 'relationshipsFetch';
+    req.table    = 'relationships';
+    req.params   = [];
+    // entity type and id to return
+    req.params.push(entity_name);
+    req.params.push(key_value);
+    // set return format to json
+    req.params.push('json');
+    console.log(req);
+
+  // do the request
+  // use the handlers to finish the UI updates
+  $.post('/lib/ajax_handler.php', 
+         { 
+          "request": req 
+         },
+         "json"
+         )
+         .done() 
+         .fail( ajaxFailed )
+         .always(function(r){
+                   console.log(r);
+                   if (r.error === false) {
+                     openDeleteModal_f2(r, entity_result);
+                   } else {
+                     ajaxFailed(r);
+                   }
+                 }) 
+         ;
+
+  }
+
+  function openDeleteModal_f2(data, entity_result){
+    var rel_results = data.results[0];
+    console.log(rel_results);
+    console.log(entity_result);
+
+    delete_array = [];
+
+    delete_array.push([ entity_name, key_field, entity_result[key_field] ]);
+    modal_message_html += '<p>Delete this entity? (' + formatEntityResultAsShortText(entity_name, entity_result) + ')</p>';
+
+    if ( $.isEmptyObject(rel_results) === false ){
+      modal_message_html += '<p>Also remove the relationships to these other things?</p>';
+      modal_message_html += '<ul>';
+      $.each(rel_results, function(rel_entity_type, relationships){
+        $.each(relationships, function(index, obj){
+          var rel_key_field = key_field_mapping[rel_entity_type];
+          delete_array.push( [rel_entity_type, rel_key_field, obj.id] );
+          modal_message_html += '<li><strong>' + rel_entity_type + '</strong> (id #' + obj.id + ') related as ' + obj.type + '</li>';
+        });
+      });
+      modal_message_html += '</ul>';
+    }
+
+
+    $('body').append('<div id="delete-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">' +
+                     '<div class="modal-dialog">' +
+                     '  <div class="modal-content">' +
+                     '    <div class="modal-header">' +
+                     '      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>' +
+                     '      <h3 id="data-modal-label">Confirm Delete</h3>' +
+                     '    </div>'+
+                     '    <div class="modal-body">' +
+                     '      <div>' + modal_message_html + '</div>' +
+                     '    </div>' +
+                     '    <div class="modal-footer">'+
+                     '      <button id="delete-modal-cancel-button" class="btn btn-default" data-dismiss="modal">< Oops, go back</button>'+
+                     '      <button id="delete-modal-confirm-button" class="btn btn-primary">Confirm delete ></button>'+
+                     '    </div>' +
+                     '  </div>'+
+                     '</div>' +
+                     '</div>'
+                     );
+
+    var delete_modal = $('#delete-modal');
+
+    // console.log(delete_modal);
+    delete_modal.modal('show');
+
+    // attach listener for the delete confirmation button
+    $('#delete-modal-confirm-button').on('click', function(){
+      ajaxDelete(delete_array) 
+    });
+
+      
+  } 
+
+  
+}
+
+function ajaxDelete(a){
+  console.log(a);
+  // do the deletes
+  // if delete is successful then redirect the window.location
 }
 
 function getTableData(entity) {

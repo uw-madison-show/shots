@@ -47,7 +47,7 @@ $return_array["request_params"] = $this_request;
 $valid_request_targets = array('entity',
                                'page',
                                'report',
-                               'relationship',
+                               'relationships',
                                'setting'
                                );
 
@@ -92,8 +92,21 @@ if ( $this_request["target"] === 'entity' ){
 
 } elseif ( $this_request["target"] === 'report' ) {
   # code...
-} elseif ( $this_request["target"] === 'relationship' ) {
-  # code...
+} elseif ( $this_request["target"] === 'relationships' ) {
+  // this will handle most of the CRUD functions for relationship table
+  try {
+    // include the correct entity type
+    include_once('shots/relationships/relationships.php');
+    // run the specified function with the provided params
+    $result = call_user_func_array($this_request['action'], $this_request['params'] );
+    $return_array["error"] = FALSE;
+    $return_array["results"][] = $result;
+  } catch (Exception $e) {
+    $return_array["error"] = TRUE;
+    $return_array["error_messages"][] = 'PHP or database error in '. $_SERVER['SCRIPT_NAME'];
+    $return_array["error_messages"][] = $e->getMessage();
+    $return_array["error_messages"][] = $e->getTraceAsString();
+  }
 } elseif ( $this_request["target"] === 'setting' ) {
   # code...
 } else {

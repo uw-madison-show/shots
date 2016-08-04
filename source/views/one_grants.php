@@ -77,8 +77,16 @@ $related_entities = relationshipsFetch('grants', $grant_id, 'php');
           <div class="fields">
           <?php echo $all_html; ?>
           </div>
+          <div class="row">
+            <div class="col-xs-2 col-xs-offset-10">
+              <div class="form-group"> 
+                <button type="button" class="btn btn-default" id="delete-button">Delete</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
     </div>
     <div id="related-entities" class="col-md-3">
       <div id="related-entities-accordian" class="panel-group">
@@ -96,6 +104,8 @@ $related_entities = relationshipsFetch('grants', $grant_id, 'php');
     console.log('ready');
 
     $('input').change( ajaxChange );
+
+    $('#delete-button').click( openDeleteModal );
 
     $('.related-entities.panel-collapse').on('show.bs.collapse', revealRelatedEntities );
 

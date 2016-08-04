@@ -154,15 +154,17 @@ set_exception_handler('custom_exception_handler');
 set_error_handler('custom_error_handler');
 
 
-function changelog( $table_name, $table_key_field, $key_value, $old_value, $new_value )
+function changelog( $table_name, $table_key_field, $key_value, $field_name, $old_value, $new_value )
 {
   global $db;
   $db->insert('changelog',
               array('table_name' => strtolower($table_name),
                     'key_field' => strtolower($table_key_field),
                     'key_value' => strtolower($key_value),
+                    'field'     => strtolower($field_name),
                     'old_value' => $old_value,
                     'new_value' => $new_value
+                    // TODO add username and datetime to the changelog record
                     )
               );
 }
@@ -180,17 +182,17 @@ function changelog( $table_name, $table_key_field, $key_value, $old_value, $new_
 function updateRecord($table_name = NULL, $edits = array(), $key_field = NULL, $id = NULL)
 {
   global $db;
-  
+  $return_boolean = FALSE;
 
-  $table_name = $db->quoteIdentifier($table_name);
-  $key_field = $db->quoteIdentifier($key_field);
+  // $table_name_q = $db->quoteIdentifier($table_name);
+  $key_field_q = $db->quoteIdentifier($key_field);
   foreach ($edits as $field => $value) {
     // find old value
-    $field = $db->quoteIdentifier($field);
+    // $field_q = $db->quoteIdentifier($field);
     $query = $db->createQueryBuilder();
     $query->select($field)
           ->from($table_name)
-          ->where($key_field . ' = ?')
+          ->where($key_field_q . ' = ?')
           ->setParameter(0, $id)
           ;
     $statement = $query->execute();
@@ -207,23 +209,101 @@ function updateRecord($table_name = NULL, $edits = array(), $key_field = NULL, $
         $c = changelog($table_name,
                        $key_field,
                        $id,
+                       $field,
                        $old_value,
                        $value
                        );
+        $return_boolean = TRUE;
       }
     }
   }
-
-  return TRUE;
+  return $return_boolean;
 }
 
-function addRecord()
+function addRecord($table_name = NULL, $field_name = NULL, $field_value = NULL)
 {
+  global $db;
 
+  $sm = $db->getSchemaManager();
+  $key_field = $sm->listTableIndexes($table_name)['primary']->getColumns()[0];
+
+  // $table_name = $db->quoteIdentifier($table_name);
+  // $field_name = $db->quoteIdentifier($field_name);
+
+  $affected_rows = $db->insert($table_name,
+                               array($field_name => $field_value)
+                               );
+
+  if ( $affected_rows > 0 ) {
+    $last_insert_id = $db->lastInsertId();
+    // if the update is successful, add record to changelog
+    $c = changelog($table_name,
+                   $key_field,
+                   $last_insert_id,
+                   $field_name,
+                   NULL,
+                   $field_value
+                   );
+    return TRUE;
+  }
+  return FALSE;
 }
 
-function deleteRecord()
+/*
+ * Delete a record.
+ *
+ * Strictly speaking you can feed in any field, but you should be submitting the key field and the key value. If you submit a non-key field this function might delete multiple records.
+ *
+ * @param string table_name The name of the table that will have the deletion.
+ * @param string field_name The name of the field to use in the where clause of the sql. Should be the key field in most cases.
+ * @param string field_value. The value for the where clause of the sql. Should be the database id in most cases.
+ *
+ * @return boolean True if at least one successful deletion occurs.
+ */
+function deleteRecord($table_name, $field_name, $field_value)
 {
+  global $db;
+
+  $return_boolean = FALSE;
+
+  // get primary key
+  $sm = $db->getSchemaManager();
+  $key_field = $sm->listTableIndexes($table_name)['primary']->getColumns()[0];
+  
+  $field_name_q = $db->quoteIdentifier($field_name);
+
+  // search for matching records; save primary keys for matches
+  $q = $db->createQueryBuilder();
+  $q->select($key_field);
+  $q->from($table_name);
+  $q->where($field_name_q . ' = :value' );
+  $q->setParameters( array(':value' => $field_value) );
+  $r = $q->execute()->fetchAll();
+
+  // return $r;
+  // loop through matches and delete
+  foreach( $r as $key => $data ){
+    $this_id = $data[$key_field];
+    $affected_rows = $db->delete($table_name,
+                                 array($key_field => $this_id)
+                                 );
+
+    // if delete is successful do changelog
+    if ($affected_rows > 0) {
+      $c = changelog($table_name,
+                     $key_field,
+                     $this_id,
+                     $key_field,
+                     $this_id,
+                     'record deleted'
+                     );
+      $return_boolean = TRUE;
+    }
+  }
+
+  return $return_boolean;
+
+
 
 }
 

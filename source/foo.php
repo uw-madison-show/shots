@@ -6,8 +6,15 @@ include 'html_head.php';
 
 // query a table and get all the data in json;
 include 'shots/entities/people.php';
+include 'shots/entities/grants.php';
 
 
+
+// $grant_update = grantsUpdate('7', 'title', 'testing update');
+
+// $grant_add    = grantsAdd( 'title', 'testing add');
+
+// $test_delete = deleteRecord('grants', 'link_to_cfp', 'woo');
 
 ?>
 
