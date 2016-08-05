@@ -31,6 +31,7 @@ function grantsFetch( $id = false, $return_format = 'php' )
     $q->where( $grants_primary_key .' = :key_value' );
     $q->setParameters( array(':key_value' => $this_id) );
     $r = $q->execute()->fetchAll()[0];
+    // TODO test if there are results before using the arrray index, otherwise it throws undefined offset notices.
     $return_array[$this_id] = $r;
   }
   if ( $return_format === 'json' ){
@@ -221,7 +222,15 @@ function grantsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
                       );
 }
 
-//deleteGrants
+//delete Grants
+function grantsDelete($id_value)
+{
+  global $db, $grants_primary_key;
+  return deleteRecord('grants',
+                      $grants_primary_key,
+                      $id_value
+                      );
+}
 
 
 

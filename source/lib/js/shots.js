@@ -107,20 +107,48 @@ function ajaxChange(e){
          { "request": req },
          "json"
          )
-         .done(function(d){
-                 console.log('ajaxChange post done');
-                 console.log(d);
-               }) 
-         .fail(function(d){
-                 console.log('ajaxChange post fail');
-                 console.log(d);
-                 // TODO handle error message
-               })
-         .always(function(d) {
-                   console.log('ajaxChange always');
-                   // TODO check if the result object has error messages from php/db
+         .done() 
+         .fail( ajaxFailed )
+         .always(function(r) {
+                   if (r.error === false){
+                    console.log(r);
+                   } else {
+                    ajaxFailed(r);
+                   }
                  })
          ;
+}
+
+// opens an empty modal dialog
+// returns the jQuery object of the modal
+// sets default behavior so that any modal hide action will completely destory the html element
+function openModal(){
+  $('body').append('<div id="basic-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="basic-modal-label" aria-hidden="true">' +
+                   '<div class="modal-dialog">' +
+                   '  <div class="modal-content">' +
+                   '  <form id="modal-form">'+
+                   '    <div class="modal-header">' +
+                   '      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>' +
+                   '      <h3 id="basic-modal-label"></h3>' +
+                   '    </div>'+
+                   '    <div class="modal-body">' +
+                   '      <div></div>' +
+                   '    </div>' +
+                   '    <div class="modal-footer">'+
+                   '    </div>' +
+                   '  </form>'+
+                   '  </div>'+
+                   '</div>' +
+                   '</div>'
+                   );
+  var m = $('#basic-modal');
+  m.modal('show');
+  // on any type of modal close, remove modal from html
+  m.on('hidden.bs.modal', function(){
+    $(this).remove();
+    $('.modal-backdrop').remove();
+  });
+  return m;
 }
 
 // opens the modal dialog box to confirm deletions
@@ -232,46 +260,91 @@ function openDeleteModal(e){
       modal_message_html += '</ul>';
     }
 
+    var delete_modal = openModal();
+    
+    delete_modal.find('#basic-modal-label').html('Confirm Delete');
+    delete_modal.find('#modal-form').attr('action', '/delete.php');
+    delete_modal.find('#modal-form').attr('method', 'post');
 
-    $('body').append('<div id="delete-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="delete-modal-label" aria-hidden="true">' +
-                     '<div class="modal-dialog">' +
-                     '  <div class="modal-content">' +
-                     '    <div class="modal-header">' +
-                     '      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>' +
-                     '      <h3 id="data-modal-label">Confirm Delete</h3>' +
-                     '    </div>'+
-                     '    <div class="modal-body">' +
-                     '      <div>' + modal_message_html + '</div>' +
-                     '    </div>' +
-                     '    <div class="modal-footer">'+
-                     '      <button id="delete-modal-cancel-button" class="btn btn-default" data-dismiss="modal">< Oops, go back</button>'+
-                     '      <button id="delete-modal-confirm-button" class="btn btn-primary">Confirm delete ></button>'+
-                     '    </div>' +
-                     '  </div>'+
-                     '</div>' +
-                     '</div>'
-                     );
+    // add the delete_array as a hidden object
+    delete_encoded = encodeURIComponent(JSON.stringify(delete_array));
+    console.log(delete_encoded);
+    delete_modal.find('#modal-form').append('<input type="hidden" name="delete-array" id="delete-array" value ="'+ delete_encoded +'"/>');
 
-    var delete_modal = $('#delete-modal');
+    delete_modal.find('.modal-body').append(modal_message_html);
+    // add buttons
+    delete_modal.find('.modal-footer').append('<button id="delete-modal-cancel-button" class="btn btn-default" data-dismiss="modal">< Oops, go back</button>');
+    delete_modal.find('.modal-footer').append('<button type="submit" id="delete-modal-confirm-button" class="btn btn-primary">Confirm delete ></button>');
 
     // console.log(delete_modal);
-    delete_modal.modal('show');
 
+    /*
     // attach listener for the delete confirmation button
     $('#delete-modal-confirm-button').on('click', function(){
-      ajaxDelete(delete_array) 
+      var successful_deletes = ajaxDelete(delete_array);
+      $.when(successful_deletes).done(function(){
+        console.log(successful_deletes);
+        if (successful_deletes) {
+          if (delete_array[0][0]) {
+            window.location = '/views/table_all_' + delete_array[0][0] + '.php';
+          } else {
+            window.location = '/';
+          }
+        }
+      });
     });
+    */
 
-      
   } 
-
-  
 }
 
 function ajaxDelete(a){
   console.log(a);
+  var all_reqs = [];
+  var first_entity = a[0][0];
   // do the deletes
-  // if delete is successful then redirect the window.location
+  $.each(a, function(index, this_delete){
+    var req = {};
+    req.target = 'entity';
+    req.action = this_delete[0] + 'Delete';
+    req.table  = this_delete[0];
+    req.params = [];
+    req.params.push(this_delete[2]);
+  
+    console.log(req);
+
+    var this_req = $.post('/lib/ajax_handler.php', 
+                          { "request": req },
+                          "json"
+                          );
+    all_reqs.push(this_req);
+
+            /*
+             .done() 
+             .fail( ajaxFailed )
+             .always(function(r) {
+                       if (r.error === false){
+                         successful_delete = true;
+                         ajax_deletes.push(r);
+                         console.log(r);
+                       } else {
+                         ajaxFailed(r);
+                       }
+                     })
+             ;
+             */
+  });
+
+  $.when.apply($, all_reqs).done(function(){
+    console.log(all_reqs);
+    // if delete is successful then redirect the window.location
+    $.each(all_reqs, function(index, resp){
+      if (resp.responseJSON.error === false) {
+        return true;
+      }
+    });
+    return false;
+  });
 }
 
 function getTableData(entity) {
@@ -325,7 +398,7 @@ function saveHandsonChange(change, entity) {
   // object for request is defined by grants.php functions
   var req = {};
   req.target = 'entity';
-  req.action = entity + 'update';
+  req.action = entity + 'Update';
   req.table  = entity;
   req.params = [];
 
@@ -339,20 +412,14 @@ function saveHandsonChange(change, entity) {
            { "request": req },
            "json"
            )
-           .done(
-                 function(d){
-                   console.log('ajax post done');
-                   console.log(d);
-                 }) 
-           .fail(
-                 // TODO if there are db/server errors there should be a notification fro the user and the original value should be set
-                 function(d){
-                   console.log('ajax post fail');
-                   console.log(d);
-                 })
-           .always(
-                   function(d) {
-                     console.log('ajax always');
+           .done() 
+           .fail( ajaxFailed )
+           .always(function(r) {
+                     if (r.error === false){
+                       console.log(r);
+                     } else {
+                       ajaxFailed(r);
+                     }
                    })
            ;
 
@@ -564,7 +631,8 @@ function formatEntityResultAsShortText(entity_name, data){
   for (var ii = 0; ii < title_vars.length; ii++) {
     var this_title_var = title_vars[ii];
     var this_string = data[this_title_var];
-    if ( this_string.length > 18 ){
+    console.log(this_string);
+    if ( this_string && this_string.length > 18 ){
       this_string = this_string.substr(0,16) + '...';
     }
     return_array.push(this_string);

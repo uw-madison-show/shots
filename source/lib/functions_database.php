@@ -302,9 +302,6 @@ function deleteRecord($table_name, $field_name, $field_value)
   }
 
   return $return_boolean;
-
-
-
 }
 
 
