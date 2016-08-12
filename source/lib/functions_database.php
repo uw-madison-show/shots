@@ -104,11 +104,13 @@ function custom_error_handler($error_code, $message, $file, $line, $context)
 
   $random_number = rand(100, 1000);
 
-  echo '<div class="panel-group  server-side-error-message">';
+  echo '<div class="panel-group server-side-error-message">';
   echo '<div class="panel panel-default">';
+  
   echo '<div class="panel-heading">';
   echo '<h4 class="panel-title"><a data-toggle="collapse" href="#e'. $random_number .'">' . $error_label . '...</a></h4>';
   echo '</div>';
+  
   echo '<div id="e'. $random_number .'" class="panel-collapse collapse">';
   echo '<div class="panel-body">';
   echo '<p>' . $output_message . '</p>';
@@ -117,6 +119,7 @@ function custom_error_handler($error_code, $message, $file, $line, $context)
   echo '<pre>'. $stacktrace . '</p>';
   echo '</div>';
   echo '</div>';
+  
   echo '</div>';
   echo '</div>';
 

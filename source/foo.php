@@ -4,90 +4,23 @@ include './lib/all_pages.php';
 include 'html_doctype.php';
 include 'html_head.php';
 
-// query a table and get all the data in json;
-include 'shots/entities/people.php';
-include 'shots/entities/grants.php';
+include 'functions_database.php';
 
+trigger_error('test error message');
 
+try{
+  throw new Exception("test exception message");
+} catch (Exception $e) {
+  trigger_error($e);
+}
 
-// $grant_update = grantsUpdate('7', 'title', 'testing update');
+$str = 'first_second_third';
 
-// $grant_add    = grantsAdd( 'title', 'testing add');
-
-// $test_delete = deleteRecord('grants', 'link_to_cfp', 'woo');
-
+$foo = preg_replace_callback('/_(.?)/', function($matches) { return strtoupper($matches[1]); }, $str);
 ?>
 
-<body>
+  <?php include 'html_navbar.php'; ?>
 
-  <form>
-    User name:<br>
-    <input type="text" name="username"><br>
-    User password:<br>
-    <input type="password" name="psw">
-
-    <br>
-    <input type="radio" name="gender" value="male" checked> Male<br>
-    <input type="radio" name="gender" value="female"> Female<br>
-    <input type="radio" name="gender" value="other"> Other
-
-    <br>
-    <input type="checkbox" name="vehicle1" value="Bike"> I have a bike<br>
-    <input type="checkbox" name="vehicle2" value="Car"> I have a car<br>
-
-    <br>
-    <input type="button" name="generic-button" value="click me"/> 
-
-    <br>
-    <input type="number" name="quantity" min="1" max="5">
-
-    <br>
-    Select your favorite color: <input type="color" name="favcolor">
-
-    <br>
-    Birthday: <input type="date" name="bday">
-
-    
-    <br>
-    Birthday (date and time): <input type="datetime-local" name="bdaytime">
-
-    <br>
-    E-mail: <input type="email" name="usremail">
-
-    <br>
-    Select a file: <input type="file" name="img">
-
-    <br>
-    Hidden: <input type="hidden" name="country" value="Norway">
-
-    <br>
-    Birthday (month and year): <input type="month" name="bdaymonth">
-
-    <br>
-    Quantity (between 1 and 5): <input type="number" name="quantity" min="1" max="5">
-
-    <br>
-    Range: <input type="range" name="points" min="0" max="10">
-
-    <br>
-    Search Google: <input type="search" name="googlesearch">
-
-    <br>
-    Telephone: <input type="tel" name="usrtel">
-
-    <br>
-    Select a time: <input type="time" name="usr_time">
-
-    <br>
-    Add your homepage: <input type="url" name="homepage">
-
-    <br>
-    Select a week: <input type="week" name="week_year">
-
-    <br>
-    <input type="submit" name="submit-button" value="Submit"> <input name="reset-button" type="reset">
-  </form>
-  
   <?php include 'html_footer.php'; ?>
 
   <script type="text/javascript">
@@ -95,17 +28,29 @@ include 'shots/entities/grants.php';
     // this isn't done yet TODO finish it
     $(document).ready(function() {
 
-      function foo(e) {
-        e.preventDefault();
-        console.log($(this));
-        var my_input = getFormInputValue($(this));
-        console.log(my_input);
+      // foo = initializeTable('internals', 'lookup_values', 'lookup_value_id');
 
-      }
+      
 
-      $('input').change( foo );
-      $('input[type=button]').click( foo );
-      $('input[type=submit]').click( foo );
+      // var test_vals = ['', {}, {'key': 'value'}, {null: null}, [], 1, '11', {'key': false}, false, true, 'false', 'true',{ill:'formed',javascript:'object'}, '{"good": "object in a string", "1": 27.3}', NaN, null, function(){}, [null, null, NaN], [true, true], [1, 2, 3] ];
+
+      // var results = [];
+
+      // for (var i = test_vals.length - 1; i >= 0; i--) {
+      //   console.log(test_vals[i]);
+      //   var test_one = $.isEmptyObject(test_vals[i]);
+      //   var test_two = test_vals[i] !== null ? test_vals[i].length : 'null';
+      //   var test_three = typeof test_vals[i] === 'object';
+
+      //   var label = typeof test_vals[i] === 'object' ? 'object => ' + JSON.stringify(test_vals[i]) : test_vals[i];
+
+      //   var this_result = [ label , test_one, test_two, test_three ];
+      //   results[i] = this_result;
+      // }
+
+      // console.table(results);
+      
+
       
     });
   </script>

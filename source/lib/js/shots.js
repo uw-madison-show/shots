@@ -11,14 +11,16 @@ var autosave_timeout, table_data, table_handsontable, table_data_key_field;
 
 var key_field_mapping = { 
                           "grants": "grant_id",
-                          "people": "person_id"
+                          "people": "person_id",
+                          "lookup_values": "lookup_value_id",
                         }
 
 // these fields are set to empty for the addRow function
 // just need to be string field with no constraints
 var empty_field_mapping = {
                             "grants": "title",
-                            "people": "name" 
+                            "people": "name",
+                            "lookup_values": "lookup_value", 
                           }            
 
 // these are the fields that most humans would want to read
@@ -27,7 +29,8 @@ var empty_field_mapping = {
 // must be an array of variable names. array of 1 is ok.
 var title_field_mapping = {
                             "grants": ["title", "grant_body"],
-                            "people": ["name", "affiliation"]
+                            "people": ["name", "affiliation"],
+                            "lookup_value": ["column_name", "label"],
                           }
 
 /**********************************************************/
@@ -41,7 +44,7 @@ jQuery(document).ready(function(){
   if( $('.server-side-error-message').length ){
     $('.server-side-error-message').each(function(){
       $('footer .message-holder').append(this);
-      toggleErrorMessageVisiblity(this);
+      $(this).show();
     });
   }
 });
@@ -52,11 +55,11 @@ jQuery(document).ready(function(){
 
 /**********************************************************/
 
-function toggleErrorMessageVisiblity(message){
-  // console.log(message);
-  $(message).toggle();
+// function showErrorMessageVisiblity(message){
+//   // console.log(message);
+//   $(message).show();
 
-}
+// }
 
 function ajaxFailed(d) {
   console.log('Ajax data load has failed.');
@@ -70,9 +73,7 @@ function ajaxFailed(d) {
         $('footer .message-holder').append(msg);
     }); 
   }
-  $('.server-side-error-message').each(function(){
-    toggleErrorMessageVisiblity(this);
-  });
+  $('.server-side-error-message').show();
 }
 
 function ajaxChange(e){
@@ -347,12 +348,12 @@ function ajaxDelete(a){
   });
 }
 
-function getTableData(entity) {
-  var data = {};
-  if (!entity) { return data; }
+function getTableData(target, entity) {
+  var return_data = {};
+  if (!target || !entity) { return data; }
   
   var req = {};
-  req.target = 'entity';
+  req.target = target;
   req.action = entity + 'FetchAll';
   req.table  = entity;
   req.params = [ 'json' ];
@@ -364,16 +365,16 @@ function getTableData(entity) {
           dataType: "json",
           async: false
          })
-         .done( function(d) {
-                  console.log('ajax post done');
-                  console.log(d);
-                  // TODO add handling for php/db errors; make sure that the result is parsable json;
-                  data = $.parseJSON(d['results'][0]);
-               })
-         .fail( function(d){
-                  console.log('ajax post fail');
-                  console.log(d);
-                })
+         .done() 
+         .fail( ajaxFailed )
+         .always(function(r) {
+                   if (r.error === false){
+                     console.log(r);
+                     data = JSON.parse(r.results[0]);
+                   } else {
+                     ajaxFailed(r);
+                   }
+                 })
          ;
 
   return data;
@@ -382,7 +383,7 @@ function getTableData(entity) {
 
 
 // change array is defined by handsontable
-function saveHandsonChange(change, entity) {
+function saveHandsonChange(change, entity, target) {
   // TODO make the autosave message thing work
   clearTimeout(autosave_timeout);
 
@@ -397,7 +398,7 @@ function saveHandsonChange(change, entity) {
 
   // object for request is defined by grants.php functions
   var req = {};
-  req.target = 'entity';
+  req.target = target;
   req.action = entity + 'Update';
   req.table  = entity;
   req.params = [];
@@ -435,18 +436,18 @@ function keyFieldRenderer(instance, td, row, col, prop, value, cellProperties){
   return td;
 }
 
-function initializeTable( entity, key_field ) {
-  if (!entity || !key_field) {
-    console.log('initializeTable needs the entity and key_field');
+function initializeTable( target, entity, key_field ) {
+  if (!target || !entity || !key_field) {
+    console.log('initializeTable needs the target, entity and key_field');
     return false;
   }
 
-  table_data = getTableData(entity);
+  table_data = getTableData(target, entity);
 
-  // table_data.forEach( function(this_row) {
-  //   var original = this_row[table_data_key_field];
-  //   this_row[table_data_key_field] = '<strong><a href="/grant.php?id=' + original + '">' + original + '</a></strong>';
-  // });
+  if ( typeof table_data !== 'object' || $.isEmptyObject(table_data) ) {
+    console.log('initializeTable could not find data for ' + target + ': ' + entity);
+    return false;
+  }
 
   var table_data_fields = Object.keys(table_data[0]);
 
@@ -485,7 +486,7 @@ function initializeTable( entity, key_field ) {
       var edit_types = [ 'alter', 'empty', 'edit', 'autofill', 'paste', 'external' ];
       if ( edit_types.indexOf(source) > -1 ) {
         for ( var i = 0; i < changes.length; i++ ){
-          saveHandsonChange(changes[i], entity);
+          saveHandsonChange(changes[i], entity, target);
         }
       } else {
         console.log('ignoring table change: ' + changes);
@@ -505,12 +506,14 @@ function addRow(e) {
 
   // get the table name from the html data- attribute
   var this_table_data = $(this).parent('div').data();
+  var target = this_table_data.target;
   var tbl = this_table_data.entityName;
   var empty_field = empty_field_mapping[tbl];
-  if ( !tbl || !empty_field ){
+  if ( !target || !tbl || !empty_field ){
     console.log('addRow function can not get the meta-data out of the table-holder div');
     console.log('this = ' + this);
     console.log('$(this).parent(\'div\') = ' + $(this).parent('div'));
+    console.log('target = ' + target);
     console.log('tbl = ' + tbl);
     console.log('empty_field = ' + empty_field)
     return false;
@@ -518,7 +521,7 @@ function addRow(e) {
 
   // make the request object
   var req = {};
-  req.target = 'entity';
+  req.target = target;
   req.action = tbl + 'Add';
   req.table  = tbl;
   // adding a blank field makes a new blank record
@@ -682,9 +685,7 @@ function revealRelatedEntities(e) {
                    console.log('Ajax data load has failed.');
                    console.log(d);
                    $('footer .message-holder').append(d.responseText);
-                   $('.server-side-error-message').each(function(){
-                     toggleErrorMessageVisiblity(this);
-                   });
+                   $('.server-side-error-message').show();
                    // TODO handle error message
                  })
            .always(function(d) {

@@ -18,7 +18,7 @@ $lookup_values_primary_key = $sm->listTableIndexes('lookup_values')['primary']->
  *
  * @return mixed The results come out of the database as an array indexed by IDs with an associative array formated as field_name => value. Depending on $return_format the array may be post-processed into a json string, a serialized php string, or a csv string.
  */
-function lookupFetch( $id = false, $return_format = 'php' )
+function lookup_valuesFetch( $id = false, $return_format = 'php' )
 {
   global $db, $people_primary_key;
   $id_array = (array) $id;
@@ -55,7 +55,7 @@ function lookupFetch( $id = false, $return_format = 'php' )
  *
  * @return string Depending on the `$return_format` this is either a json, serialized php, or csv string.
  */
-function lookupFetchAll( $return_format = 'json' )
+function lookup_valuesFetchAll( $return_format = 'json' )
 {
   global $db, $people_primary_key;
 
@@ -98,7 +98,7 @@ function lookupFetchAll( $return_format = 'json' )
  *
  * @return string
  */
-function lookupCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
+function lookup_valuesCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
 {
   global $db, $people_fields;
   if ($field_name === FALSE or $field_value === FALSE) return FALSE; 
@@ -172,7 +172,7 @@ function lookupCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
 //viewGrant
 
 //Add a lookup value
-function lookupAdd( $field_name = FALSE, $field_value = FALSE )
+function lookup_valuesAdd( $field_name = FALSE, $field_value = FALSE )
 {
   global $db, $lookup_values_fields;
 
@@ -184,13 +184,9 @@ function lookupAdd( $field_name = FALSE, $field_value = FALSE )
     return FALSE;
   } 
 
-  $affected_rows = $db->insert('lookup_values',
-                              array($field_name => $field_value)
-                              );
+  $check = addRecord('lookup_values', $field_name, $field_value);
 
-  if ( $affected_rows > 0 ) { return TRUE; }
-
-  return FALSE;
+  return $check;
 }
 
 /**
@@ -204,7 +200,7 @@ function lookupAdd( $field_name = FALSE, $field_value = FALSE )
  *
  * @return boolean
  */
-function lookupUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
+function lookup_valuesUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
   global $db, $lookup_values_fields;
 
