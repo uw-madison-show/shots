@@ -30,6 +30,18 @@ echo '
     <link rel="stylesheet" type="text/css" href="/includes/handsontable/handsontable.full.min.css">
     ';
 
+// moment js for handling date and time stuff
+echo '
+    <script src="/includes/moment/moment-2-14-1.min.js"></script>
+    ';
+
+// fullcalendar JS and CSS
+// from fullcalendar docs: "jQuery and Moment must be loaded before FullCalendar's JavaScript."
+echo '
+    <link rel="stylesheet" href="/includes/fullcalendar/fullcalendar.css" />
+    <script src="/includes/fullcalendar/fullcalendar.js"></script>
+    ';
+
 // custom JS and CSS for the shots database
 echo '
     <script src="/lib/js/shots.js"></script>
