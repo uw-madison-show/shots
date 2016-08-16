@@ -13,8 +13,11 @@ if ( $table_exists ){
 
   echo 'Table already exists.';
   echo "\n";
-
   print_r($shots_schema->listTableDetails('events'));
+
+  $r = $shots_schema->dropTable('events');
+  print_r($r);
+
 
 } else {
   echo 'Creating table...';
@@ -27,7 +30,7 @@ if ( $table_exists ){
   $table->addColumn('event_id',           'integer', array('notnull' => true, 'autoincrement' => true));
 
   // this is the id number used by fullcalendar to identify repeating events
-  $table->addColumn('occurance_id',       'integer', array('notnull' => true, 'autoincrement' => true));
+  $table->addColumn('repeat_id',       'integer', array('notnull' => false));
 
   $table->addColumn('title',          'string',  array('notnull' => false));
   $table->addColumn('datetime_start', 'string',  array('notnull' => false));
