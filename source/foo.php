@@ -11,6 +11,8 @@ include 'html_head.php';
 
   <?php include 'html_navbar.php'; ?>
 
+  <input id="my_upload" type="file" name="files[]" data-url="lib/file_handler.php" multiple/>
+
   <?php include 'html_footer.php'; ?>
 
   <script type="text/javascript">
@@ -21,7 +23,13 @@ include 'html_head.php';
     // Page Setup Code
 
     /**********************************************************/
-    
+    $('#my_upload').fileupload({
+      dataType: 'json',
+      done: function (e, data) {
+        console.log(e);
+        console.log(data);
+      }
+    });
     
     /**********************************************************/
 

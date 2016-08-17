@@ -30,10 +30,14 @@ $common_loader->register();
 $dbal_loader = new ClassLoader('Doctrine\DBAL');
 $dbal_loader->register();
 
+// add database functions
 require_once('database_connection.php');
 
 // add utility functions
 require_once('functions_utility.php');
+
+// add class for file uploads
+require_once('jQuery-File-Upload/UploadHandler.php');
 
 // TODO session variables
 

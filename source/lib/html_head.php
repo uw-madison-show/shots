@@ -42,6 +42,15 @@ echo '
     <script src="/includes/fullcalendar/fullcalendar.js"></script>
     ';
 
+// file upload
+// source: https://github.com/blueimp/jQuery-File-Upload
+echo '
+    <script src="/includes/jQuery-File-Upload/jquery.ui.widget.js"></script>
+    <script src="/includes/jQuery-File-Upload/jquery.iframe-transport.js"></script>
+    <script src="/includes/jQuery-File-Upload/jquery.fileupload.js"></script>
+     ';
+
+
 // custom JS and CSS for the shots database
 echo '
     <script src="/lib/js/shots.js"></script>

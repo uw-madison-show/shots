@@ -1,3 +1,7 @@
 **/*.sublime-*
 *.sq3
 
+
+source/database/files/.htaccess
+source/database/files/**
+
