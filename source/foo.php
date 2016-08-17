@@ -4,6 +4,11 @@ include './lib/all_pages.php';
 include 'html_doctype.php';
 include 'html_head.php';
 
+$foo = $_SERVER['SCRIPT_NAME'];
+
+$bar = dirname($_SERVER['SCRIPT_FILENAME']);
+
+
 
 ?>
 
