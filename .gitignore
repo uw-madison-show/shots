@@ -5,3 +5,4 @@
 source/database/files/.htaccess
 source/database/files/**
 source/database/files/*
+tools/npm-debug.log
