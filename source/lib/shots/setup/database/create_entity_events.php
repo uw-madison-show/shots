@@ -15,8 +15,8 @@ if ( $table_exists ){
   echo "\n";
   print_r($shots_schema->listTableDetails('events'));
 
-  $r = $shots_schema->dropTable('events');
-  print_r($r);
+  // $r = $shots_schema->dropTable('events');
+  // print_r($r);
 
 
 } else {

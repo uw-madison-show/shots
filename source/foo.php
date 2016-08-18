@@ -4,9 +4,11 @@ include './lib/all_pages.php';
 include 'html_doctype.php';
 include 'html_head.php';
 
-$foo = $_SERVER['SCRIPT_NAME'];
+include 'shots/entities/documents.php';
 
-$bar = dirname($_SERVER['SCRIPT_FILENAME']);
+// $bar = documentsAdd('title', 'blah');
+
+$foo = documentsFetchAll('native');
 
 
 
