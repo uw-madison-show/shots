@@ -1,0 +1,209 @@
+/* Matt Moehr
+/* 2016-04-28
+/* Style sheet for SHOW Output Tracking System
+*/
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: larger;
+  line-height: 1.2em;
+  color: #333;
+  background-color: #fff;
+  margin: 0;
+  display: block;
+  padding-top: 50px; /* for the fixed navbar */
+}
+
+#body-background {
+  background-color: #ccc;
+}
+
+.container-fluid {
+  height: inherit;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 30px;
+  padding-left: 30px;
+}
+
+.centering {
+  text-align: center;
+}
+
+.page-content {
+  padding-top:    20px;
+  padding-bottom: 20px;
+  padding-left:    0px;
+  padding-right:   0px;
+}
+
+#region-main {
+  /* anything here? */
+}
+
+.portal-frame {
+  margin-bottom: 15px;
+  padding-top: 0;
+  padding-bottom: 5px;
+  padding-left: 0;
+  padding-right: 0;
+  position: relative;
+}
+
+.portal-main {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.tile-list {
+  list-style-type: none;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  max-width: 1200px;
+}
+
+.no-padding {
+  padding: 0;
+}
+
+.list-container {
+  /* anything here? */
+}
+
+.widget-frame {
+  position: relative;
+  margin: 5px;
+  background-color: #F3F3F3;
+  border-radius: 0px;
+  height: 280px;
+}
+
+.widget-frame .widget-title {
+  font-size: 1.2em;
+  padding: 5px;
+  margin: 0px;
+  text-align: center;
+}
+
+.widget-frame .widget-help {
+  position: absolute;
+  left: -999em;
+}
+
+.widget-frame .widget-remove {
+  position: absolute;
+  right: 999em;
+}
+
+.widget-frame .widget-body {
+  width: 100%;
+  height: 67%;
+  text-align: center;
+}
+
+.widget-frame .icon-link {
+  text-decoration: none;
+}
+
+.widget-icon-container {
+  font-size: 70px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.widget-multiple-button {
+  font-size: 4em;
+  padding-top: 15px; 
+  padding-bottom: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.widget-frame .launch-app-button {
+  width: 100%;
+  padding: 5px;
+  position: absolute;
+  bottom: 0;
+  background-color: #ddd;
+  text-align: center;
+  display: block;
+  color: #666;
+  border-radius: 0;
+}
+
+.widget-frame .quick-list {
+  list-style-type: none;
+}
+
+.widget-frame .quick-list-item {
+  border-top: 1px solid #ddd;
+  margin-right: 15px;
+  margin-left: 15px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  font-weight: bolder;
+}
+
+div#main-entity {
+  border: 1px solid #ddd;
+  margin: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 30px;
+  padding-right: 30px;
+  font-size: 1.5em;
+}
+
+div#related-entities {
+  border: 1px solid #ddd;
+  margin-top: 15px;
+  padding: 5px;
+  font-size: .9em;
+  font-weight: bolder;
+}
+
+.related-entity {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-bottom: 2px solid #ddd;
+}
+  
+
+/***************************************************************/
+
+/* Server-side (php, sqlite, etc.) Error Messages
+
+/***************************************************************/
+
+.server-side-error-message {
+  display: none;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: normal;
+  color: black;
+}
+
+footer {
+  padding-top: 55px;
+  padding-bottom: 55px;
+  background-color: #f8f8f8;
+  border-color: #e7e7e7;
+  color: #777;
+  font-weight: bolder;
+  font-size: xx-small;
+}
+
+footer .message-holder{
+  background: #e7e7e7;
+}
+
+
+

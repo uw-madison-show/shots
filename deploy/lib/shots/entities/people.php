@@ -3,35 +3,34 @@
 include_once 'all_pages.php';
 include_once 'functions_database.php';
 
-
-$sm = $db->getSchemaManager();
-$grants_fields = $sm->listTableColumns('grants');
-$grants_primary_key = $sm->listTableIndexes('grants')['primary']->getColumns()[0];
+// get schema info
+$sm                 = $db->getSchemaManager();
+$people_fields      = $sm->listTableColumns('people');
+$people_primary_key = $sm->listTableIndexes('people')['primary']->getColumns()[0];
 
 
 
 /**
- * Returns all grants that match the ID(s).
+ * Returns all people that match the ID(s).
  *
  * @param mixed $id Either a string with a single id, e.g. '2', or an array of ids to fetch. Almost always an integer.
  * @param string $return_format A string to denote how the function should return the results. One of 'php', 'json'. Support of 'csv', 'serialzed' coming soon.
  *
  * @return mixed The results come out of the database as an array indexed by IDs with an associative array formated as field_name => value. Depending on $return_format the array may be post-processed into a json string, a serialized php string, or a csv string.
  */
-function grantsFetch( $id = false, $return_format = 'php' )
+function peopleFetch( $id = false, $return_format = 'php' )
 {
-  global $db, $grants_primary_key;
+  global $db, $people_primary_key;
   $id_array = (array) $id;
   $return_array = array();
   foreach ($id_array as $this_id) {
     //echo $this_id;
     $q = $db->createQueryBuilder();
     $q->select('*');
-    $q->from('grants');
-    $q->where( $grants_primary_key .' = :key_value' );
+    $q->from('people');
+    $q->where( $people_primary_key .' = :key_value' );
     $q->setParameters( array(':key_value' => $this_id) );
     $r = $q->execute()->fetchAll()[0];
-    // TODO test if there are results before using the arrray index, otherwise it throws undefined offset notices.
     $return_array[$this_id] = $r;
   }
   if ( $return_format === 'json' ){
@@ -56,13 +55,13 @@ function grantsFetch( $id = false, $return_format = 'php' )
  *
  * @return string Depending on the `$return_format` this is either a json, serialized php, or csv string.
  */
-function grantsFetchAll( $return_format = 'json' )
+function peopleFetchAll( $return_format = 'json' )
 {
-  global $db, $grants_primary_key;
+  global $db, $people_primary_key;
 
   $q = $db->createQueryBuilder();
   $q->select('*');
-  $q->from('grants');
+  $q->from('people');
   $r = $q->execute()->fetchAll();
 
   if ( !empty($r) ){
@@ -100,15 +99,12 @@ function grantsFetchAll( $return_format = 'json' )
  *
  * @return string
  */
-function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
+function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
 {
-  global $db, $grants_fields;
+  global $db, $people_fields;
   if ($field_name === FALSE or $field_value === FALSE) return FALSE; 
 
-  // print_r($grants_fields);
-  // echo $field_name;
-
-  if ( !in_array($field_name, array_keys($grants_fields)) ){
+  if ( !in_array($field_name, array_keys($people_fields)) ){
     // TODO error message 
     return FALSE;
   }
@@ -132,7 +128,7 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
     $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
     // figure out if i have integer, string, text, date, etc.
     // based on the DBAL Types
-    $field_type = $grants_fields[$field_name]->getType();
+    $field_type = $people_fields[$field_name]->getType();
 
     // echo "my field type: ";
     // echo $field_type;
@@ -152,6 +148,12 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
         $return_html .= '<textarea class="form-control" rows="2" id="'. $field_name . '" name="'. $field_name . '">' . $field_value . '</textarea>';
         $return_html .= '</div>';
         break;
+      case 'Boolean':
+        $return_html .= '<div class="col-xs-2">';
+        $return_html .= '<input class="form-control" type="checkbox" value="" id="' . $field_name . '" name="' . $field_name . '" ';
+        if ($field_value == true) $return_html .= ' checked ';
+        $return_html .= '/>';
+        $return_html .= '</div>';
       default:
         // TODO add a default
         break;
@@ -171,19 +173,25 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
 //viewGrant
 
 //addGrant
-function grantsAdd( $field_name = FALSE, $field_value = FALSE )
+function peopleAdd( $field_name = FALSE, $field_value = FALSE )
 {
- global $db, $grants_fields;
- 
- if ($field_name === FALSE or $field_value === FALSE) { return FALSE; }
+  global $db, $people_fields;
 
- if ( !in_array($field_name, array_keys($grants_fields)) ) { return FALSE;  } 
+  if ($field_name === FALSE or $field_value === FALSE) { 
+    return FALSE; 
+  }
 
- return addRecord('grants',
-                  $field_name,
-                  $field_value
-                  );
+  if ( !in_array($field_name, array_keys($people_fields)) ) { 
+    return FALSE;
+  } 
 
+  $affected_rows = $db->insert('people',
+                              array($field_name => $field_value)
+                              );
+
+  if ( $affected_rows > 0 ) { return TRUE; }
+
+  return FALSE;
 }
 
 //updateGrant
@@ -198,39 +206,46 @@ function grantsAdd( $field_name = FALSE, $field_value = FALSE )
  *
  * @return boolean
  */
-function grantsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
+function peopleUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
-  global $db, $grants_fields, $grants_primary_key;
+  global $db, $people_fields;
 
   if ($id_value === FALSE
       or $field_name === FALSE
       or $new_value === NULL
       ){
-    trigger_error('Missing params for grantsUpdate().');
+    // TODO error message
+    echo 'missing params for peopleUpdate';
     return FALSE;
   }
 
-  if ( !in_array($field_name, array_keys($grants_fields)) ){
-    trigger_error($field_name .' not in grants table.');
+  $return_bool = FALSE;
+
+  if ( !in_array($field_name, array_keys($people_fields)) ){
+    // TODO error message
     return FALSE;
   }
 
-  return updateRecord('grants',
-                      array($field_name => $new_value),
-                      $grants_primary_key,
-                      $id_value
-                      );
+  // TODO coerce $new_value into the appropriate data type for the column
+
+  // $check = $db->update('people', 
+  //                      array($field_name => $new_value), 
+  //                      array('person_id' => $id_value)
+  //                      );
+  $check = updateRecord('people',
+                        array($field_name => $new_value),
+                        'person_id',
+                        $id_value
+                        );
+
+           
+
+  if ($check > 0) $return_bool = TRUE;
+
+  return $return_bool;
 }
 
-//delete Grants
-function grantsDelete($id_value)
-{
-  global $db, $grants_primary_key;
-  return deleteRecord('grants',
-                      $grants_primary_key,
-                      $id_value
-                      );
-}
+//deleteGrants
 
 
 

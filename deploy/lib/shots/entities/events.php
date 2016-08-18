@@ -5,34 +5,34 @@ include_once 'functions_database.php';
 
 
 $sm = $db->getSchemaManager();
-$grants_fields = $sm->listTableColumns('grants');
-$grants_primary_key = $sm->listTableIndexes('grants')['primary']->getColumns()[0];
-
-
+$events_fields = $sm->listTableColumns('events');
+$events_primary_key = $sm->listTableIndexes('events')['primary']->getColumns()[0];
 
 /**
- * Returns all grants that match the ID(s).
+ * Returns all events that match the ID(s).
  *
  * @param mixed $id Either a string with a single id, e.g. '2', or an array of ids to fetch. Almost always an integer.
  * @param string $return_format A string to denote how the function should return the results. One of 'php', 'json'. Support of 'csv', 'serialzed' coming soon.
  *
  * @return mixed The results come out of the database as an array indexed by IDs with an associative array formated as field_name => value. Depending on $return_format the array may be post-processed into a json string, a serialized php string, or a csv string.
  */
-function grantsFetch( $id = false, $return_format = 'php' )
+function eventsFetch( $id = false, $return_format = 'php' )
 {
-  global $db, $grants_primary_key;
+  global $db, $events_primary_key;
   $id_array = (array) $id;
   $return_array = array();
   foreach ($id_array as $this_id) {
     //echo $this_id;
     $q = $db->createQueryBuilder();
     $q->select('*');
-    $q->from('grants');
-    $q->where( $grants_primary_key .' = :key_value' );
+    $q->from('events');
+    $q->where( $events_primary_key .' = :key_value' );
     $q->setParameters( array(':key_value' => $this_id) );
-    $r = $q->execute()->fetchAll()[0];
+    $r = $q->execute()->fetchAll();
     // TODO test if there are results before using the arrray index, otherwise it throws undefined offset notices.
-    $return_array[$this_id] = $r;
+    if ( !empty($r[0]) ){
+      $return_array[$this_id] = $r[0];
+    }
   }
   if ( $return_format === 'json' ){
     return json_encode($return_array);
@@ -46,47 +46,41 @@ function grantsFetch( $id = false, $return_format = 'php' )
   }
 }
 
-//fetchAllGrants
 /**
- * Returns all grants in the database.
+ * Returns all events within date range.
  *
- * Default return value is a json string.
+ * For now this is using a SQLite function datetime() to convert strings into datetime values for the comparison. Need to in the future abstract the query so that it can run on any db.
  *
- * @param string $return_format Default is "json". Can be set to "php" or "csv".
+ * @param string $start_date A string that SQLite can format into a datetime value.
+ * @param string $end_date A string that SQLite can format ito a datetime value.
  *
- * @return string Depending on the `$return_format` this is either a json, serialized php, or csv string.
+ * @return array Holding all of the events in the specified range. json_encode() will turn it into a JSON formatted string which can be passed to FullCalendar.
  */
-function grantsFetchAll( $return_format = 'json' )
+function eventsFetchDateRange($start_date = FALSE, $end_date = FALSE)
 {
-  global $db, $grants_primary_key;
+  global $db;
+  $return_array = array();
 
   $q = $db->createQueryBuilder();
   $q->select('*');
-  $q->from('grants');
+  $q->from('events');
+  // TODO make these not be sqlite specific datetime functions; how?
+  $q->where('datetime(datetime_start) > datetime(:start_date)');
+  $q->andWhere('datetime(datetime_start) < datetime(:end_date)');
+
+  $q->setParameter(':start_date', $start_date);
+  $q->setParameter(':end_date',   $end_date);
+
   $r = $q->execute()->fetchAll();
 
-  if ( !empty($r) ){
-    if ( $return_format === 'json' ){
-      return json_encode($r);
-    } elseif ( $return_format === 'php' ){
-      return serialize($r);
-    } elseif ( $return_format === 'csv' ){
-      // TODO add the csv output support
-      return null;
-    } else {
-      return $r;
-    }
-  }
+  // convert the event records into FullCalendar json object format?
 
-  return FALSE;
+  $return_array = $r;
+  return $return_array;
 }
 
-
-//searchGrants
-
-//createGrantFieldHtml
 /**
- * Returns the HTML for a field in the grants table.
+ * Returns the HTML for a field in the events table.
  *
  * Takes the field name, field value, and an array of options and returns a string
  * containing the basic HTML for this one field. Strings, integers, etc. all have
@@ -100,16 +94,17 @@ function grantsFetchAll( $return_format = 'json' )
  *
  * @return string
  */
-function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
+function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
 {
-  global $db, $grants_fields;
-  if ($field_name === FALSE or $field_value === FALSE) return FALSE; 
+  global $db, $events_fields;
+  if ($field_name === FALSE or $field_value === FALSE) {
+    trigger_error('Field name and field value are required for *CreateFieldHtml functions.');
+    return FALSE; 
+  }
 
-  // print_r($grants_fields);
-  // echo $field_name;
 
-  if ( !in_array($field_name, array_keys($grants_fields)) ){
-    // TODO error message 
+  if ( !in_array($field_name, array_keys($events_fields)) ){
+    trigger_error($field_name . ' is not a valid field in the events table.');
     return FALSE;
   }
 
@@ -132,7 +127,7 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
     $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
     // figure out if i have integer, string, text, date, etc.
     // based on the DBAL Types
-    $field_type = $grants_fields[$field_name]->getType();
+    $field_type = $events_fields[$field_name]->getType();
 
     // echo "my field type: ";
     // echo $field_type;
@@ -168,77 +163,48 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
 
 }
 
-//viewGrant
-
-//addGrant
-function grantsAdd( $field_name = FALSE, $field_value = FALSE )
-{
- global $db, $grants_fields;
- 
- if ($field_name === FALSE or $field_value === FALSE) { return FALSE; }
-
- if ( !in_array($field_name, array_keys($grants_fields)) ) { return FALSE;  } 
-
- return addRecord('grants',
-                  $field_name,
-                  $field_value
-                  );
-
-}
-
-//updateGrant
 /**
- * Changes a value in the grant table.
+ * Changes a value in the events table.
  *
  * You provide the key value, the field name, and the new value.
  * 
- * @param integer $id_value The id value for the grant for the update.
+ * @param integer $id_value The id value for the event for the update.
  * @param string $field_name Field to be updated.
  * @param mixed $new_value New value. Can be integer, string, etc. depending on the type of $field_name.
  *
  * @return boolean
  */
-function grantsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
+function eventsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
-  global $db, $grants_fields, $grants_primary_key;
+  global $db, $events_fields, $events_primary_key;
 
   if ($id_value === FALSE
       or $field_name === FALSE
       or $new_value === NULL
       ){
-    trigger_error('Missing params for grantsUpdate().');
+    trigger_error('Missing params for eventsUpdate().');
     return FALSE;
   }
 
-  if ( !in_array($field_name, array_keys($grants_fields)) ){
-    trigger_error($field_name .' not in grants table.');
+  if ( !in_array($field_name, array_keys($events_fields)) ){
+    trigger_error($field_name .' not in events table.');
     return FALSE;
   }
 
-  return updateRecord('grants',
+  return updateRecord('events',
                       array($field_name => $new_value),
-                      $grants_primary_key,
+                      $events_primary_key,
                       $id_value
                       );
 }
 
-//delete Grants
-function grantsDelete($id_value)
+//delete Event
+function eventsDelete($id_value)
 {
-  global $db, $grants_primary_key;
-  return deleteRecord('grants',
-                      $grants_primary_key,
+  global $db, $events_primary_key;
+  return deleteRecord('evnts',
+                      $events_primary_key,
                       $id_value
                       );
 }
 
-
-
-
-
-
-
-// echo '<pre>';
-// print_r(get_defined_vars());
-// echo '</pre>';
-?>
