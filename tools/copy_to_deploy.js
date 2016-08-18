@@ -17,6 +17,7 @@ copy_options.overwrite = true;
 // function for ignoring files; defined globally across the whole project
 // cpr documentation: "f you give it a RegExp, it will use that to test the filename as they are being gathered. If it passes, it will be removed. If you give it a function, it will use that with Array.filter on the list of files.""
 function filenameFilter (filename){
+  // TODO make this filename filter for git stuff, and *foo* files
   return true;
 }
 
