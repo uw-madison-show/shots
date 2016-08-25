@@ -1,4 +1,5 @@
 <?php
+require_once 'all_pages.php';
 
 // stuff that goes at the top of every html page
 
@@ -17,7 +18,7 @@
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li><a href="/">Home</a></li>
+        <li><a href="/<?php echo $app_root;?>">Home</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Jump To <span class="caret"></span></a>
           <ul class="dropdown-menu">

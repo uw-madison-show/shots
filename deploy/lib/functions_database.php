@@ -180,7 +180,7 @@ function changelog( $table_name, $table_key_field, $key_value, $field_name, $old
  * @param string $key_field Name of the primary key in the table.
  * @param string $id Value of the key where the update will get made.
  *
- * @return mixed Returns TRUE if there are no errors and at least one update. Returns FALSE if there are no errors, but there were no updates. Returns an error message if there are db/php errors.
+ * @return boolean Returns TRUE if there are no errors and at least one update. Returns FALSE if there are no errors, but there were no updates. 
  */
 function updateRecord($table_name = NULL, $edits = array(), $key_field = NULL, $id = NULL)
 {
@@ -223,6 +223,17 @@ function updateRecord($table_name = NULL, $edits = array(), $key_field = NULL, $
   return $return_boolean;
 }
 
+/**
+ * Add a record to the table with one field value.
+ *
+ * You should not add the value of the primary key as we assume that it will be autoincrementing. To get a "blank" row, set the field name to a string field with no constraints and set the value to an empty string, "".
+ *
+ * @param string $table_name The name of the entity to be added.
+ * @param string $field_name The field that will get set to $field_value.
+ * @param mixed $field_value The new value. The format depends on the format of the field specified by $field_name.
+ *
+ * @return mixed Returns FALSE when there are errors or the query fails. Returns DBAL's lastInsertId() when the insert query succeeds.
+ */
 function addRecord($table_name = NULL, $field_name = NULL, $field_value = NULL)
 {
   global $db;
@@ -247,7 +258,7 @@ function addRecord($table_name = NULL, $field_name = NULL, $field_value = NULL)
                    NULL,
                    $field_value
                    );
-    return TRUE;
+    return $last_insert_id;
   }
   return FALSE;
 }
@@ -305,6 +316,47 @@ function deleteRecord($table_name, $field_name, $field_value)
   }
 
   return $return_boolean;
+}
+
+/**
+  * Returns the record from the table.
+  * 
+  * The key field is determined dynamically by using the DBAL built in functions, so you only specify the key value.
+  *
+  * @param string $table_name Name of the table.
+  * @param string $key_value Value of the key field.
+  *
+  * @return mixed Associative array of the record or FALSE if there are any errors or there is no record.
+  */
+function getRecord($table_name = NULL, $key_value)
+{
+  global $db;
+
+  $return_array = array();
+
+  // get primary key
+  $sm = $db->getSchemaManager();
+  $key_field = $sm->listTableIndexes($table_name)['primary']->getColumns()[0];
+
+  // TODO maybe quote the table name; but i think i can trust that only my own functions are calling this function?
+
+  // run the search
+  $q = $db->createQueryBuilder();
+  $q->select('*');
+  $q->from($table_name);
+  $q->where($key_field .' = :key_value');
+  $q->setParameters( array(':key_value' => $key_value) );
+  $r = $q->execute()->fetchAll();
+
+  if (empty($r)) {
+    return FALSE;
+  } else if ( count($r) > 1 ) {
+    trigger_error('Too many records. Table: ' . $table_name . ', ID: '. $key_value . ', count: '. count($r));
+    return FALSE;
+  } else {
+    $return_array = $r[0];
+    return $return_array; 
+  }
 }
 
 

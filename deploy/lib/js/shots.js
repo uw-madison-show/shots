@@ -107,7 +107,7 @@ function ajaxChange(e){
 
   console.log(req);
 
-  $.post('/lib/ajax_handler.php', 
+  $.post(app_root + '/lib/ajax_handler.php', 
          { "request": req },
          "json"
          )
@@ -183,7 +183,7 @@ function openDeleteModal(e){
 
   // do the request
   // use the handlers to finish the UI updates
-  $.post('/lib/ajax_handler.php', 
+  $.post(app_root + '/lib/ajax_handler.php', 
          { 
           "request": req 
          },
@@ -221,7 +221,7 @@ function openDeleteModal(e){
 
   // do the request
   // use the handlers to finish the UI updates
-  $.post('/lib/ajax_handler.php', 
+  $.post(app_root + '/lib/ajax_handler.php', 
          { 
           "request": req 
          },
@@ -317,7 +317,7 @@ function ajaxDelete(a){
   
     console.log(req);
 
-    var this_req = $.post('/lib/ajax_handler.php', 
+    var this_req = $.post(app_root + '/lib/ajax_handler.php', 
                           { "request": req },
                           "json"
                           );
@@ -363,7 +363,7 @@ function getTableData(target, entity) {
 
   console.log(req);
 
-  $.post({url: '/lib/ajax_handler.php',
+  $.post({url: app_root + '/lib/ajax_handler.php',
           data: { "request": req },
           dataType: "json",
           async: false
@@ -412,7 +412,7 @@ function saveHandsonChange(change, entity, target) {
 
   console.log(req);
 
-  $.post('/lib/ajax_handler.php', 
+  $.post(app_root + '/lib/ajax_handler.php', 
            { "request": req },
            "json"
            )
@@ -532,7 +532,7 @@ function addRow(e) {
 
   console.log(req);
 
-  $.post('/lib/ajax_handler.php',
+  $.post(app_root + '/lib/ajax_handler.php',
          { "request": req },
          "json"
          )
@@ -673,7 +673,7 @@ function revealRelatedEntities(e) {
 
     // do the request
     // use the handlers to finish the UI updates
-    $.post('/lib/ajax_handler.php', 
+    $.post(app_root + '/lib/ajax_handler.php', 
            { "request": req },
            "json"
            )

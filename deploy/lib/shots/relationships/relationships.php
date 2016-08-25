@@ -72,3 +72,74 @@ function relationshipsFetch( $entity_type = false, $entity_id = false, $format =
 
   return $return_array;
 }
+
+function relationshipsAdd($from_entity_type = FALSE, $from_entity_id = FALSE, $to_entity_type = FALSE, $to_entity_id = FALSE, $relationship_type = 'is_related_to')
+{
+  $timer_start = microtime(true);
+  global $db;
+
+
+  if (!$from_entity_type or !$from_entity_id or !$to_entity_type or !$to_entity_id) {
+    trigger_error('Missing parameters from relationshipsAdd().');
+    return FALSE;
+  }
+
+  // test if entity types are valid table names
+  $sm = $db->getSchemaManager();
+  $t = $sm->listTables();
+  $table_list = array();
+  foreach ($t as $key => $this_table) {
+    $table_list[] = $this_table->getName();
+  }
+
+  if ( !in_array($from_entity_type, $table_list) ){
+    trigger_error($from_entity_type . ' is not a valid entity.');
+    return FALSE;
+  }
+
+  if (!in_array($to_entity_type, $table_list) ){
+    trigger_error($to_entity_type . ' is not a valid entity.');
+    return FALSE;
+  }
+  $checks_done = microtime(true);
+
+  // test if the id values exist in the entity tables;
+  $from_record = getRecord($from_entity_type, $from_entity_id);
+  $to_record   = getRecord($to_entity_type,   $to_entity_id);
+
+  if (empty($from_record)) {
+    trigger_error('Could not find ID '. $from_entity_id . ' in table ' . $from_entity_type);
+    return FALSE;
+  }
+
+  if (empty($to_record)) {
+    trigger_error('Could not find ID '. $to_entity_id . ' in table ' . $to_entity_type);
+    return FALSE;
+  }
+  $getRecord_done = microtime(true);
+
+  // check if this relationship already exists
+
+  // insert the relationship
+  $new_id = addRecord('relationships',
+                      'from_entity_type',
+                      $from_entity_type
+                      );
+  $addRecord_done = microtime(true);
+  $ck = updateRecord('relationships',
+                     array('from_entity_id'    => $from_entity_id,
+                           'to_entity_type'    => $to_entity_type,
+                           'to_entity_id'      => $to_entity_id,
+                           'relationship_type' => $relationship_type),
+                     'relationship_id',
+                     $new_id
+                     );
+  $updateRecord_done = microtime(true);
+
+  echo '<div>checks '. ($checks_done - $timer_start) . '</div>';
+  echo '<div>getRecord '. ($getRecord_done - $checks_done) . '</div>';
+  echo '<div>addRecord '. ($addRecord_done - $getRecord_done). '</div>';
+  echo '<div>updateRecord '. ($updateRecord_done - $addRecord_done) . '</div>';
+
+  return $ck;
+}
