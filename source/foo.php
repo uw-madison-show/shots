@@ -1,53 +1,34 @@
 <?php
-
 include './lib/all_pages.php';
+
+// ob_start();
 include 'html_doctype.php';
 include 'html_head.php';
+// ob_end_flush();
 
-include 'shots/entities/documents.php';
+$new_rel_start = microtime(true);
+include 'shots/relationships/relationships.php';
+$new_rel = relationshipsAdd('grants',
+                            '2',
+                            'people',
+                            '4'
+                            );
+$new_rel_done = microtime(true);
 
-// $bar = documentsAdd('title', 'blah');
+echo '<div>relationshipsAdd ' . ($new_rel_done - $new_rel_start) . '</div>';
 
-$foo = documentsFetchAll('native');
-
-
+$foo = $db->query('select * from relationships')->fetchAll();
 
 ?>
 
 <body>
 
-  <?php include 'html_navbar.php'; ?>
+<?php include 'html_navbar.php'; ?>
 
-  <input id="my_upload" type="file" name="files[]" data-url="lib/file_handler.php" multiple/>
+<?php include 'html_footer.php'; ?>
 
-  <?php include 'html_footer.php'; ?>
-
-  <script type="text/javascript">
-  $(document).ready(function() {
-    
-    /**********************************************************/
-
-    // Page Setup Code
-
-    /**********************************************************/
-    $('#my_upload').fileupload({
-      dataType: 'json',
-      done: function (e, data) {
-        console.log(e);
-        console.log(data);
-      }
-    });
-    
-    /**********************************************************/
-
-    // Event Listeners
-
-    /**********************************************************/
-
-  });
-  </script>
-
+<script>
+  
+</script>
 </body>
 </html>
-
-
