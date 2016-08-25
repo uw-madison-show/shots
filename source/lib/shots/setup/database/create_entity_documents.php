@@ -27,15 +27,17 @@ if ( $table_exists ){
   $table->addColumn('document_id', 'integer', array('notnull' => true, 'autoincrement' => true));
   // this is the filename as it is stored on the server
   $table->addColumn('server_name', 'string',  array('notnull' => false));
-  $table->addColumn('name',        'string',  array('notnull' => false));
-  $table->addColumn('extension',   'string',  array('notnull' => false));
-  $table->addColumn('size',        'string',  array('notnull' => false));
-  $table->addColumn('mime_type',   'string',  array('notnull' => false));
-  $table->addColumn('url',         'text',    array('notnull' => false));
-  $table->addColumn('title',       'string',  array('notnull' => false));
-  $table->addColumn('description', 'text',    array('notnull' => false));
-  $table->addColumn('version',     'integer', array('notnull' => false));
-  $table->addColumn('active',      'boolean', array('notnull' => false));
+  // this is the human readable filename
+  $table->addColumn('name',             'string',   array('notnull' => false));
+  $table->addColumn('extension',        'string',   array('notnull' => false));
+  $table->addColumn('size',             'string',   array('notnull' => false));
+  $table->addColumn('mime_type',        'string',   array('notnull' => false));
+  $table->addColumn('url',              'text',     array('notnull' => false));
+  $table->addColumn('title',            'string',   array('notnull' => false));
+  $table->addColumn('description',      'text',     array('notnull' => false));
+  $table->addColumn('upload_timestamp', 'datetime', array('notnull' => false));
+  $table->addColumn('version',          'integer',  array('notnull' => false));
+  $table->addColumn('active',           'boolean',  array('notnull' => false));
 
   $table->setPrimaryKey(array('document_id'));
 

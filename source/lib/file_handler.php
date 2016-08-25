@@ -20,9 +20,11 @@ require_once('shots/entities/documents.php');
 //         'upload_url' => "localhost:3000/database/files/")
 //   );
 
-$upload_handler = new ShotsUploadHandler( array(
-  'upload_dir' => "C:\\Users\\moehr\\Documents\\GitHub\\shots\\source\\database\\files\\",
-  'upload_url' => "localhost:3000/database/files/",
-  )
-                                         );
+$options = array('upload_dir' => "C:\\Users\\moehr\\Documents\\GitHub\\shots\\source\\database\\files\\",
+                 'upload_url' => "localhost:3000/database/files/",
+                 'image_file_types' => null,
+                 );
+
+$upload_handler = new ShotsUploadHandler( $options );
+
 ?>

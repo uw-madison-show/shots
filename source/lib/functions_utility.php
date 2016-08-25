@@ -49,7 +49,7 @@ function grabString( $variable_name = FALSE )
   $value = '';
   if ( !$variable_name ) { return $value; }
   $value = filter_input(INPUT_GET, $variable_name, FILTER_SANITIZE_STRING);
-  if ( $value === '' ) {
+  if ( empty($value) ) {
     $value = filter_input(INPUT_POST, $variable_name, FILTER_SANITIZE_STRING);
   }
   return $value;
