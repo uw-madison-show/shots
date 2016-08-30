@@ -13,6 +13,7 @@ var key_field_mapping = {
                           "events": "event_id",
                           "grants": "grant_id",
                           "people": "person_id",
+                          "documents": "document_id",
                           "lookup_values": "lookup_value_id",
                         }
 
@@ -22,6 +23,7 @@ var empty_field_mapping = {
                             "events": "title",
                             "grants": "title",
                             "people": "name",
+                            "documents": "title",
                             "lookup_values": "lookup_value", 
                           }            
 
@@ -33,6 +35,7 @@ var title_field_mapping = {
                             "events": ["datetime_start", "title"],
                             "grants": ["title", "grant_body"],
                             "people": ["name", "affiliation"],
+                            "documents": ["name", "extension"],
                             "lookup_value": ["column_name", "label"],
                           }
 

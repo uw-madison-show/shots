@@ -3,11 +3,14 @@
 require_once 'all_pages.php';
 require_once 'jQuery-File-Upload/UploadHandler.php';
 require_once 'functions_database.php';
+require_once 'shots/relationships/relationships.php';
 
 
 $sm                    = $db->getSchemaManager();
 $documents_fields      = $sm->listTableColumns('documents');
 $documents_primary_key = $sm->listTableIndexes('documents')['primary']->getColumns()[0];
+
+$only_show_active_documents_default = TRUE;
 
 
 /**
@@ -138,7 +141,7 @@ function documentsAdd( $field_name = FALSE, $field_value = FALSE )
  * @param string $field_name Field to be updated.
  * @param mixed $new_value New value. Can be integer, string, etc. depending on the type of $field_name.
  *
- * @return boolean
+ * @return boolean TRUE when there are no errors and there is an update. FALSE when there are no updates or when there are errors.
  */
 function documentsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
@@ -161,14 +164,28 @@ function documentsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = N
                       );
 }
 
-
-function documentsFetchAll( $return_format = 'json' )
+/**
+ * Returns all of the documents in the table.
+ *
+ * @param string $return_format The format that the function returs. Can be one of 'json', 'php', or 'csv'. Defaults to 'json'.
+ * @param boolean $only_show_active_documents Determines if the database returns all matching documents or just the documents where active = '1'. Defaults to TRUE.
+ *
+ * @return mixed JSON string or php array depending on the value of $return_format.
+ */
+function documentsFetchAll( $return_format = 'json', $only_show_active_documents = null )
 {
-  global $db;
+  global $db, $only_show_active_documents_default;
+
+  if (null === $only_show_active_documents) {
+    $only_show_active_documents = $only_show_active_documents_default;
+  }
 
   $q = $db->createQueryBuilder();
   $q->select('*');
   $q->from('documents');
+  if ($only_show_active_documents) {
+    $q->andWhere("active = '1'");
+  }
   $r = $q->execute()->fetchAll();
 
   if ( !empty($r) ){
@@ -188,18 +205,66 @@ function documentsFetchAll( $return_format = 'json' )
 }
 
 /**
+ * Returns all documents that match the ID(s).
+ *
+ * @param mixed $id Either a string with a single id, e.g. '2', or an array of ids to fetch. Almost always an integer.
+ * @param string $return_format A string to denote how the function should return the results. One of 'php', 'json'. Support of 'csv', 'serialzed' coming soon.
+ * @param boolean $only_show_active_documents Determines if the database returns all matching documents or just the documents where active = '1'. Defaults to TRUE.
+ *
+ * @return mixed The results come out of the database as an array indexed by IDs with an associative array formated as "field_name" => "value". Depending on $return_format the array may be post-processed into a json string, a serialized php string, or a csv string.
+ */
+function documentsFetch( $id = false, $return_format = 'php', $only_show_active_documents = null )
+{
+  global $db, $documents_primary_key, $only_show_active_documents_default;
+  $id_array = (array) $id;
+  if (null == $only_show_active_documents) {
+    $only_show_active_documents = $only_show_active_documents_default;
+  }
+  $return_array = array();
+  foreach ($id_array as $this_id) {
+    //echo $this_id;
+    $q = $db->createQueryBuilder();
+    $q->select('*');
+    $q->from('documents');
+    $q->where( $documents_primary_key .' = :key_value' );
+    if ($only_show_active_documents) {
+      $q->andWhere("active = '1'");
+    }
+    $q->setParameters( array(':key_value' => $this_id) );
+    $r = $q->execute()->fetchAll()[0];
+    // TODO test if there are results before using the arrray index, otherwise it throws undefined offset notices.
+    $return_array[$this_id] = $r;
+  }
+  if ( $return_format === 'json' ){
+    return json_encode($return_array);
+  } elseif ( $return_format === 'php' ){
+    return $return_array;
+  } elseif ( $return_format === 'csv' ){
+    // TODO add the csv output support
+    return null;
+  } else {
+    return $return_array;
+  }
+}
+
+/**
  * Search the documents table.
  *
  * @param string $search_field The field to search.
- * @param mixed $search_value The value to match on. Give me a string or an array of values. If it is an array the function will use the in SQL operator.
+ * @param mixed $search_value The value to match on. Give me a string or an array of values. If it is an array the function will use the SQL `in` operator.
  * @param string $return_format One of json, php, csv, or native. csv may not work yet. php is a serialized string. native is a php array that hasn't been transformed. Defaults to native.
+ * @param boolean $only_show_active_documents Determines if the database returns all matching documents or just the documents where active = '1'. Defaults to TRUE.
  *
  * @return mixed String or php array depending on the $return_format. Returns FALSE on errors.
  */
-function documentsSearch( $search_field = FALSE, $search_value = FALSE, $return_format = 'native' )
+function documentsSearch( $search_field = FALSE, $search_value = FALSE, $return_format = 'native', $only_show_active_documents = null )
 {
-  global $db, $documents_fields;
+  global $db, $documents_fields, $only_show_active_documents_default;
   $result = FALSE;
+
+  if (null === $only_show_active_documents) {
+    $only_show_active_documents = $only_show_active_documents_default;
+  }
 
   if (!$search_field or !$search_value){
     trigger_error('Missing params for documentsSearch().');
@@ -216,9 +281,12 @@ function documentsSearch( $search_field = FALSE, $search_value = FALSE, $return_
   $q = $db->createQueryBuilder();
   $q->select('*');
   $q->from('documents');
+  if ($only_show_active_documents) {
+    $q->andWhere("active = '1'");
+  }
 
   if (is_array($search_value)) {
-    $q->where($search_field_q . ' in (?)');
+    $q->andWhere($search_field_q . ' in (?)');
     $sql = $q->getSQL();
     $stmt = $db->executeQuery($sql,
                               array($search_value),
@@ -226,7 +294,7 @@ function documentsSearch( $search_field = FALSE, $search_value = FALSE, $return_
                               );
     $result = $stmt->fetchAll();
   } else {
-    $q->where($search_field_q . ' = :search_value');
+    $q->andWhere($search_field_q . ' = :search_value');
     $q->setParameters( array(':search_value' => $search_value) );
     $result = $q->execute()->fetchAll();
   }
@@ -247,6 +315,77 @@ function documentsSearch( $search_field = FALSE, $search_value = FALSE, $return_
   return FALSE;
 }
 
+/**
+ * Set the documents active field to "0" thus making it an archived file.
+ *
+ * You must feed in an associative array with some identifiable info; either the document_id, the server_name, or a combination of the name, extension, and file size. All the documents that match the criteria will be set to inactive. UNLESS, you set the $guaranty_one_active_file paramter to TRUE; in which case, the query will set the most recently uploaded file to active. TODO maybe I should make these two things (deactivation and making sure that one file is actie) into two separate functions, but it's handy to have them in the same function for now.
+ *
+ * @param array $search_array Associative array formatted like array("field_name" => "field_value") that can identify the documents.
+ * @param boolean $guaranty_one_active_file Defaults to FALSE. This is a flag that will ensure that the function does not archive all the matching files. If set to TRUE, it will try to leave the most recent file as active. If set to TRUE, and the function can not set a file to active, it will trigger an error and return FALSE.
+ *
+ * @return boolean Returns TRUE when there are no errors; Returns FALSE on any error.
+ */
+function documentsDeactivate($search_array = FALSE, $guaranty_one_active_file = FALSE)
+{
+  global $db, $documents_fields, $documents_primary_key;
+  $return_boolean = TRUE;
+
+  if (!$search_array or empty($search_array) or !is_array($search_array)){
+    trigger_error('Missing params for documentsDeactivate().');
+    return FALSE;
+  }
+
+  $q = $db->createQueryBuilder();
+  $q->select($documents_primary_key, 'upload_timestamp');
+  $q->from('documents');
+  $q->where("upload_timestamp <> ''");
+  
+    // $q->where($search_field_q . ' = :search_value');
+    // $q->setParameters( array(':search_value' => $search_value) );
+    // $result = $q->execute()->fetchAll();
+
+  // create a where clause for each element in the search array
+  foreach( $search_array as $key => $value ){
+    if ( !in_array($key, array_keys($documents_fields)) ){
+      trigger_error($key .' is not a field in the documents table.');
+      return FALSE;
+    }
+    $key_q = $db->quoteIdentifier($key);
+    $q->andWhere($key_q . ' = ' . $q->createPositionalParameter($value));
+  }
+
+  // if the call needs a guaranty one active record, then we can leave the most current record as active
+  $q->orderBy('datetime(upload_timestamp)', 'ASC');
+
+  $sql = $q->getSQL();
+
+  $result = $q->execute()->fetchAll();
+
+  // TODO loop through each of the document IDs in the result and use documentsUpdate to set the 'active' field to zero.
+  $ii = 1;
+  $count_results = count($result);
+  foreach ( $result as $key => $this_doc ){
+    try {
+      if ( $guaranty_one_active_file && ($ii === $count_results) ) {
+        // set the most recent to active
+        $ck = documentsUpdate( $this_doc[$documents_primary_key], 'active', '1' );
+        // echo "guaranty is true and is last;";
+        // var_dump($ck);
+      } else {
+        // set all the other files to inactive
+        $ck = documentsUpdate( $this_doc[$documents_primary_key], 'active', '0' );
+        // echo "guaranty is false or is not last;";
+        // var_dump($ck);
+      }
+    } catch (Exception $e) {
+      trigger_error($e);
+      $return_boolean = FALSE; 
+    }
+    $ii++;
+  }
+  return $return_boolean;
+}
+
 
 // stolen from here: https://github.com/blueimp/jQuery-File-Upload/wiki/PHP-MySQL-database-integration
 class ShotsUploadHandler extends UploadHandler 
@@ -262,25 +401,28 @@ class ShotsUploadHandler extends UploadHandler
 
   protected function handle_form_data($file, $index) 
   {
-    // error_log('ShotsUploadHandler handle_form_data has been called.');
+    error_log('ShotsUploadHandler handle_form_data has been called.');
 
-    // $stuff = print_r($file, TRUE) . 
-    //          print_r($_REQUEST, TRUE) . 
-    //          print_r($_GET, TRUE) .
-    //          print_r($_POST, TRUE)
-    //          ;
-    // error_log($stuff);
+    $stuff = print_r($file, TRUE) . 
+             print_r($_REQUEST, TRUE) . 
+             print_r($_GET, TRUE) .
+             print_r($_POST, TRUE)
+             ;
+    error_log($stuff);
 
     // TODO implement the $index param to make this handle multiple files;
-    $file->title       = grabString('title');
-    $file->description = grabString('description');
+    $file->title            = grabString('title');
+    $file->description      = grabString('description');
+    $file->from_entity_type = grabString('from_entity_type');
+    $file->from_entity_id   = grabString('from_entity_id');
+
   }
 
   protected function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null, $content_range = null) 
   {
     global $db;
-    error_log($uploaded_file);
-    error_log($name);
+    // error_log($uploaded_file);
+    // error_log($name);
 
     // set all the default values
     $obfus_name              = null;
@@ -290,8 +432,8 @@ class ShotsUploadHandler extends UploadHandler
     
     if ( !is_null($name) ){
       $pathinfo = pathinfo($name);
-      // $pathinfo_string = print_r($pathinfo, TRUE);
-      // error_log("\npathinfo()\n" .$pathinfo_string);
+      $pathinfo_string = print_r($pathinfo, TRUE);
+      error_log("\npathinfo()\n" .$pathinfo_string);
 
       $uploaded_file_timestamp = date("Y-m-d H:i:s", filemtime($uploaded_file));
       // $st = print_r($file_upload_time, TRUE);
@@ -313,8 +455,7 @@ class ShotsUploadHandler extends UploadHandler
         $version = $matches + 1;
       }
 
-      // guess whether or not this file is active
-      // TODO deactive the previous versions of this document
+      // by default this file will be active
       $active = 1;
 
       // make up a obfusicated md5 filename
@@ -322,7 +463,7 @@ class ShotsUploadHandler extends UploadHandler
       $obfus_name = $obfus_file_part . '.' . $pathinfo['extension'];
     } 
 
-    error_log("\nobfus name:\n". $obfus_name);
+    // error_log("\nobfus name:\n". $obfus_name);
 
     $file = parent::handle_file_upload($uploaded_file, 
                                        $obfus_name, 
@@ -340,16 +481,21 @@ class ShotsUploadHandler extends UploadHandler
 
       $ck = documentsAdd('server_name', $file->name);
 
-      $new_documents = documentsSearch('server_name', $file->name);
+      // third param of documentsSearch must be set to FALSE to return all docs not just the active docs
+      $new_documents = documentsSearch('server_name', $file->name, FALSE);
       $new_documents_string = print_r($new_documents, TRUE);
       error_log("\n last insert id:\n" .$new_documents_string);
 
-      // TODO handle the edge case when there are > 1 matched documents; although maybe server_name is gauranteed to be unique???
       $new_id = $new_documents[0]['document_id'];
 
       if (!empty($new_id)) {
         try {
+
           $file->id = $new_id;
+
+          // *************************************
+          // update the metadata for the new file
+          // *************************************
           $ck_n = documentsUpdate($new_id, 'name',             $pathinfo['filename']);
           $ck_e = documentsUpdate($new_id, 'extension',        $pathinfo['extension']);
           $ck_s = documentsUpdate($new_id, 'size',             $file->size);
@@ -360,64 +506,73 @@ class ShotsUploadHandler extends UploadHandler
           $ck_p = documentsUpdate($new_id, 'upload_timestamp', $uploaded_file_timestamp);
           $ck_v = documentsUpdate($new_id, 'version',          $version);
           $ck_a = documentsUpdate($new_id, 'active',           $active);
+
+          // ******************************************
+          // deactive any old versions of the same file
+          // ******************************************
+          $to_deactivate = array("name" => $pathinfo['filename'],
+                                 "extension" => $pathinfo['extension'],
+                                 "size" => $file->size
+                                 );
+          // second param of documentsDeactivate is set to true to make sure that the most recent version of this file is still set to active;
+          $ck_deactivate = documentsDeactivate($to_deactivate, TRUE);
+
+          // ******************************************
+          // update the relationships table
+          // ******************************************
+          $from_entity_type = $file->from_entity_type;
+          $from_entity_id   = $file->from_entity_id;
+          if ( !empty($from_entity_type) && !empty($from_entity_id) ){
+            $ck_relate = relationshipsAdd($from_entity_type,
+                                          $from_entity_id,
+                                          'documents',
+                                          $new_id
+                                          );
+          }
+          $stuff = print_r(get_defined_vars(), TRUE);
+          error_log($stuff);
         } catch (Exception $e) {
           trigger_error($e);
-        }
+        } // end try-catch for all the metadata db updates
+      } // end if new_id is not empty
+    } // end if $file->error is empty
+    return $file;
+  }
+
+  protected function set_additional_file_properties($file) 
+  {
+      parent::set_additional_file_properties($file);
+      if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        // TODO redesign this to use a function like documentsFetch;
+
+          // $sql = 'SELECT `id`, `type`, `title`, `description` FROM `'
+          //     .$this->options['db_table'].'` WHERE `name`=?';
+          // $query = $this->db->prepare($sql);
+          // $query->bind_param('s', $file->name);
+          // $query->execute();
+          // $query->bind_result(
+          //     $id,
+          //     $type,
+          //     $title,
+          //     $description
+          // );
+          // while ($query->fetch()) {
+          //     $file->id = $id;
+          //     $file->type = $type;
+          //     $file->title = $title;
+          //     $file->description = $description;
+          // }
       }
-      
-    
-      // $sql = 'INSERT INTO `'.$this->options['db_table']
-      //     .'` (`name`, `size`, `type`, `title`, `description`)'
-      //     .' VALUES (?, ?, ?, ?, ?)';
-      // $query = $this->db->prepare($sql);
-      // $query->bind_param(
-      //     'sisss',
-      //     $file->name,
-      //     $file->size,
-      //     $file->type,
-      //     $file->title,
-      //     $file->description
-      // );
-      // $query->execute();
-      
-    }
-        return $file;
-    }
+  }
 
-    protected function set_additional_file_properties($file) 
-    {
-        parent::set_additional_file_properties($file);
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-          // TODO redesign this to use a function like documentsFetch;
+  public function delete($print_response = true) {
+    // I will not actually delete any files
+    // $response = parent::delete(false);
 
-            // $sql = 'SELECT `id`, `type`, `title`, `description` FROM `'
-            //     .$this->options['db_table'].'` WHERE `name`=?';
-            // $query = $this->db->prepare($sql);
-            // $query->bind_param('s', $file->name);
-            // $query->execute();
-            // $query->bind_result(
-            //     $id,
-            //     $type,
-            //     $title,
-            //     $description
-            // );
-            // while ($query->fetch()) {
-            //     $file->id = $id;
-            //     $file->type = $type;
-            //     $file->title = $title;
-            //     $file->description = $description;
-            // }
-        }
-    }
-
-    public function delete($print_response = true) {
-        // I will not actually delete any files
-        // $response = parent::delete(false);
-
-        // TODO use documentsUpdate to set the active field to false;
-
-        return $this->generate_response($response, $print_response);
-    }
+    // TODO use documentsUpdate to set the active field to false;
+    // return $this->generate_response($response, $print_response);
+    return 'delete failed';
+  }
 }
 
 
