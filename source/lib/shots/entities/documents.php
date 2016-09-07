@@ -231,9 +231,13 @@ function documentsFetch( $id = false, $return_format = 'php', $only_show_active_
       $q->andWhere("active = '1'");
     }
     $q->setParameters( array(':key_value' => $this_id) );
-    $r = $q->execute()->fetchAll()[0];
+    $r = $q->execute()->fetchAll();
+    if (!empty($r)) {
+      $return_array[$this_id] = $r[0];
+    } else {
+      $return_array[$this_id] = null;
+    }
     // TODO test if there are results before using the arrray index, otherwise it throws undefined offset notices.
-    $return_array[$this_id] = $r;
   }
   if ( $return_format === 'json' ){
     return json_encode($return_array);
@@ -481,8 +485,8 @@ class ShotsUploadHandler extends UploadHandler
 
       $ck = documentsAdd('server_name', $file->name);
 
-      // third param of documentsSearch must be set to FALSE to return all docs not just the active docs
-      $new_documents = documentsSearch('server_name', $file->name, FALSE);
+      // fourth param of documentsSearch must be set to FALSE to return all docs not just the active docs
+      $new_documents = documentsSearch('server_name', $file->name, 'native', FALSE);
       $new_documents_string = print_r($new_documents, TRUE);
       error_log("\n last insert id:\n" .$new_documents_string);
 
@@ -529,8 +533,8 @@ class ShotsUploadHandler extends UploadHandler
                                           $new_id
                                           );
           }
-          $stuff = print_r(get_defined_vars(), TRUE);
-          error_log($stuff);
+          // $stuff = print_r(get_defined_vars(), TRUE);
+          // error_log($stuff);
         } catch (Exception $e) {
           trigger_error($e);
         } // end try-catch for all the metadata db updates

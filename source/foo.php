@@ -90,13 +90,8 @@ include_once 'shots/entities/documents.php';
     // Page Setup Code
 
     /**********************************************************/
-    $('#file-upload-button').fileupload({
-      dataType: 'json',
-      done: function (e, data) {
-        console.log(e);
-        console.log(data);
-      }
-    });
+
+
 
     /**********************************************************/
 
@@ -108,13 +103,8 @@ include_once 'shots/entities/documents.php';
 
     $('#delete-button').click( openDeleteModal );
 
-    $('#open-file-upload-modal').click( function(e){
-      var modal_message = $('#file-upload-modal-message');
-      var file_modal = openModal();
-      file_modal.find('.modal-body').append(modal_message);
-      modal_message.show();
-    });
-
+    $('#open-file-upload-modal').click( openUploadModal );
+    
     $('.related-entities.panel-collapse').on('show.bs.collapse', revealRelatedEntities );
 
 
