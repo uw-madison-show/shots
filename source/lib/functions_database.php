@@ -40,6 +40,7 @@ function sqliteDatabaseExists( $schema_manager = NULL )
  */
 function custom_error_handler($error_code, $message, $file, $line, $context)
 {
+  if ( error_reporting() === 0 ) { return TRUE; }
 
   $error_code_map = array(E_WARNING           => 'Warning',
                           E_NOTICE            => 'Notice',
@@ -102,7 +103,7 @@ function custom_error_handler($error_code, $message, $file, $line, $context)
     }
   }
 
-  $random_number = rand(100, 1000);
+  $random_number = rand(100, 100000);
 
   echo '<div class="panel-group server-side-error-message">';
   echo '<div class="panel panel-default">';

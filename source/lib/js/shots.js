@@ -345,6 +345,13 @@ function openUploadModal(e){
             '</label>' +
           '</div>' +
         '</div>' +
+        '<div class="form-group">' +
+          '<div class="col-xs-8 col-xs-offset-4">' +
+            '<div id="file-upload-progress" class="progress">' +
+              '<div class="progress-bar progress-bar-default"></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
     '</div>' 
     ;
@@ -355,11 +362,25 @@ function openUploadModal(e){
     
     // TODO the fileupload dialog needs a throbber until the upload is finished and the page is reloaded
     $('#file-upload-button').fileupload({
-      dataType: 'json',
+      // dataType: 'json',
       always: function (e, data) {
+        console.log("done!");
         console.log(e);
         console.log(data);
-        location.reload();
+        var e = {};
+        e.error_messages = [data.result];
+        ajaxFailed(e);
+        // location.reload();
+        foobar = data;
+      },
+      progressall: function (e, data) {
+        console.log("progressall!");
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#file-upload-progress .progress-bar').css(
+            'width',
+            progress + '%'
+        );
+
       }
     }); 
 }
