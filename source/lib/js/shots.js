@@ -363,15 +363,26 @@ function openUploadModal(e){
     // TODO the fileupload dialog needs a throbber until the upload is finished and the page is reloaded
     $('#file-upload-button').fileupload({
       // dataType: 'json',
-      always: function (e, data) {
+      done: function (e, data) {
         console.log("done!");
-        console.log(e);
-        console.log(data);
-        var e = {};
-        e.error_messages = [data.result];
-        ajaxFailed(e);
-        // location.reload();
-        foobar = data;
+        // console.log(e);
+        // console.log(data);
+        // foobar = data;
+        try {
+          var result = JSON.parse(data.result);
+          if (result && typeof result === 'object'){
+
+            // TODO also test if result files is a non empty array; files that are too big or have issues during upload will result in an empty file array
+
+            // we have a good result
+            location.reload();
+          }
+        } catch (js_err) {
+          var e = {};
+          e.error_messages = [ js_err, data.result ];
+          ajaxFailed(e);
+        }
+        
       },
       progressall: function (e, data) {
         console.log("progressall!");
