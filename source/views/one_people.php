@@ -36,7 +36,10 @@ $related_entities = relationshipsFetch('people', $people_id, 'php');
       <div class="form-horizontal">
         <div class="record" data-entity-name="people">
           <div class="fields">
-          <?php echo $all_html; ?>
+            <?php echo $all_html; ?>
+          </div>
+          <div id="upload-area">
+            <?php include 'widget_upload_documents.php' ?>
           </div>
         </div>
       </div>
@@ -57,8 +60,11 @@ $related_entities = relationshipsFetch('people', $people_id, 'php');
 
     $('input').change( ajaxChange );
 
+    $('#delete-button').click( openDeleteModal );
+
     $('.related-entities.panel-collapse').on('show.bs.collapse', revealRelatedEntities );
 
+    $('#open-file-upload-modal').on('click', openUploadModal);
 
   }); // end document ready
 </script>
