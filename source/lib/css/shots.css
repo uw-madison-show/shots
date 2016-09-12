@@ -192,6 +192,7 @@ div#related-entities {
 }
 
 footer {
+  min-height: 300px;
   padding-top: 55px;
   padding-bottom: 55px;
   background-color: #f8f8f8;
