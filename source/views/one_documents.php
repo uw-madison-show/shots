@@ -54,7 +54,7 @@ $related_entities = relationshipsFetch('documents', $this_id, 'php');
         <div class="form-horizontal">
           <div class="record" data-entity-name="documents">
             <div class="fields">
-            <?php echo $all_html; ?>
+              <?php echo $all_html; ?>
             </div>
           </div>
         </div>
