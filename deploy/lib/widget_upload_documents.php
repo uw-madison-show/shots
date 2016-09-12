@@ -56,6 +56,7 @@ echo '
     </div>
     ';
 
+/*
 // TODO make the upload button work as a drag and drop target area
 // TODO move all of this code into javascript. the .fileupload() initializer is having too many glitches with the hidden div + clone into a modal approach that I started using
 echo '
@@ -82,14 +83,14 @@ echo '
 
         <div class="form-group">
           <div class="col-xs-4 col-xs-offset-4">
-            <label for="file-upload-button" class="btn btn-default">Pick file<input type="file" id="file-upload-button" name="files[]" data-url="lib/file_handler.php" style="display: none;" />
+            <label for="file-upload-button" class="btn btn-default">Pick file<input type="file" id="file-upload-button" name="files[]" data-url="lib/file_handler.php"  style="display: none;"/>
             </label>
           </div>
         </div>
       </div>
     </div>
     ';
-
+*/
   
   
 ?>

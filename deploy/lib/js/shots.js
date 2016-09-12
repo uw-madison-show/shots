@@ -83,6 +83,7 @@ function ajaxFailed(d) {
 }
 
 function ajaxChange(e){
+  console.log(this);
   var html_input_type = $(this).attr('type');
   var entity_name = $(this).parents('.record').data('entityName');
   // the ajax handler is going to include the file /lib/shots/entities/{table}.php
@@ -155,6 +156,7 @@ function openModal(){
     $(this).remove();
     $('.modal-backdrop').remove();
   });
+  console.log(m);
   return m;
 }
 
@@ -163,7 +165,8 @@ function openDeleteModal(e){
   console.log('openDeleteModal');
   console.log($(this));
 
-  var modal_message_html, delete_array;
+  var modal_message_html = '';
+  var delete_array = [];
 
   var entity_name = $(this).closest('.record').data('entityName');
   var key_field = key_field_mapping[entity_name];
@@ -304,6 +307,95 @@ function openDeleteModal(e){
 
   } 
 }
+
+
+// opens the modal dialog box to confirm deletions
+function openUploadModal(e){
+  console.log('openUploadModal');
+
+  var modal_message_html = '';
+
+  // find the 'parent' entity for the document
+  var entity_name = $(this).closest('.record').data('entityName');
+  var key_field = key_field_mapping[entity_name];
+  var key_html_id = '#' + key_field;
+  var key_value = $(this).closest('.record').find(key_html_id).val();
+
+  // write out the html input form elements
+  // TODO refactor this so the input fields are added programatically?
+  modal_message_html += '<div id="file-upload-modal-message">' +
+      '<div class="form-horizontal">' +
+        '<div class="form-group">' +
+          '<label class="control-label col-xs-4" for="title">Title</label>' +
+          '<div class="col-xs-8">' +
+            '<input id="title" name="title" class="form-control" type="text" placeholder="optional" />' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label class="control-label col-xs-4" for="description">Description</label>' +
+          '<div class="col-xs-8">' +
+            '<input id="description" name="description" class="form-control" type="text" placeholder="optional" />' +
+          '</div>' +
+        '</div>' +
+        '<input type="hidden" name="from_entity_type" id="from_entity_type" value="' + entity_name + '"/>' +
+        '<input type="hidden" name="from_entity_id" id="from_entity_id" value="' + key_value + '"/>' +
+        '<div class="form-group">' +
+          '<div class="col-xs-4 col-xs-offset-4">' +
+            '<label for="file-upload-button" class="btn btn-default">Pick file<input type="file" id="file-upload-button" name="files[]" data-url="lib/file_handler.php"  style="display: none;"/>' +
+            '</label>' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<div class="col-xs-8 col-xs-offset-4">' +
+            '<div id="file-upload-progress" class="progress">' +
+              '<div class="progress-bar progress-bar-default"></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' 
+    ;
+
+    var upload_modal = openModal();
+    upload_modal.find('#basic-modal-label').html('Upload File');
+    upload_modal.find('.modal-body').append(modal_message_html);
+    
+    // TODO the fileupload dialog needs a throbber until the upload is finished and the page is reloaded
+    $('#file-upload-button').fileupload({
+      // dataType: 'json',
+      done: function (e, data) {
+        console.log("done!");
+        // console.log(e);
+        // console.log(data);
+        // foobar = data;
+        try {
+          var result = JSON.parse(data.result);
+          if (result && typeof result === 'object'){
+
+            // TODO also test if result files is a non empty array; files that are too big or have issues during upload will result in an empty file array
+
+            // we have a good result
+            location.reload();
+          }
+        } catch (js_err) {
+          var e = {};
+          e.error_messages = [ js_err, data.result ];
+          ajaxFailed(e);
+        }
+        
+      },
+      progressall: function (e, data) {
+        console.log("progressall!");
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#file-upload-progress .progress-bar').css(
+            'width',
+            progress + '%'
+        );
+
+      }
+    }); 
+}
+
 
 function ajaxDelete(a){
   console.log(a);

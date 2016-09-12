@@ -1,5 +1,8 @@
 <?php
 
+// You need to change this if you install SHOTS in another timezone; this is used for file uploads and calendar records
+date_default_timezone_set('America/Chicago');
+
 
 // handle includes paths on multiple dev/test/prod environments
 // this assumes that all_pages.php is in this location:

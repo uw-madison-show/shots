@@ -25,6 +25,13 @@ $options = array('upload_dir' => "C:\\Users\\moehr\\Documents\\GitHub\\shots\\so
                  'image_file_types' => null,
                  );
 
+  $stuff =  "\n file_handler.php \n" .
+            print_r($_REQUEST, TRUE) . 
+            print_r($_GET, TRUE) .
+            print_r($_POST, TRUE)
+            ;
+  error_log($stuff);
+    
 $upload_handler = new ShotsUploadHandler( $options );
 
 ?>

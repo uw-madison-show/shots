@@ -16,7 +16,7 @@
 
     echo '<ul id="related-'. $entity_type .'-list" class="related-list">';
     foreach ($relationships as $key => $rel) {
-      echo '<li id="related-'. $entity_type . '-list-item-'. $key .'" class="related-list-item" data-entity="'. $entity_type .'" data-entity-id="'.$rel['id'] .'"><a href="/views/one_'. $entity_type .'.php?id='. $rel['id'] .'">'. $rel['id'] . '</a></li>';
+      echo '<li id="related-'. $entity_type . '-list-item-'. $key .'" class="related-list-item" data-entity="'. $entity_type .'" data-entity-id="'.$rel['id'] .'"><a href="'. $app_root .'/views/one_'. $entity_type .'.php?id='. $rel['id'] .'">'. $rel['id'] . '</a></li>';
     }
     echo '</ul>';
 

@@ -12,6 +12,70 @@ $documents_primary_key = $sm->listTableIndexes('documents')['primary']->getColum
 
 $only_show_active_documents_default = TRUE;
 
+/**
+ * Format the bytes into human-readable file size.
+ *
+ * stolen from https://github.com/ael-code/dir-listing-bootstrap/blob/master/dir_listing_func.php (GNU GPL licensed)
+ *
+ * @param integer $size The number of bytes in the file.
+ *
+ * @return string File size with KB, MB, GB, etc. attached.
+ */
+function format_bytes($size)
+{
+      
+  $sizes = array('&nbsp&nbspB', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+  $count = 0;
+  while( $count < (count( $sizes )-1) and $size > 1024){
+    $size = $size/1024;
+    $count ++;
+  }
+  $result = sprintf("%.2f %s", $size, $sizes[$count]);
+  return $result;
+}
+
+/**
+ * Pick an icon for an extension.
+ * 
+ * stolen from https://github.com/ael-code/dir-listing-bootstrap/blob/master/dir_listing_func.php (GNU GPL licensed)
+ *
+ * @param string $extension The file extension (defaults to 'txt').
+ *
+ * @return string The name of the glyphicon icon.
+ */
+function choose_icon( $extension = 'txt' )
+{
+  $ext = strtolower($extension); 
+  
+  $types = array(
+  "audio" => array("aif","iff","m3u","m4a","mid","mp3","mpa","ra","wav","wma"),
+  "video" => array("avi","mkv","3gp","asf","asx","3g2","flv","m4v","mov","mp4","mpg","rm","srt","swf","vob","wmv"),
+  "image" => array("gif","jpg","jpeg","png","psd","pspimage","tga","thm","tif","tiff","yuv","svg","bmp","dds"),
+  "text" => array("doc","docx","log","msg","odt","pages","rtf","tex","txt","wpd","wps","pdf"),
+  "zip" => array("7z","deb","gz","pkg","rar","rpm",".tar.gz","zip","zipx","jar"),
+  "disk" => array("bin","cue","dmg","iso","mdf","toast","vcd"),
+  "code" => array("java","c","class","pl","py","sh","cpp","cs","dtd","fla","h","lua","m","sln"),
+  "excel" => array("xlr","xls","xlsx")
+  );
+  $icons = array(
+  "audio" => "glyphicon-music",
+  "video" => "glyphicon-film",
+  "image" => "glyphicon-picture",
+  "text" => "glyphicon-file",
+  "zip" => "glyphicon-compressed",
+  "disk" => "glyphicon-record",
+  "code" => "glyphicon-indent-left",
+  "excel" => "glyphicon-list-alt",
+  "generic" => "glyphicon-unchecked"
+  );
+  foreach( $types as $elem_i => $elem_v){
+    if(in_array($ext, $elem_v)){
+      return $icons[$elem_i];
+    }
+  }
+  return $icons['generic'];
+}
+
 
 /**
  * Returns the HTML for a field in the documents table.
@@ -231,9 +295,13 @@ function documentsFetch( $id = false, $return_format = 'php', $only_show_active_
       $q->andWhere("active = '1'");
     }
     $q->setParameters( array(':key_value' => $this_id) );
-    $r = $q->execute()->fetchAll()[0];
+    $r = $q->execute()->fetchAll();
+    if (!empty($r)) {
+      $return_array[$this_id] = $r[0];
+    } else {
+      $return_array[$this_id] = null;
+    }
     // TODO test if there are results before using the arrray index, otherwise it throws undefined offset notices.
-    $return_array[$this_id] = $r;
   }
   if ( $return_format === 'json' ){
     return json_encode($return_array);
@@ -481,8 +549,8 @@ class ShotsUploadHandler extends UploadHandler
 
       $ck = documentsAdd('server_name', $file->name);
 
-      // third param of documentsSearch must be set to FALSE to return all docs not just the active docs
-      $new_documents = documentsSearch('server_name', $file->name, FALSE);
+      // fourth param of documentsSearch must be set to FALSE to return all docs not just the active docs
+      $new_documents = documentsSearch('server_name', $file->name, 'native', FALSE);
       $new_documents_string = print_r($new_documents, TRUE);
       error_log("\n last insert id:\n" .$new_documents_string);
 
@@ -529,8 +597,8 @@ class ShotsUploadHandler extends UploadHandler
                                           $new_id
                                           );
           }
-          $stuff = print_r(get_defined_vars(), TRUE);
-          error_log($stuff);
+          // $stuff = print_r(get_defined_vars(), TRUE);
+          // error_log($stuff);
         } catch (Exception $e) {
           trigger_error($e);
         } // end try-catch for all the metadata db updates

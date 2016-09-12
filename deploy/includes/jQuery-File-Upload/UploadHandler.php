@@ -408,7 +408,7 @@ class UploadHandler
         $min_width = @$this->options['min_width'];
         $min_height = @$this->options['min_height'];
         if (($max_width || $max_height || $min_width || $min_height)
-           && preg_match($this->options['image_file_types'], $file->name)) {
+           && @preg_match($this->options['image_file_types'], $file->name)) {
             list($img_width, $img_height) = $this->get_image_size($uploaded_file);
 
             // If we are auto rotating the image by default, do the checks on
@@ -1019,7 +1019,7 @@ class UploadHandler
     }
 
     protected function is_valid_image_file($file_path) {
-        if (!preg_match($this->options['image_file_types'], $file_path)) {
+        if (empty($this->options['image_file_types']) || !preg_match($this->options['image_file_types'], $file_path)) {
             return false;
         }
         if (function_exists('exif_imagetype')) {

@@ -35,14 +35,14 @@ $all_grants = $db->fetchAll($all_grants_sql);
                           for ($i = 0; $i <= 3 ; $i++) { 
                             $g = $all_grants[$i];
                             echo '<li class="quick-list-item centering">';
-                            echo '<a id="grants-' . $g['grant_id'] . '" href="/views/one_grants.php?id=' . $g['grant_id'] .'"">' . $g['title'] . '</a>';
+                            echo '<a id="grants-' . $g['grant_id'] . '" href="'. $app_root .'/views/one_grants.php?id=' . $g['grant_id'] .'"">' . $g['title'] . '</a>';
                             echo '</li>';
                           }
                         ?>
                       </ul>
                     </div>
                   </div>
-                  <a href="/views/table_all_grants.php" class="btn btn-default launch-app-button">All Grants</a>
+                  <a href="<?php echo $app_root; ?>/views/table_all_grants.php" class="btn btn-default launch-app-button">All Grants</a>
                 </div>
               </widget>
             </li>
@@ -61,7 +61,7 @@ $all_grants = $db->fetchAll($all_grants_sql);
                         <span class="fa fa-users"></span>
                       </div>
                     </a>
-                    <a href="/views/table_all_people.php" class="btn btn-default launch-app-button">All People</a>
+                    <a href="<?php echo $app_root; ?>/views/table_all_people.php" class="btn btn-default launch-app-button">All People</a>
                   </div>
                 </div>
               </widget>
