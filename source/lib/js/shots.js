@@ -341,7 +341,7 @@ function openUploadModal(e){
         '<input type="hidden" name="from_entity_id" id="from_entity_id" value="' + key_value + '"/>' +
         '<div class="form-group">' +
           '<div class="col-xs-4 col-xs-offset-4">' +
-            '<label for="file-upload-button" class="btn btn-default">Pick file<input type="file" id="file-upload-button" name="files[]" data-url="lib/file_handler.php"  style="display: none;"/>' +
+            '<label for="file-upload-button" class="btn btn-default">Pick file<input type="file" id="file-upload-button" name="files[]" data-url="' + app_root + '/lib/file_handler.php"  style="display: none;"/>' +
             '</label>' +
           '</div>' +
         '</div>' +
