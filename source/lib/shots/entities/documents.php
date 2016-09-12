@@ -494,9 +494,9 @@ class ShotsUploadHandler extends UploadHandler
 
   protected function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null, $content_range = null) 
   {
-    global $db;
-    // error_log($uploaded_file);
-    // error_log($name);
+    global $db, $app_root, $server_file_storage_root;
+    error_log('app root: ' . $app_root);
+    error_log('storage root: ' . $server_file_storage_root);
 
     // set all the default values
     $obfus_name              = null;
@@ -564,8 +564,12 @@ class ShotsUploadHandler extends UploadHandler
 
       if (!empty($new_id)) {
         try {
-
           $file->id = $new_id;
+
+          $server_file_url = $file->url;
+          if ( isset($app_root) && isset($server_file_storage_root) ) {
+            $server_file_url = '' . $app_root . $server_file_storage_root . '/' . $file->name;
+          }
 
           // *************************************
           // update the metadata for the new file
@@ -574,7 +578,7 @@ class ShotsUploadHandler extends UploadHandler
           $ck_e = documentsUpdate($new_id, 'extension',        $pathinfo['extension']);
           $ck_s = documentsUpdate($new_id, 'size',             $file->size);
           $ck_m = documentsUpdate($new_id, 'mime_type',        $file->type);
-          $ck_u = documentsUpdate($new_id, 'url',              $file->url);
+          $ck_u = documentsUpdate($new_id, 'url',              $server_file_url);
           $ck_t = documentsUpdate($new_id, 'title',            $file->title);
           $ck_d = documentsUpdate($new_id, 'description',      $file->description);
           $ck_p = documentsUpdate($new_id, 'upload_timestamp', $uploaded_file_timestamp);
