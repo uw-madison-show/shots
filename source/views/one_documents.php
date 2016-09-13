@@ -9,7 +9,8 @@ $this_id = grabString('id');
 
 include 'shots/entities/documents.php';
 
-$documents = documentsFetch( $this_id );
+// third param only_show_active_documents = FALSE; 
+$documents = documentsFetch( $this_id, 'php', FALSE );
 
 $all_html = '';
 
