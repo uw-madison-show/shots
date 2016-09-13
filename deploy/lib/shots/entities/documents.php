@@ -97,10 +97,7 @@ function documentsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $o
   global $db, $documents_fields;
   if ($field_name === FALSE or $field_value === FALSE) return FALSE; 
 
-  // print_r($grants_fields);
-  // echo $field_name;
-
-  if ( !in_array($field_name, array_keys($grants_fields)) ){
+  if ( !in_array($field_name, array_keys($documents_fields)) ){
     // TODO error message 
     return FALSE;
   }
@@ -114,6 +111,7 @@ function documentsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $o
   $return_html .= '<div class="form-group">';
 
   // e.g. drop down lookups
+  // TODO make title, description, and active into editable fields
   $special_fields = array();
   if ( in_array($field_name, $special_fields) ){
     // do stuff for speical fields
@@ -124,7 +122,7 @@ function documentsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $o
     $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
     // figure out if i have integer, string, text, date, etc.
     // based on the DBAL Types
-    $field_type = $grants_fields[$field_name]->getType();
+    $field_type = $documents_fields[$field_name]->getType();
 
     // echo "my field type: ";
     // echo $field_type;
@@ -135,13 +133,13 @@ function documentsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $o
       case 'Date':
         // add a normal input field for all four types
         $return_html .= '<div class="col-xs-8">';
-        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'"/>';
+        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'" readonly/>';
         $return_html .= '</div>';
         break;
         // TODO make date fields a date picker input
       case 'Text':
         $return_html .= '<div class="col-xs-8">';
-        $return_html .= '<textarea class="form-control" rows="2" id="'. $field_name . '" name="'. $field_name . '">' . $field_value . '</textarea>';
+        $return_html .= '<textarea readonly class="form-control" rows="2" id="'. $field_name . '" name="'. $field_name . '">' . $field_value . '</textarea>';
         $return_html .= '</div>';
         break;
       default:
@@ -281,7 +279,7 @@ function documentsFetch( $id = false, $return_format = 'php', $only_show_active_
 {
   global $db, $documents_primary_key, $only_show_active_documents_default;
   $id_array = (array) $id;
-  if (null == $only_show_active_documents) {
+  if (null === $only_show_active_documents) {
     $only_show_active_documents = $only_show_active_documents_default;
   }
   $return_array = array();
@@ -398,6 +396,9 @@ function documentsDeactivate($search_array = FALSE, $guaranty_one_active_file = 
   global $db, $documents_fields, $documents_primary_key;
   $return_boolean = TRUE;
 
+  $g = print_r($guaranty_one_active_file, TRUE);
+  error_log($g);
+
   if (!$search_array or empty($search_array) or !is_array($search_array)){
     trigger_error('Missing params for documentsDeactivate().');
     return FALSE;
@@ -433,12 +434,17 @@ function documentsDeactivate($search_array = FALSE, $guaranty_one_active_file = 
   $ii = 1;
   $count_results = count($result);
   foreach ( $result as $key => $this_doc ){
+    $e = print_r($this_doc, TRUE);
+    error_log($e);
+
     try {
       if ( $guaranty_one_active_file && ($ii === $count_results) ) {
         // set the most recent to active
         $ck = documentsUpdate( $this_doc[$documents_primary_key], 'active', '1' );
         // echo "guaranty is true and is last;";
         // var_dump($ck);
+        error_log($ck);
+
       } else {
         // set all the other files to inactive
         $ck = documentsUpdate( $this_doc[$documents_primary_key], 'active', '0' );
@@ -488,9 +494,9 @@ class ShotsUploadHandler extends UploadHandler
 
   protected function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null, $content_range = null) 
   {
-    global $db;
-    // error_log($uploaded_file);
-    // error_log($name);
+    global $db, $app_root, $server_file_storage_root;
+    error_log('app root: ' . $app_root);
+    error_log('storage root: ' . $server_file_storage_root);
 
     // set all the default values
     $obfus_name              = null;
@@ -558,8 +564,12 @@ class ShotsUploadHandler extends UploadHandler
 
       if (!empty($new_id)) {
         try {
-
           $file->id = $new_id;
+
+          $server_file_url = $file->url;
+          if ( isset($app_root) && isset($server_file_storage_root) ) {
+            $server_file_url = '' . $app_root . $server_file_storage_root . '/' . $file->name;
+          }
 
           // *************************************
           // update the metadata for the new file
@@ -568,7 +578,7 @@ class ShotsUploadHandler extends UploadHandler
           $ck_e = documentsUpdate($new_id, 'extension',        $pathinfo['extension']);
           $ck_s = documentsUpdate($new_id, 'size',             $file->size);
           $ck_m = documentsUpdate($new_id, 'mime_type',        $file->type);
-          $ck_u = documentsUpdate($new_id, 'url',              $file->url);
+          $ck_u = documentsUpdate($new_id, 'url',              $server_file_url);
           $ck_t = documentsUpdate($new_id, 'title',            $file->title);
           $ck_d = documentsUpdate($new_id, 'description',      $file->description);
           $ck_p = documentsUpdate($new_id, 'upload_timestamp', $uploaded_file_timestamp);

@@ -4,42 +4,44 @@ include '../lib/all_pages.php';
 include 'html_doctype.php';
 include 'html_head.php';
 
-$this_table = 'events';
+$this_table = 'documents';
 $this_id = grabString('id');
 
-include 'shots/entities/events.php';
+include 'shots/entities/documents.php';
 
-$events = eventsFetch( $this_id );
+// third param only_show_active_documents = FALSE; 
+$documents = documentsFetch( $this_id, 'php', FALSE );
 
 $all_html = '';
 
-if (empty($events)) {
+if (empty($documents)) {
   $all_html = "No records found.";
 } else {
-  foreach ($events as $event_id => $data) {
+  foreach ($documents as $document_id => $data) {
     if (empty($data)) {
-      $all_html .= "Event id #" . $event_id ." has no data.";
+      $all_html .= "Document id #" . $document_id ." has no data.";
     } else {
       foreach ( $data as $key => $value ){
-        $html = eventsCreateFieldHtml($key, $value);
+        $html = documentsCreateFieldHtml($key, $value);
         $all_html .= $html;
       }
-      // add a delete button
-      $all_html .= '<div class="row">
-                      <div class="col-xs-2 col-xs-offset-10">
-                        <div class="form-group"> 
-                          <button type="button" class="btn btn-default" id="delete-button">Delete</button>
-                        </div>
-                      </div>
-                    </div>
-                  ';
+      // documents can not be deleted
+      // TODO add a "deactivate" button for documents
+      // $all_html .= '<div class="row">
+      //                 <div class="col-xs-2 col-xs-offset-10">
+      //                   <div class="form-group"> 
+      //                     <button type="button" class="btn btn-default" id="delete-button">Delete</button>
+      //                   </div>
+      //                 </div>
+      //               </div>
+      //             ';
     }
   }
 }
 
 include_once 'shots/relationships/relationships.php';
 
-$related_entities = relationshipsFetch('events', $this_id, 'php');
+$related_entities = relationshipsFetch('documents', $this_id, 'php');
 
 ?>
 
@@ -51,12 +53,9 @@ $related_entities = relationshipsFetch('events', $this_id, 'php');
     <div class="row">
       <div id="main-entity" class="col-md-8">
         <div class="form-horizontal">
-          <div class="record" data-entity-name="events">
+          <div class="record" data-entity-name="documents">
             <div class="fields">
-            <?php echo $all_html; ?>
-            </div>
-            <div id="upload-area">
-              <?php include 'widget_upload_documents.php' ?>
+              <?php echo $all_html; ?>
             </div>
           </div>
         </div>
@@ -80,8 +79,6 @@ $related_entities = relationshipsFetch('events', $this_id, 'php');
       $('#delete-button').click( openDeleteModal );
 
       $('.related-entities.panel-collapse').on('show.bs.collapse', revealRelatedEntities);
-
-      $('#open-file-upload-modal').on('click', openUploadModal);
 
     }); // end document ready
     

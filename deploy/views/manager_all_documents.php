@@ -61,26 +61,31 @@ $all_docs = documentsFetchAll('native', FALSE);
                 foreach ($all_docs as $key => $doc) {
                   $doc_active_class = ($doc['active'] == 1) ? 'file-manager-doc-active' : 'file-manager-doc-inactive';
                   echo '
-                    <tr id="file-manager-doc-id-'. $doc['document_id'] . '" class="file-manager-doc '. $doc_active_class .'">
+                    <tr id="file-manager-doc-id-'. $doc['document_id'] . '" class="file-manager-doc '. $doc_active_class .
+                    '" data-entity-name="documents"'.
+                    '  data-entity-id="'. $doc['document_id'] .
+                    '" data-entity-filename="'. htmlentities($doc['name']) .
+                    '" data-entity-extension="'. htmlentities($doc['extension']) .
+                    '" data-entity-size="'. htmlentities($doc['size']) .'">
                       <td><span class="glyphicon '.choose_icon($doc['extension']).'"></span></td>
                       <td><a href="' . $doc['url'] .'" target="_blank" download>'. htmlentities($doc['name']. '.'. $doc['extension']) .'</td>
                       <td class="text-right">'. format_bytes($doc['size']) .'</td>
                       <td class="text-right"><small>'. $doc['upload_timestamp'] .'</small></td>
                       <td class="text-right"><small>'. $doc['version'] . '</td>
                       <td>
-                        <button class="file-manger-button file-manager-button-view btn btn-xs btn-default">
+                        <button class="file-manager-action-button file-manager-button-view btn btn-xs btn-default">
                           <span class="glyphicon glyphicon-eye-open"></span>
                         </button>
                   ';
                   if ($doc['active'] == 1) {
                     echo '
-                      <button class="file-manager-button file-manager-button-delete btn btn-xs btn-warning">
+                      <button class="file-manager-action-button file-manager-button-delete btn btn-xs btn-warning">
                         <span class="glyphicon glyphicon-remove"></span>
                       </button>
                     ';
                   } else {
                     echo '
-                      <button class="file-manager-button file-manager-button-delete btn btn-xs btn-primary">
+                      <button class="file-manager-action-button file-manager-button-activate btn btn-xs btn-primary">
                         <span class="glyphicon glyphicon-plus"></span>
                       </button>
                     ';
@@ -132,7 +137,6 @@ $all_docs = documentsFetchAll('native', FALSE);
       // show the rows that match the class name
       var to_show = $(this).data('filesToDisplay');
       $('#file-manager-table tbody tr.' + to_show).show();
-
     });
 
     // filename text filter
@@ -143,6 +147,120 @@ $all_docs = documentsFetchAll('native', FALSE);
       $('#file-manager-table tbody tr').filter(function() {
         return rex.test($(this).text());
       }).show();
+    });
+
+    // view, deactivate, activate buttons
+    $('.file-manager-action-button').on('click', function(){
+      foobar = $(this);
+      var btn_type = 'view';
+      if ($(this).hasClass('file-manager-button-activate')){
+        btn_type = 'activate';
+      } else if ($(this).hasClass('file-manager-button-delete')) {
+        btn_type = 'delete';
+      }
+
+      var this_doc = $(this).parents('.file-manager-doc').data();
+
+      if ( !$.isEmptyObject(this_doc) ){
+        switch(btn_type) {
+          case 'view':
+            // TODO maybe make a modal pop up to view the file details instead of loading a new page?
+            window.location.href = '' + app_root + '/views/one_documents.php?id=' + this_doc.entityId;
+            break;
+          case 'activate':
+            // set other docs with same name and extension to not active, then activate this doc
+            var deact = {};
+            deact.target = 'entity';
+            deact.action = 'documentsDeactivate';
+            deact.table  = 'documents';
+            deact.params = [];
+
+            deact.params.push({
+                               "name":      this_doc.entityFilename,
+                               "extension": this_doc.entityExtension,
+                               "size":      this_doc.entitySize
+                              });
+
+            console.log(deact);
+
+            $.post(app_root + '/lib/ajax_handler.php', 
+              { "request": deact },
+              "json"
+              )
+              .done() 
+              .fail( ajaxFailed )
+              .always(function(r) {
+                        if (r.error === false){
+                         console.log(r);
+                         activate_step2();
+                        } else {
+                         ajaxFailed(r);
+                        }
+                      })
+              ;
+
+            // now set this doc to active
+            function activate_step2() {
+              var activate = {};
+              activate.target = 'entity';
+              activate.action = 'documentsUpdate';
+              activate.table  = 'documents';
+              activate.params = [this_doc.entityId,
+                                 'active',
+                                 '1'];
+
+              console.log(activate);
+
+              $.post(app_root + '/lib/ajax_handler.php', 
+                { "request": activate },
+                "json"
+                )
+                .done() 
+                .fail( ajaxFailed )
+                .always(function(r) {
+                          if (r.error === false){
+                            console.log(r);
+                            location.reload();
+                          } else {
+                            ajaxFailed(r);
+                          }
+                        })
+                ;
+            }
+            break;
+          case 'delete':
+            // deactivate this doc; do not worry about 
+            var req = {};
+            req.target = 'entity';
+            req.action = 'documentsDeactivate';
+            req.table  = 'documents';
+            req.params = [];
+
+            req.params.push({'document_id': this_doc.entityId});
+
+            console.log(req);
+
+            $.post(app_root + '/lib/ajax_handler.php', 
+             { "request": req },
+             "json"
+             )
+             .done() 
+             .fail( ajaxFailed )
+             .always(function(r) {
+                       if (r.error === false){
+                        console.log(r);
+                        location.reload();
+                       } else {
+                        ajaxFailed(r);
+                       }
+                     })
+             ;
+            break;
+          default:
+          
+        } // end switch btn_type
+      } // end if this_doc not empty
+
     });
 
     /**********************************************************/

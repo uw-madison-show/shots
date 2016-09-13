@@ -28,6 +28,7 @@ if ( empty($this_table) or empty($this_id) ){
     $related_documents_id_array[] = $this_file['id'];
   }
 
+  // by default this only shows active documents
   $related_documents = documentsFetch($related_documents_id_array);
 
   // related documents could be empty if all the docs are set to inactive
@@ -35,7 +36,16 @@ if ( empty($this_table) or empty($this_id) ){
     // build up the html for displaying download links
     foreach ($related_documents as $key => $this_document) {
       $related_files_html .= '<div class="related-documents">';
-      $related_files_html .= '<a href="'. $this_document['url'] .'">'. $this_document['name'] .'</a>';
+      $related_files_html .= '<a href="'. $this_document['url'] .'" target="_blank" download>';
+      if ($this_document['name'] != '') {
+        $related_files_html .= $this_document['name'];
+      } else {
+        $related_files_html .= '(no name)';
+      }
+      if ($this_document['extension'] != '') {
+        $related_files_html .= '.'. $this_document['extension'];
+      }
+      $related_files_html .= '</a>';
       $related_files_html .= '</div>';
     }
   }
