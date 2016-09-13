@@ -7,9 +7,9 @@ var Browsersync = require('browser-sync').create();
 // run the server config
 Browsersync.init({files: ["../source/*",
                           "../source/lib/*",
-                          "../source/setup/*",
-                          "../source/setup/database/*",
-                          "../source/php/*",
+                          "../source/lib/js/*",
+                          "../source/lib/css/*",
+                          "../source/lib/shots/entities/*",
                           "../source/views/*"
                           ],
                   proxy: "127.0.0.1:8080"
