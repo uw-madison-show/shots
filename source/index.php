@@ -1,9 +1,19 @@
 <?php
 include './lib/all_pages.php';
+include_once 'functions_database.php';
+
+// test if the database exists, if not, go to the db manager page
+$first_load = $db->getSchemaManager();
+$db_exists = sqliteDatabaseExists($first_load);
+if (!$db_exists){
+  header('Location: '. $app_root . '/manage_database.php');
+  exit();
+}
 
 include 'html_doctype.php';
 include 'html_head.php';
 
+// TODO refactor all of the sql into files for each entity type
 $all_grants_sql = 'select * from grants';
 $all_grants = $db->fetchAll($all_grants_sql);
 
