@@ -360,7 +360,6 @@ function openUploadModal(e){
     upload_modal.find('#basic-modal-label').html('Upload File');
     upload_modal.find('.modal-body').append(modal_message_html);
     
-    // TODO the fileupload dialog needs a throbber until the upload is finished and the page is reloaded
     $('#file-upload-button').fileupload({
       // dataType: 'json',
       done: function (e, data) {
@@ -371,8 +370,13 @@ function openUploadModal(e){
         try {
           var result = JSON.parse(data.result);
           if (result && typeof result === 'object'){
-
-            // TODO also test if result files is a non empty array; files that are too big or have issues during upload will result in an empty file array
+            console.log(result);
+            if (result.files[0].error) {
+              var e = {};
+              e.error_messages = [ result.files[0].error ];
+              ajaxFailed(e);
+              $('#basic-modal').modal('hide');
+            }
 
             // we have a good result
             location.reload();
@@ -381,11 +385,14 @@ function openUploadModal(e){
           var e = {};
           e.error_messages = [ js_err, data.result ];
           ajaxFailed(e);
+          $('#basic-modal').modal('hide');
         }
         
       },
       progressall: function (e, data) {
         console.log("progressall!");
+        // disable the modal inputs while the upload is working
+        $('#file-upload-modal-message input').prop('disabled', true);
         var progress = parseInt(data.loaded / data.total * 100, 10);
         $('#file-upload-progress .progress-bar').css(
             'width',
