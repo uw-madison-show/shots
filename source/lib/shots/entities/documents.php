@@ -279,7 +279,7 @@ function documentsFetch( $id = false, $return_format = 'php', $only_show_active_
 {
   global $db, $documents_primary_key, $only_show_active_documents_default;
   $id_array = (array) $id;
-  if (null == $only_show_active_documents) {
+  if (null === $only_show_active_documents) {
     $only_show_active_documents = $only_show_active_documents_default;
   }
   $return_array = array();
