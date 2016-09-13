@@ -370,7 +370,7 @@ function openUploadModal(e){
         try {
           var result = JSON.parse(data.result);
           if (result && typeof result === 'object'){
-            console.log(result);
+            // console.log(result);
             if (result.files[0].error) {
               var e = {};
               e.error_messages = [ result.files[0].error ];
@@ -390,7 +390,7 @@ function openUploadModal(e){
         
       },
       progressall: function (e, data) {
-        console.log("progressall!");
+        // console.log("progressall!");
         // disable the modal inputs while the upload is working
         $('#file-upload-modal-message input').prop('disabled', true);
         var progress = parseInt(data.loaded / data.total * 100, 10);
