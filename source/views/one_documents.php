@@ -25,16 +25,6 @@ if (empty($documents)) {
         $html = documentsCreateFieldHtml($key, $value);
         $all_html .= $html;
       }
-      // documents can not be deleted
-      // TODO add a "deactivate" button for documents
-      // $all_html .= '<div class="row">
-      //                 <div class="col-xs-2 col-xs-offset-10">
-      //                   <div class="form-group"> 
-      //                     <button type="button" class="btn btn-default" id="delete-button">Delete</button>
-      //                   </div>
-      //                 </div>
-      //               </div>
-      //             ';
     }
   }
 }
@@ -74,11 +64,11 @@ $related_entities = relationshipsFetch('documents', $this_id, 'php');
   <script type="text/javascript">
     $(document).ready(function() {
 
-      $('input').change( ajaxChange );
-
-      $('#delete-button').click( openDeleteModal );
+      $(':input').change( ajaxChange );
 
       $('.related-entities.panel-collapse').on('show.bs.collapse', revealRelatedEntities);
+
+      // TODO the active checkbox should mimic the function of the activate button found on the manager_all_documents.php page; ie it should active this doc and deactivate all the other versions of this doc
 
     }); // end document ready
     

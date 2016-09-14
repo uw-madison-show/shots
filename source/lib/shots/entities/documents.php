@@ -110,16 +110,36 @@ function documentsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $o
   $return_html .= '<div class="field">';
   $return_html .= '<div class="form-group">';
 
+  // set up the label
+    $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
+    
+
   // e.g. drop down lookups
   // TODO make title, description, and active into editable fields
-  $special_fields = array();
+  $special_fields = array('title', 
+                          'description', 
+                          'active',
+                          );
   if ( in_array($field_name, $special_fields) ){
     // do stuff for speical fields
+    switch ($field_name) {
+      case 'title':
+      case 'description':
+        $return_html .= '<div class="col-xs-8">';
+        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'" />';
+        $return_html .= '</div>';
+        break;
+      case 'active':
+        $return_html .= '<div class="col-xs-2">';
+        $return_html .= '<input class="form-control" type="checkbox" value="" id="' . $field_name . '" name="' . $field_name . '" ';
+        if ($field_value == true) $return_html .= ' checked ';
+        $return_html .= '/>';
+        $return_html .= '</div>';
+        break;
+    }
   } else {
     // do stuff for normal fields
 
-    // set up the label
-    $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
     // figure out if i have integer, string, text, date, etc.
     // based on the DBAL Types
     $field_type = $documents_fields[$field_name]->getType();
@@ -131,6 +151,7 @@ function documentsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $o
       case 'Decimal':
       case 'String':
       case 'Date':
+      case 'DateTime':
         // add a normal input field for all four types
         $return_html .= '<div class="col-xs-8">';
         $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'" readonly/>';
