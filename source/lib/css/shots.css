@@ -41,6 +41,12 @@ body {
   /* anything here? */
 }
 
+/***************************************************************/
+
+/* Tile-based index page.
+
+/***************************************************************/
+
 .portal-frame {
   margin-bottom: 15px;
   padding-top: 0;
@@ -149,6 +155,12 @@ body {
   font-weight: bolder;
 }
 
+/***************************************************************/
+
+/* View for one record.
+
+/***************************************************************/
+
 div#main-entity {
   border: 1px solid #ddd;
   margin: 15px;
@@ -158,6 +170,12 @@ div#main-entity {
   padding-right: 30px;
   font-size: 1.5em;
 }
+
+/***************************************************************/
+
+/* Related Entities.
+
+/***************************************************************/
 
 div#related-entities {
   border: 1px solid #ddd;
@@ -179,7 +197,18 @@ div.related-documents {
   padding-top: 5px;
   padding-bottom: 5px;
 }
+
+/***************************************************************/
+
+/* Drop down form inputs
+
+/***************************************************************/
   
+.form-control .drop-down-option-default {
+  font-weight: bolder;
+  color: #777;
+  background-color: #f8f8f8;
+}  
 
 /***************************************************************/
 

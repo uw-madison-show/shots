@@ -664,60 +664,78 @@ function addRow(e) {
  */
 function getFormInputValue(object) {
   // e.preventDefault();
-  console.log(object);
+  console.log(object.is('select'));
+  // foobar = object;
   var input = {};
+  var type  = '';
+  var key   = '';
 
-  var type = object.attr('type');
-  var key = object.attr('name') ? object.attr('name') : object.attr('id');
-  
-  // console.log(type);
-  // console.log($(this).prop('name'));
-  // console.log($(this).prop('id'));
-  // console.log($(this).prop('checked'));
-  // console.log($(this).prop('value'));
-
-  if (!key || !type) {
-    // TODO return something?
-    console.log('getFormInputValue is missing key or type.');
+  if (object.is('select')) {
+    // deal with drop down select elements
+    input.type  = 'select';
+    input.key   = object.attr('name');
+    input.value = object.val();
+  } else if (object.is('textarea')) {
+    // deal with textareas
+    input.type  = 'textarea';
+    input.key   = object.attr('name');
+    input.value = object.val();
   } else {
-    input.type = type;
-    input.key = key;
+    // deal with all the input and checkbox elements
+
+    type = object.attr('type');
+    key = object.attr('name') ? object.attr('name') : object.attr('id');
   
-    // switch statement to get the value;
-    switch(type){
-      case 'hidden':
-      case 'text':
-      case 'search':
-      case 'tel':
-      case 'url':
-      case 'email':
-      case 'password':
-      case 'number':
-      case 'range':
-      case 'color':
-      case 'date':
-      case 'datetime-local':
-      case 'time':
-      case 'file':
-      case 'radio':
-      case 'image':
-        input.value = object.prop('value');
-        break;
-      case 'checkbox':
-        input.value = object.prop('checked') ? 1 : 0;
-        break;
-      case 'submit':
-      // case 'reset':
-      case 'button':
-        input.value = 1;
-        break;
-      default:
-        input.value = object.prop('value');
-        break;
-    } // end switch
-    // TODO capture other stuff, e.g. html classes or data-* attributes
-    // TODO expand to deal with textarea, select, and button elements
-  } // end if key and type exists
+    // console.log(type);
+    // console.log($(this).prop('name'));
+    // console.log($(this).prop('id'));
+    // console.log($(this).prop('checked'));
+    // console.log($(this).prop('value'));
+
+    if (!key || !type) {
+      // TODO return something?
+      console.log('getFormInputValue is missing key or type.');
+    } else {
+      input.type = type;
+      input.key = key;
+    
+      // switch statement to get the value;
+      switch(type){
+        case 'hidden':
+        case 'text':
+        case 'search':
+        case 'tel':
+        case 'url':
+        case 'email':
+        case 'password':
+        case 'number':
+        case 'range':
+        case 'color':
+        case 'date':
+        case 'datetime-local':
+        case 'time':
+        case 'file':
+        case 'radio':
+        case 'image':
+          input.value = object.prop('value');
+          break;
+        case 'checkbox':
+          input.value = object.prop('checked') ? 1 : 0;
+          break;
+        case 'submit':
+        // case 'reset':
+        case 'button':
+          input.value = 1;
+          break;
+        default:
+          input.value = object.prop('value');
+          break;
+      } // end switch
+
+      // TODO capture other stuff, e.g. html classes or data-* attributes
+      // TODO expand to deal with textarea, select, and button elements
+    } // end if key and type exists
+  } // end if for is select?
   // console.log(input);
   return input;
 }

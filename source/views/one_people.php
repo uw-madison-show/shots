@@ -58,7 +58,7 @@ $related_entities = relationshipsFetch('people', $people_id, 'php');
   $(document).ready(function() {
     console.log('ready');
 
-    $('input').change( ajaxChange );
+    $(':input').change( ajaxChange );
 
     $('#delete-button').click( openDeleteModal );
 
