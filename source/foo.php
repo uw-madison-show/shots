@@ -10,7 +10,16 @@ $this_id = grabString('id');
 // include './lib/all_pages.php';
 include 'shots/entities/grants.php';
 
+$foo = getLookups('grants', 'status');
+$bax = getLookups('grants', 'baz');
+
 // $my_grants = grantsFetch( array($this_id) );
+
+$bb = array_column($foo, 'lookup_value');
+
+$cc = array_search('bobo', array_column($foo, 'lookup_value'));
+
+// var_dump($cc);
 
 
 include_once 'shots/relationships/relationships.php';
@@ -25,7 +34,6 @@ include_once 'shots/entities/documents.php';
 //                             TRUE
 //                             );
 
-$foo = documentsDeactivate(array('document_id' => 5), FALSE);
 
 ?>
 
