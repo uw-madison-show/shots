@@ -10,9 +10,10 @@
 // if i am on a test or dev server, print all the vars
 $test_machines_pattern = '/(127\\.0\\.0\\.1)|(localhost)|(wwwtest)/i';
 if ( preg_match($test_machines_pattern, $_SERVER['SERVER_NAME']) === 1) {
-  echo '<pre>';
-  print_r(get_defined_vars());
-  echo '</pre>';
+  echo '<pre><code>';
+  $p = print_r(get_defined_vars(), TRUE);
+  echo encode($p);
+  echo '</code></pre>';
 }
 
 ?>
