@@ -335,6 +335,43 @@ function documentsFetch( $id = false, $return_format = 'php', $only_show_active_
 }
 
 /**
+ * Get the most recently editted documents.
+ *
+ * In the future this function might be extended based on the username. Maybe we should switch the documents function to be based on upload date instead of last edit date?
+ *
+ * @param integer $count The number of documents to return.
+ * @param string $return_format Defaults to 'php'.
+ *
+ * @return mixed Depending on $return_format returns data on documents in a string/array.
+ */
+function documentsFetchRecent( $count = 3, $return_format = 'php')
+{
+  global $db, $documents_primary_key;
+
+  $q = $db->createQueryBuilder();
+  $q->select('key_value');
+  $q->from('changelog');
+  $q->where('key_field = :key_field');
+  $q->groupBy('key_value');
+  $q->orderBy('change_timestamp', 'DESC');
+  $q->setMaxResults( $count );
+
+  $q->setParameters( array(':key_field' => $documents_primary_key) );
+
+  $r = $q->execute()->fetchAll();
+
+  if ( !empty($r) ){
+    $f = array_column($r, 'key_value');
+    if ( !empty($f) ){
+      return documentsFetch($f, $return_format);
+    }
+  }
+
+  return FALSE;
+
+}
+
+/**
  * Search the documents table.
  *
  * @param string $search_field The field to search.

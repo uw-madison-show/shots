@@ -41,6 +41,20 @@ body {
   /* anything here? */
 }
 
+.align-left {
+  text-align: left;
+}
+
+.smaller {
+  font-weight: lighter;
+  font-size: smaller;
+}
+
+.larger {
+  font-weight: bolder;
+  font-size: larger;
+}
+
 /***************************************************************/
 
 /* Tile-based index page.

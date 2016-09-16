@@ -17,7 +17,7 @@
 function encode($content)
 {
   if (is_array($content)) {
-    return array_map(array('encode'), $content);
+    return array_map('encode', $content);
   }
   return htmlentities($content, ENT_QUOTES, 'UTF-8');
 }

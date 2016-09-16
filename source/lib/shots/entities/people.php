@@ -80,8 +80,43 @@ function peopleFetchAll( $return_format = 'json' )
   return FALSE;
 }
 
+/**
+ * Get the most recently editted people.
+ *
+ * In the future this function might be extended based on the username.
+ *
+ * @param integer $count The number of people to return.
+ * @param string $return_format Defaults to 'php'.
+ *
+ * @return mixed Depending on $return_format returns data on grants in a string/array.
+ */
+function peopleFetchRecent( $count = 3, $return_format = 'php')
+{
+  global $db, $people_primary_key;
 
-//searchGrants
+  $q = $db->createQueryBuilder();
+  $q->select('key_value');
+  $q->from('changelog');
+  $q->where('key_field = :key_field');
+  $q->groupBy('key_value');
+  $q->orderBy('change_timestamp', 'DESC');
+  $q->setMaxResults( $count );
+
+  $q->setParameters( array(':key_field' => $people_primary_key) );
+
+  $r = $q->execute()->fetchAll();
+
+  if ( !empty($r) ){
+    // flatten the array
+    $f = array_column($r, 'key_value');
+    if ( !empty($f) ){
+      return peopleFetch($f, $return_format);
+    }
+  }
+
+  return FALSE;
+}
+
 
 //createGrantFieldHtml
 /**
