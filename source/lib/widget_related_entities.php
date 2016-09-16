@@ -68,12 +68,14 @@ if (isset($entities) && isset($related_entities)) {
     console.log(ego_entity_name);
     console.log(ego_key_value);
     console.log(alter_data);
-
-    // quick search of all entities of this type
-    // this should leave out the entities of this type that are already attached to ego
-
+    
     // open a modal 
     var a = openAttachModal( ego_entity_name, ego_key_value, alter_data.entityName );
+
+    // search of all entities of this type
+    // this should leave out the entities of this type that are already attached to ego
+    // inject the values into the modal's drop down field
+
 
 
     // TODO maybe a type ahead input?
