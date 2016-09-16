@@ -1,75 +1,35 @@
 <?php
-include './lib/all_pages.php';
 
-include 'html_doctype.php';
-include 'html_head.php';
+function encode_in_place (&$value) {
+  $value = htmlentities($value, ENT_QUOTES, 'UTF-8');
+}
 
-$this_table = 'grants';
-$this_id = grabString('id');
+$foo = array("foo" => array("<script>console.log('gotcha');</script>", 
+                            18, 
+                            FALSE, 
+                            NULL, 
+                            TRUE
+                            ),
+             "bar" => array("<h1>INJECTED</h1>",
+                            "hi",
+                            "TRUE"
+                            ),
+             );
+echo '<pre>';
+echo "\nBefore:";
+var_dump($foo);
 
-// include './lib/all_pages.php';
-include 'shots/entities/grants.php';
+// encode_in_place($foo);
+// array_walk_recursive($foo, 'encode_in_place');
 
-$foo = getLookups('grants', 'status');
-$bax = getLookups('grants', 'baz');
+include 'lib/functions_utility.php';
 
-// $my_grants = grantsFetch( array($this_id) );
+$new = encode($foo);
 
-$bb = array_column($foo, 'lookup_value');
+echo "\nAfter:";
+var_dump($new);
 
-$cc = array_search('bobo', array_column($foo, 'lookup_value'));
-
-// var_dump($cc);
-
-
-include_once 'shots/relationships/relationships.php';
-// $related_entities = relationshipsFetch('grants', $grant_id, 'php');
-
-include_once 'shots/entities/documents.php';
-// $foo = TRUE + FALSE;
-// var_dump($foo);
-// $foo = documentsDeactivate( array("name" => "IMG_20150813_164647845",
-//                                   "extension" => "jpg",
-//                                   "size" => 27467),
-//                             TRUE
-//                             );
-
+echo '</pre>';
 
 ?>
 
-
-
-<body>
-
-<?php include 'html_navbar.php'; ?>
-
-
-
-<?php include 'html_footer.php'; ?>
-
-
-<!-- include javascript scripts -->
-<script type="text/javascript">
-  $(document).ready(function() {
-    console.log('ready');
-
-    /**********************************************************/
-
-    // Page Setup Code
-
-    /**********************************************************/
-
-
-
-    /**********************************************************/
-
-    // Event Listeners
-
-    /**********************************************************/
-
-    
-
-  }); // end document ready
-</script>
-</body>
-</html>
