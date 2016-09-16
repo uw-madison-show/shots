@@ -10,6 +10,8 @@
 /**
  * Converts all special characters to entites, using UTF-8.
  *
+ * Stolen from: https://github.com/flourishlib/flourish-classes/blob/master/fHTML.php
+ *
  * @param  string|array $content  The content to encode
  * @return string  The encoded content
  *
@@ -17,7 +19,7 @@
 function encode($content)
 {
   if (is_array($content)) {
-    return array_map(array('encode'), $content);
+    return array_map('encode', $content);
   }
   return htmlentities($content, ENT_QUOTES, 'UTF-8');
 }

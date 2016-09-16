@@ -30,9 +30,12 @@ function grantsFetch( $id = false, $return_format = 'php' )
     $q->from('grants');
     $q->where( $grants_primary_key .' = :key_value' );
     $q->setParameters( array(':key_value' => $this_id) );
-    $r = $q->execute()->fetchAll()[0];
-    // TODO test if there are results before using the arrray index, otherwise it throws undefined offset notices.
-    $return_array[$this_id] = $r;
+    $r = $q->execute()->fetchAll();
+    $result = array();
+    if ( !empty($r) ){
+      $result = $r[0];
+    }
+    $return_array[$this_id] = $result;
   }
   if ( $return_format === 'json' ){
     return json_encode($return_array);
@@ -46,7 +49,6 @@ function grantsFetch( $id = false, $return_format = 'php' )
   }
 }
 
-//fetchAllGrants
 /**
  * Returns all grants in the database.
  *
@@ -81,6 +83,43 @@ function grantsFetchAll( $return_format = 'json' )
   return FALSE;
 }
 
+/**
+ * Get the most recently editted grants.
+ *
+ * In the future this function might be extended based on the username.
+ *
+ * @param integer $count The number of grants to return.
+ * @param string $return_format Defaults to 'php'.
+ *
+ * @return mixed Depending on $return_format returns data on grants in a string/array.
+ */
+function grantsFetchRecent( $count = 3, $return_format = 'php')
+{
+  global $db, $grants_primary_key;
+
+  $q = $db->createQueryBuilder();
+  $q->select('key_value');
+  $q->from('changelog');
+  $q->where('key_field = :key_field');
+  $q->groupBy('key_value');
+  $q->orderBy('change_timestamp', 'DESC');
+  $q->setMaxResults( $count );
+
+  $q->setParameters( array(':key_field' => $grants_primary_key) );
+
+  $r = $q->execute()->fetchAll();
+
+  if ( !empty($r) ){
+    $f = array_column($r, 'key_value');
+    if ( !empty($f) ){
+      return grantsFetch($f, $return_format);
+    }
+  }
+
+  return FALSE;
+
+}
+
 
 //searchGrants
 
@@ -109,7 +148,7 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
   // echo $field_name;
 
   if ( !in_array($field_name, array_keys($grants_fields)) ){
-    // TODO error message 
+    trigger_error($field_name . ' is not a recognized field in the grants table.');
     return FALSE;
   }
 
@@ -121,15 +160,41 @@ function grantsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
   $return_html .= '<div class="field">';
   $return_html .= '<div class="form-group">';
 
-  // e.g. drop down lookups
-  $special_fields = array();
+  // set up the label
+  $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
+
+  // handle special fields, e.g. drop down lookups
+  $special_fields = array('status');
   if ( in_array($field_name, $special_fields) ){
-    // do stuff for speical fields
+    switch ($field_name) {
+      case 'status':
+
+        $lookups = getLookups('grants', 'status');
+
+        // set up the select element
+        $return_html .= '<div class="col-xs-8">';
+        $return_html .= '<select class="form-control " id="' . $field_name . '" name="'. $field_name .'">';
+
+        // deal with the possibility that the db has a value that is not on the lookup list
+        if ( !empty($field_value) && array_search($field_value, array_column($lookups, 'lookup_value')) === FALSE ){
+          $return_html .= '<option class="drop-down-option-default" value="" selected disabled>'. $field_value .' [invalid option]</option>';
+        } else {
+          $return_html .= '<option class="drop-down-option-default" value=""></option>';
+        }
+        foreach ($lookups as $key => $lookup) {
+          $return_html .= '<option class="drop-down-option" value="'. $lookup['lookup_value'] .'" ';
+          if ( $lookup['lookup_value'] === $field_value ) {
+            $return_html .= 'selected';
+          }
+          $return_html .= '>'. $lookup['label'] . '</option>';
+        }
+        $return_html .= '</select>';
+        $return_html .= '</div>';
+        break;
+    }
   } else {
     // do stuff for normal fields
 
-    // set up the label
-    $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
     // figure out if i have integer, string, text, date, etc.
     // based on the DBAL Types
     $field_type = $grants_fields[$field_name]->getType();

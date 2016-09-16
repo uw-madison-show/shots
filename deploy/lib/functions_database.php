@@ -158,16 +158,41 @@ set_exception_handler('custom_exception_handler');
 set_error_handler('custom_error_handler');
 
 
+function getLookups( $table_name, $column_name )
+{
+  global $db;
+  $return_array = array();
+
+  $query = $db->createQueryBuilder();
+  $query->select('lookup_value, label')
+        ->from('lookup_values')
+        ->andWhere('table_name = ?')
+        ->andWhere('column_name = ?')
+        ->setParameter(0, $table_name)
+        ->setParameter(1, $column_name)
+        ;
+  $r = $query->execute()->fetchAll();
+
+  // TODO maybe have a third parameter for the return format
+  if (count($r) > 0) {
+    $return_array = $r;
+  } else {
+    trigger_error('No lookup values for column/table ('. $column_name .'/' .$table_name .').');
+    $return_array = FALSE;
+  }
+  return $return_array;
+}
+
 function changelog( $table_name, $table_key_field, $key_value, $field_name, $old_value, $new_value )
 {
   global $db;
   $db->insert('changelog',
               array('table_name' => strtolower($table_name),
-                    'key_field' => strtolower($table_key_field),
-                    'key_value' => strtolower($key_value),
-                    'field'     => strtolower($field_name),
-                    'old_value' => $old_value,
-                    'new_value' => $new_value
+                    'key_field'  => strtolower($table_key_field),
+                    'key_value'  => strtolower($key_value),
+                    'field'      => strtolower($field_name),
+                    'old_value'  => $old_value,
+                    'new_value'  => $new_value
                     // TODO add username and datetime to the changelog record
                     )
               );

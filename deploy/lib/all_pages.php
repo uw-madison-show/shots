@@ -54,7 +54,7 @@ $common_loader->register();
 $dbal_loader = new ClassLoader('Doctrine\DBAL');
 $dbal_loader->register();
 
-// add database functions
+// create a $db variable to hold a connection to the SQLite database
 require_once('database_connection.php');
 
 // add utility functions
@@ -63,15 +63,12 @@ require_once('functions_utility.php');
 // add class for file uploads
 require_once('jQuery-File-Upload/UploadHandler.php');
 
+// include the global settings
+require_once('shots/internals/settings_global.php');
+
 // TODO session variables
 
 // TODO cookies, if needed
 
-// TODO php error handling
 
-// TODO php ini settings, if needed
-
-// echo '<pre>';
-// print_r(get_defined_vars());
-// echo '</pre>';
 ?>

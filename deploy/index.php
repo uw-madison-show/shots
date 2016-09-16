@@ -13,9 +13,17 @@ if (!$db_exists){
 include 'html_doctype.php';
 include 'html_head.php';
 
-// TODO refactor all of the sql into files for each entity type
-$all_grants_sql = 'select * from grants';
-$all_grants = $db->fetchAll($all_grants_sql);
+include_once 'shots/entities/grants.php';
+include_once 'shots/entities/people.php';
+include_once 'shots/entities/documents.php';
+
+
+$recent_grants = encode(grantsFetchRecent(7));
+$recent_people = encode(peopleFetchRecent(7));
+$recent_documents = encode(documentsFetchRecent(7));
+
+
+
 
 ?>
 
@@ -29,8 +37,8 @@ $all_grants = $db->fetchAll($all_grants_sql);
       <div class="row portal-frame">
         <div class="col-xs-12 portal-main">
           <ul class="tile-list" aria-invalid="false">
+
             <li class="col-xs-12 col-sm-6 col-md-4 no-padding list-container">
-            
               <widget>
                 <div class="widget-frame" id="portal-id-001">
                   <div class="widget-header">
@@ -42,11 +50,15 @@ $all_grants = $db->fetchAll($all_grants_sql);
                     <div class="quick-list-container">
                       <ul class="quick-list">
                         <?php
-                          for ($i = 0; $i <= 3 ; $i++) { 
-                            $g = $all_grants[$i];
-                            echo '<li class="quick-list-item centering">';
-                            echo '<a id="grants-' . $g['grant_id'] . '" href="'. $app_root .'/views/one_grants.php?id=' . $g['grant_id'] .'"">' . $g['title'] . '</a>';
-                            echo '</li>';
+                          foreach ($recent_grants as $id => $data) { 
+                            if ( !empty($data) ){                         
+                              echo '<li class="quick-list-item align-left">';
+                              echo '<a id="grants-' . $data['grant_id'] . '" href="'. $app_root .'/views/one_grants.php?id=' . $data['grant_id'] .'"">';
+                              echo  ($data['title'] ? $data['title'] : 'no title');
+                              echo '</a>';
+                              echo ($data['grant_body'] ? '<span class="smaller"> ('. $data['grant_body'] .')</span>' : '');
+                              echo '</li>';
+                            }
                           }
                         ?>
                       </ul>
@@ -66,13 +78,24 @@ $all_grants = $db->fetchAll($all_grants_sql);
                     <div class="widget-title"><h4>People</h4></div>
                   </div>
                   <div class="widget-body">
-                    <a href="#" class="icon-link">
-                      <div class="widget-icon-container">
-                        <span class="fa fa-users"></span>
-                      </div>
-                    </a>
-                    <a href="<?php echo $app_root; ?>/views/table_all_people.php" class="btn btn-default launch-app-button">All People</a>
+                    <div class="quick-list-container">
+                      <ul class="quick-list">
+                        <?php
+                          foreach ($recent_people as $id => $data) { 
+                            if ( !empty($data) ){                         
+                              echo '<li class="quick-list-item align-left">';
+                              echo '<a id="grants-' . $data['person_id'] . '" href="'. $app_root .'/views/one_people.php?id=' . $data['person_id'] .'"">';
+                              echo  ($data['name'] ? $data['name'] : 'no name');
+                              echo '</a>';
+                              echo ($data['affiliation'] ? '<span class="smaller"> ('. $data['affiliation'] .')</span>' : '');
+                              echo '</li>';
+                            }
+                          }
+                        ?>
+                      </ul>
+                    </div>
                   </div>
+                  <a href="<?php echo $app_root; ?>/views/table_all_people.php" class="btn btn-default launch-app-button">All People</a>
                 </div>
               </widget>
             </li>
@@ -86,6 +109,7 @@ $all_grants = $db->fetchAll($all_grants_sql);
                     <div class="widget-title"><h4>Ancillary Studies</h4></div>
                   </div>
                   <div class="widget-body">
+                    <p>Placeholder. Not real links.</p>
                     <div class="quick-list-container">
                       <ul class="quick-list">
                         <li class="quick-list-item centering">
@@ -139,6 +163,37 @@ $all_grants = $db->fetchAll($all_grants_sql);
                       </a>
                     </div>
                   </div>  
+                </div>
+              </widget>
+            </li>
+
+            <li class="col-xs-12 col-sm-6 col-md-4 no-padding list-container">
+              <widget>
+                <div class="widget-frame" id="portal-id-001">
+                  <div class="widget-header">
+                    <div class="widget-help">?</div>
+                    <div class="widget-remove">x</div>
+                    <div class="widget-title"><h4>Documents</h4></div>
+                  </div>
+                  <div class="widget-body">
+                    <div class="quick-list-container">
+                      <ul class="quick-list">
+                        <?php
+                          foreach ($recent_documents as $id => $data) { 
+                            if ( !empty($data) ){                         
+                              echo '<li class="quick-list-item align-left">';
+                              echo '<a id="grants-' . $data['document_id'] . '" href="'. $app_root .'/views/one_documents.php?id=' . $data['document_id'] .'"">';
+                              echo  ($data['name'] ? $data['name'] : 'unnamed');
+                              echo '</a>';
+                              echo ($data['extension'] ? '<span class="smaller"> ('. $data['extension'] .')</span>' : '');
+                              echo '</li>';
+                            }
+                          }
+                        ?>
+                      </ul>
+                    </div>
+                  </div>
+                  <a href="<?php echo $app_root; ?>/views/manager_all_documents.php" class="btn btn-default launch-app-button">All Documents</a>
                 </div>
               </widget>
             </li>

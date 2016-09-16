@@ -80,8 +80,43 @@ function peopleFetchAll( $return_format = 'json' )
   return FALSE;
 }
 
+/**
+ * Get the most recently editted people.
+ *
+ * In the future this function might be extended based on the username.
+ *
+ * @param integer $count The number of people to return.
+ * @param string $return_format Defaults to 'php'.
+ *
+ * @return mixed Depending on $return_format returns data on grants in a string/array.
+ */
+function peopleFetchRecent( $count = 3, $return_format = 'php')
+{
+  global $db, $people_primary_key;
 
-//searchGrants
+  $q = $db->createQueryBuilder();
+  $q->select('key_value');
+  $q->from('changelog');
+  $q->where('key_field = :key_field');
+  $q->groupBy('key_value');
+  $q->orderBy('change_timestamp', 'DESC');
+  $q->setMaxResults( $count );
+
+  $q->setParameters( array(':key_field' => $people_primary_key) );
+
+  $r = $q->execute()->fetchAll();
+
+  if ( !empty($r) ){
+    // flatten the array
+    $f = array_column($r, 'key_value');
+    if ( !empty($f) ){
+      return peopleFetch($f, $return_format);
+    }
+  }
+
+  return FALSE;
+}
+
 
 //createGrantFieldHtml
 /**
@@ -117,15 +152,42 @@ function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
   $return_html .= '<div class="field">';
   $return_html .= '<div class="form-group">';
 
-  // e.g. drop down lookups
-  $special_fields = array();
+  // set up the label
+  $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
+    
+
+  // handle special fields, e.g. drop down lookups
+  $special_fields = array('category');
   if ( in_array($field_name, $special_fields) ){
-    // do stuff for speical fields
+    switch ($field_name) {
+      case 'category':
+
+        $lookups = getLookups('people', 'category');
+
+        // set up the select element
+        $return_html .= '<div class="col-xs-8">';
+        $return_html .= '<select class="form-control " id="' . $field_name . '" name="'. $field_name .'">';
+
+        // deal with the possibility that the db has a value that is not on the lookup list
+        if ( !empty($field_value) && array_search($field_value, array_column($lookups, 'lookup_value')) === FALSE ){
+          $return_html .= '<option class="drop-down-option-default" value="" selected disabled>'. $field_value .' [invalid option]</option>';
+        } else {
+          $return_html .= '<option class="drop-down-option-default" value=""></option>';
+        }
+        foreach ($lookups as $key => $lookup) {
+          $return_html .= '<option class="drop-down-option" value="'. $lookup['lookup_value'] .'" ';
+          if ( $lookup['lookup_value'] === $field_value ) {
+            $return_html .= 'selected';
+          }
+          $return_html .= '>'. $lookup['label'] . '</option>';
+        }
+        $return_html .= '</select>';
+        $return_html .= '</div>';
+        break;
+    }
   } else {
     // do stuff for normal fields
 
-    // set up the label
-    $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
     // figure out if i have integer, string, text, date, etc.
     // based on the DBAL Types
     $field_type = $people_fields[$field_name]->getType();
@@ -214,8 +276,7 @@ function peopleUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
       or $field_name === FALSE
       or $new_value === NULL
       ){
-    // TODO error message
-    echo 'missing params for peopleUpdate';
+    trigger_error('missing params for peopleUpdate');
     return FALSE;
   }
 
