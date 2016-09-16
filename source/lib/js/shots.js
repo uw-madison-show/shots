@@ -403,6 +403,45 @@ function openUploadModal(e){
     }); 
 }
 
+// open a modal dialog to connect two entities
+function openAttachModal(ego_entity_name, ego_id, alter_entity_name){
+  console.log('openAttachModal');
+
+  var modal_message_html = '';
+
+  // write out the html input form elements
+  // TODO refactor this so the input fields are added programatically?
+  modal_message_html += '<div id="related-entity-modal-message">'+
+    '<div class="form-horizontal">' +
+      '<div class="form-group">'+
+        '<label class="control-label col-xs-4" for="existing-entity">Pick an existing record:</label>'+
+        '<div class="col-xs-8">'+
+          '<select id="existing-entity" name="existing-entity" class="form-control">'+
+            '<option class="drop-down-option-default" value=""></option>'+
+          '</select>'+
+        '</div>'+
+      '</div>'+
+      '<p class="col-xs-12 centering">~ or ~</p>'+
+      '<div class="form-group">'+
+        '<label class="control-label col-xs-4" for="new-entity">Create new record:</label>'+
+        '<div class="col-xs-8">'+
+          '<input id="new-entity" name="new-entity" class="form-control" type="text" placeholder="" />'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '</div>';
+
+  var attach_modal = openModal();
+  attach_modal.find('#basic-modal-label').html('Connect to ' + alter_entity_name);
+  attach_modal.find('.modal-body').append(modal_message_html);
+
+  attach_modal.find('.modal-footer').append('<button type="submit" id="delete-modal-confirm-button" class="btn btn-primary">Attach ></button>');
+
+  
+  return attach_modal;  
+    
+}
+
 
 function ajaxDelete(a){
   console.log(a);
@@ -537,7 +576,7 @@ function keyFieldRenderer(instance, td, row, col, prop, value, cellProperties){
   // console.log(instance.rootElement.getAttribute('data-entity-name'));
   var entity = instance.rootElement.getAttribute('data-entity-name');
   var id = Handsontable.helper.stringify(value);
-  td.innerHTML = '<a href="/views/one_' + entity + '.php?id=' + id + '">' + id + '</a>';
+  td.innerHTML = '<a href="' + app_root + '/views/one_' + entity + '.php?id=' + id + '">' + id + '</a>';
   return td;
 }
 

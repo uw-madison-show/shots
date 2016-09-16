@@ -16,7 +16,7 @@ if (isset($entities) && isset($related_entities)) {
 
     echo '
       <div class="panel panel-default">
-        <div class="panel-heading">
+        <div class="related-entities-heading panel-heading" data-entity-name="'. $this_entity .'">
           <h4 class="panel-title">
             <a class="toggle-related-entities" data-toggle="collapse" data-parent="#related-entities-accordion" href="#collapse-' . $this_entity .'">
             ' . $this_entity . ' <span class="badge">'. $this_entity_related_count .'</span></a>
@@ -57,6 +57,30 @@ if (isset($entities) && isset($related_entities)) {
 
 <script>
   $('.related-entities-button').on('click', function(e) {
-    console.log($(this));
+    // ego = the main entity; i.e. the one that will get a thing attached to it
+    // alter = the entity to be attached; at this point we probably only name the name of the entity type for the alter
+    var ego_entity_name = $('#main-entity .record').data('entityName');
+    var ego_key_field   = key_field_mapping[ego_entity_name];
+    var ego_key_value   = $('#' + ego_key_field).val();
+    var alter_data      = $(this).parents('.related-entities-heading').data();
+
+
+    console.log(ego_entity_name);
+    console.log(ego_key_value);
+    console.log(alter_data);
+
+    // quick search of all entities of this type
+    // this should leave out the entities of this type that are already attached to ego
+
+    // open a modal 
+    var a = openAttachModal( ego_entity_name, ego_key_value, alter_data.entityName );
+
+
+    // TODO maybe a type ahead input?
+
+    // update the relationship table
+
+    // reload the page
+
   });
 </script>
