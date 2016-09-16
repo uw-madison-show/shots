@@ -4,7 +4,7 @@ If you are deploying shots onto a server, you don't need to worry about anything
 
 ## Dependencies
 
-1. php >= 5.4.0 on the dev machine. This provides a "built-in sever":
+1. php >= 5.4.0 on the dev machine. (Note: After I upgraded from 5.6 to 7.1.0RC1 the built-in server was so much better behaved on my local machine. Probably a memory/cache thing?) This provides a "built-in sever":
     * `php -S 127.0.0.1:8080`
     * I made a ini file for the built in server on my dev, but hopefully it will not be necessary when loading into test/prod. See `...\shots\source\php\built_in_server.ini`.
 2. node on the dev machine
