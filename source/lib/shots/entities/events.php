@@ -208,3 +208,128 @@ function eventsDelete($id_value)
                       );
 }
 
+/**
+ * Add a record to the events table.
+ *
+ * @param string $field_name The name of the field to use in the insert query. Do not use the field name of an autoincrement id field, e.g. do not use event_id.
+ * @param mixed $field_value The value to use in the insert query.
+ *
+ * @return boolean If count of affected rows is greater than 0 then return TRUE, otherwise return FALSE.
+ */
+
+function eventsAdd( $field_name = FALSE, $field_value = FALSE )
+{
+  global $db, $events_fields;
+
+  if ($field_name === FALSE or $field_value === FALSE) { 
+    return FALSE; 
+  }
+
+  if ( !in_array($field_name, array_keys($events_fields)) ) { 
+    return FALSE;
+  } 
+
+  $affected_rows = $db->insert('events',
+                              array($field_name => $field_value)
+                              );
+
+  if ( $affected_rows > 0 ) { return TRUE; }
+
+  return FALSE;
+}
+
+/**
+ * Returns all events in the database.
+ *
+ * Default return value is a json string.
+ *
+ * @param string $return_format Default is "json". Can be set to "php" or "csv".
+ *
+ * @return string Depending on the `$return_format` this is either a json, serialized php, or csv string.
+ */
+function eventsFetchAll( $return_format = 'json' )
+{
+  global $db, $events_primary_key;
+
+  $q = $db->createQueryBuilder();
+  $q->select('*');
+  $q->from('events');
+  $r = $q->execute()->fetchAll();
+
+  if ( !empty($r) ){
+    if ( $return_format === 'json' ){
+      return json_encode($r);
+    } elseif ( $return_format === 'php' ){
+      return serialize($r);
+    } elseif ( $return_format === 'csv' ){
+      // TODO add the csv output support
+      return null;
+    } else {
+      return $r;
+    }
+  }
+
+  return FALSE;
+}
+
+
+/**
+ * Search the events table.
+ *
+ * @param string $search_field The field to search.
+ * @param mixed $search_value The value to match on. Give me a string or an array of values. If it is an array the function will use the SQL `in` operator.
+ * @param string $return_format One of json, php, csv, or native. csv may not work yet. php is a serialized string. native is a php array that hasn't been transformed. Defaults to native.
+ *
+ * @return mixed String or php array depending on the $return_format. Returns FALSE on errors.
+ */
+function eventsSearch( $search_field = FALSE, $search_value = FALSE, $return_format = 'native' )
+{
+  global $db, $events_fields;
+  $result = FALSE;
+
+  if (!$search_field or !$events_fields){
+    trigger_error('Missing params for eventsSearch().');
+    return FALSE;
+  }
+
+  if ( !in_array($search_field, array_keys($events_fields)) ){
+    trigger_error($search_field . ' not found in the documents table.');
+    return FALSE;
+  }
+
+  $search_field_q = $db->quoteIdentifier($search_field);
+
+  $q = $db->createQueryBuilder();
+  $q->select('*');
+  $q->from('events');
+  
+  if (is_array($search_value)) {
+    $q->andWhere($search_field_q . ' in (?)');
+    $sql = $q->getSQL();
+    $stmt = $db->executeQuery($sql,
+                              array($search_value),
+                              array(\Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+                              );
+    $result = $stmt->fetchAll();
+  } else {
+    $q->andWhere($search_field_q . ' = :search_value');
+    $q->setParameters( array(':search_value' => $search_value) );
+    $result = $q->execute()->fetchAll();
+  }
+
+  if ( !empty($result) ){
+    if ( $return_format === 'json' ){
+      return json_encode($result);
+    } elseif ( $return_format === 'php' ){
+      return serialize($result);
+    } elseif ( $return_format === 'csv' ){
+      // TODO add the csv output support
+      return FALSE;
+    } else {
+      return $result;
+    }
+  }
+
+  return FALSE;
+}
+

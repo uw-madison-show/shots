@@ -63,6 +63,7 @@ if (isset($entities) && isset($related_entities)) {
     var ego_key_field   = key_field_mapping[ego_entity_name];
     var ego_key_value   = $('#' + ego_key_field).val();
     var alter_data      = $(this).parents('.related-entities-heading').data();
+    var alter_key_field = key_field_mapping[alter_data.entityName];
 
 
     console.log(ego_entity_name);
@@ -72,17 +73,56 @@ if (isset($entities) && isset($related_entities)) {
     // open a modal 
     var a = openAttachModal( ego_entity_name, ego_key_value, alter_data.entityName );
 
-    // search of all entities of this type
-    // this should leave out the entities of this type that are already attached to ego
-    // inject the values into the modal's drop down field
+    if (a) {
+
+      var existing_dropdown = $('#existing-entity');
+
+      // search of all entities of this type
+      var existing = {};
+      existing.target = 'entity';
+      existing.action = alter_data.entityName + 'FetchAll';
+      existing.table  = alter_data.entityName;
+      existing.params = [];
+
+      console.log(existing);
+
+      $.post(app_root + '/lib/ajax_handler.php', 
+             {"request": existing},
+             "json"
+             )
+             .done() 
+             .fail( ajaxFailed )
+             .always(function(r){
+                       console.log(r);
+                       if (r.error === false) {
+                        // inject the values into the modal's drop down field for existing entities
+                        // TODO this should leave out the entities of  that are already attached to ego; maybe do another search in the relationship table or try to use the php $related_entities array that may alread be in scope?
+                        if (r.results[0]) {
+                          var existing_alters = JSON.parse(r.results[0]);
+                          var existing_alter_option_el = {};
+                          // TODO some sorting on the existing alters?
+                          $.each( existing_alters, function(index, this_alter) {
+                            existing_alter_option_el.value = this_alter[alter_key_field];
+                            existing_alter_option_el.text = formatEntityResultAsShortText(alter_data.entityName, this_alter);
+
+                            existing_dropdown.append($('<option>', existing_alter_option_el));
+                          });
+                          existing_dropdown.prop('disabled', false);
+                        }
+                       } else {
+                         ajaxFailed(r);
+                       }
+                     }) 
+             ;
 
 
+      // TODO maybe a type ahead input?
 
-    // TODO maybe a type ahead input?
+      // update the relationship table
+      
 
-    // update the relationship table
-
-    // reload the page
+      // reload the page
+    } // end if attach model object exists
 
   });
 </script>

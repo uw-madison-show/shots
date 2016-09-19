@@ -416,7 +416,7 @@ function openAttachModal(ego_entity_name, ego_id, alter_entity_name){
       '<div class="form-group">'+
         '<label class="control-label col-xs-4" for="existing-entity">Pick an existing record:</label>'+
         '<div class="col-xs-8">'+
-          '<select id="existing-entity" name="existing-entity" class="form-control">'+
+          '<select id="existing-entity" name="existing-entity" class="form-control" disabled>'+
             '<option class="drop-down-option-default" value=""></option>'+
           '</select>'+
         '</div>'+
@@ -435,11 +435,148 @@ function openAttachModal(ego_entity_name, ego_id, alter_entity_name){
   attach_modal.find('#basic-modal-label').html('Connect to ' + alter_entity_name);
   attach_modal.find('.modal-body').append(modal_message_html);
 
-  attach_modal.find('.modal-footer').append('<button type="submit" id="delete-modal-confirm-button" class="btn btn-primary">Attach ></button>');
+  attach_modal.find('.modal-footer').append('<button type="submit" id="attach-modal-confirm-button" class="btn btn-primary">Attach ></button>');
 
-  
-  return attach_modal;  
+  $('#attach-modal-confirm-button').on('click', function (e) {
+    // console.log('click');
+    e.preventDefault();
+    $('#new-entity').prop('disabled', true);
+    $('#existing-entity').prop('disabled', true);
+
+    // check that we have either existing record or a new record
+    var new_val         = $('#new-entity').val();
+    var alter_entity_id = $('#existing-entity').val();
+    console.log(new_val);
+    console.log(alter_entity_id);
+    // prefer the existing record if we have both
+    if (alter_entity_id){
+      var rel = {};
+      rel.target = 'relationships';
+      rel.action = 'relationshipsAdd';
+      rel.table  = 'relationships';
+      rel.params = [ego_entity_name,
+                    ego_id,
+                    alter_entity_name,
+                    alter_entity_id
+                    ];
+      $.post(app_root + '/lib/ajax_handler.php', 
+             {"request": rel},
+             "json"
+             )
+             .done() 
+             .fail( ajaxFailed )
+             .always(function(r){
+                       if (r.error === false) {
+                         // console.log(r);
+                         location.reload();
+                       } else {
+                         ajaxFailed(r);
+                       }
+                    })
+             ;
+
+    } else if (new_val) {
+      // create a new entity
+
+      // we assume that the typed in value will go into empty_field_mapping
+      // TODO double check that the new val may already exist in the alter table
+      var new_entity = {};
+      new_entity.target = 'entity';
+      new_entity.action = alter_entity_name + 'Add';
+      new_entity.table  = alter_entity_name;
+      new_entity.params = [empty_field_mapping[alter_entity_name],
+                           new_val
+                           ];
+      $.post(app_root + '/lib/ajax_handler.php', 
+             {"request": new_entity},
+             "json"
+             )
+             .done() 
+             .fail( ajaxFailed )
+             .always(function(r){
+                       if (r.error === false) {
+                         // console.log(r);
+
+                         // add a relationship from ego to the new entity
+                         openAttachModal_f1(r);
+
+                         
+                       } else {
+                         ajaxFailed(r);
+                       }
+                    })
+             ;
+
+
+    } // end if existing value or new value
     
+    // private function to use for ajax post callback
+    // get the id of the newly created entity
+    function openAttachModal_f1(data){
+      console.log(data);
+      var req = {};
+      req.target = 'entity';
+      req.action = data.request_params.table + 'Search';
+      req.table  = data.request_params.table;
+      req.params = [data.request_params.params[0],
+                    data.request_params.params[1]
+                    ];
+      $.post(app_root + '/lib/ajax_handler.php', 
+             {"request": req},
+             "json"
+             )
+             .done() 
+             .fail( ajaxFailed )
+             .always(function(r){
+                       if (r.error === false) {
+                         // console.log(r);
+
+                         // add a relationship from ego to the new entity
+                         openAttachModal_f2(r);
+
+                         
+                       } else {
+                         ajaxFailed(r);
+                       }
+                    })
+             ;
+    }
+    
+    // private function to use for ajax post callback
+    // add a relationship
+    function openAttachModal_f2(data){
+      console.log(data);
+      var alter_entity_name = data.request_params.table;
+      var alter_key_field   = key_field_mapping[alter_entity_name];
+      var alter_key_value   = data.results[0][0][alter_key_field];
+
+      var rel = {};
+      rel.target = 'relationships';
+      rel.action = 'relationshipsAdd';
+      rel.table  = 'relationships';
+      rel.params = [ego_entity_name,
+                    ego_id,
+                    alter_entity_name,
+                    alter_key_value
+                    ];
+      $.post(app_root + '/lib/ajax_handler.php', 
+             {"request": rel},
+             "json"
+             )
+             .done() 
+             .fail( ajaxFailed )
+             .always(function(r){
+                       if (r.error === false) {
+                         // console.log(r);
+                         location.reload();
+                       } else {
+                         ajaxFailed(r);
+                       }
+                    })
+             ;
+    }
+  }); // end listener for click on the confirm attach button
+  return attach_modal;  
 }
 
 
