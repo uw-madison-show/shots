@@ -1,35 +1,41 @@
 <?php
+include 'lib/all_pages.php';
 
-function encode_in_place (&$value) {
-  $value = htmlentities($value, ENT_QUOTES, 'UTF-8');
-}
+include 'shots/relationships/relationships.php';
 
-$foo = array("foo" => array("<script>console.log('gotcha');</script>", 
-                            18, 
-                            FALSE, 
-                            NULL, 
-                            TRUE
-                            ),
-             "bar" => array("<h1>INJECTED</h1>",
-                            "hi",
-                            "TRUE"
-                            ),
-             );
-echo '<pre>';
-echo "\nBefore:";
-var_dump($foo);
 
 // encode_in_place($foo);
 // array_walk_recursive($foo, 'encode_in_place');
 
-include 'lib/functions_utility.php';
+$from_entity_type = 'grants';
+$from_entity_id = 3;
+$to_entity_type = 'people';
+$to_entity_id = 1;
+$relationship_type = 'is_related_to';
 
-$new = encode($foo);
 
-echo "\nAfter:";
-var_dump($new);
+// $q = $db->createQueryBuilder();
+//   $q->select('count(*)')
+//     ->from('relationships')
+//     ->where('from_entity_type = :from_entity_type')
+//     ->andWhere('from_entity_id = :from_entity_id')
+//     ->andWhere('to_entity_type = :to_entity_type')
+//     ->andWhere('to_entity_id = :to_entity_id')
+//     ->andWhere('relationship_type = :relationship_type')
+//     ;
 
-echo '</pre>';
+//   $q->setParameters( array(':from_entity_type'  => $from_entity_type,
+//                            ':from_entity_id'    => $from_entity_id,
+//                            ':to_entity_type'    => $to_entity_type,
+//                            ':to_entity_id'      => $to_entity_id,
+//                            ':relationship_type' => $relationship_type,
+//                            )
+//                     );
 
+//   $r = $q->execute()->fetchAll();
+
+$foo = relationshipsAdd($from_entity_type, $from_entity_id, $to_entity_type, $to_entity_id, 'is_related_to');
+
+include 'html_footer.php';
 ?>
 
