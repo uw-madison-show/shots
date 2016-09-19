@@ -116,15 +116,41 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
   $return_html .= '<div class="field">';
   $return_html .= '<div class="form-group">';
 
+  // set up the label
+    $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
+
   // e.g. drop down lookups
-  $special_fields = array();
+  $special_fields = array('type');
   if ( in_array($field_name, $special_fields) ){
-    // do stuff for speical fields
+    switch ($field_name) {
+      case 'type':
+
+        $lookups = getLookups('events', 'type');
+
+        // set up the select element
+        $return_html .= '<div class="col-xs-8">';
+        $return_html .= '<select class="form-control " id="' . $field_name . '" name="'. $field_name .'">';
+
+        // deal with the possibility that the db has a value that is not on the lookup list
+        if ( !empty($field_value) && array_search($field_value, array_column($lookups, 'lookup_value')) === FALSE ){
+          $return_html .= '<option class="drop-down-option-default" value="" selected disabled>'. $field_value .' [invalid option]</option>';
+        } else {
+          $return_html .= '<option class="drop-down-option-default" value=""></option>';
+        }
+        foreach ($lookups as $key => $lookup) {
+          $return_html .= '<option class="drop-down-option" value="'. $lookup['lookup_value'] .'" ';
+          if ( $lookup['lookup_value'] === $field_value ) {
+            $return_html .= 'selected';
+          }
+          $return_html .= '>'. $lookup['label'] . '</option>';
+        }
+        $return_html .= '</select>';
+        $return_html .= '</div>';
+        break;
+    }
   } else {
     // do stuff for normal fields
 
-    // set up the label
-    $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
     // figure out if i have integer, string, text, date, etc.
     // based on the DBAL Types
     $field_type = $events_fields[$field_name]->getType();
@@ -147,6 +173,12 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
         $return_html .= '<textarea class="form-control" rows="2" id="'. $field_name . '" name="'. $field_name . '">' . $field_value . '</textarea>';
         $return_html .= '</div>';
         break;
+      case 'Boolean':
+        $return_html .= '<div class="col-xs-2">';
+        $return_html .= '<input class="form-control" type="checkbox" value="" id="' . $field_name . '" name="' . $field_name . '" ';
+        if ($field_value == true) $return_html .= ' checked ';
+        $return_html .= '/>';
+        $return_html .= '</div>';
       default:
         // TODO add a default
         break;

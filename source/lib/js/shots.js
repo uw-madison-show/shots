@@ -393,6 +393,7 @@ function openUploadModal(e){
         // console.log("progressall!");
         // disable the modal inputs while the upload is working
         $('#file-upload-modal-message input').prop('disabled', true);
+        $('#file-upload-button').prop('disabled', true);
         var progress = parseInt(data.loaded / data.total * 100, 10);
         $('#file-upload-progress .progress-bar').css(
             'width',
@@ -442,6 +443,7 @@ function openAttachModal(ego_entity_name, ego_id, alter_entity_name){
     e.preventDefault();
     $('#new-entity').prop('disabled', true);
     $('#existing-entity').prop('disabled', true);
+    $('#attach-modal-confirm-button').prop('disabled', true);
 
     // check that we have either existing record or a new record
     var new_val         = $('#new-entity').val();
