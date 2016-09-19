@@ -136,7 +136,7 @@ function peopleFetchRecent( $count = 3, $return_format = 'php')
  */
 function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
 {
-  global $db, $people_fields;
+  global $db, $people_fields, $people_primary_key;
   if ($field_name === FALSE or $field_value === FALSE) return FALSE; 
 
   if ( !in_array($field_name, array_keys($people_fields)) ){
@@ -201,7 +201,11 @@ function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
       case 'Date':
         // add a normal input field for all four types
         $return_html .= '<div class="col-xs-8">';
-        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'"/>';
+        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'"';
+        if ($field_name === $people_primary_key) {
+          $return_html .= ' readonly';
+        } 
+        $return_html .= ' />';
         $return_html .= '</div>';
         break;
         // TODO make date fields a date picker input
