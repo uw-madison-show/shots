@@ -1,0 +1,5 @@
+AuthType shibboleth
+ShibCompatWith24 On
+ShibRequestingSetting requireSession false
+ShibUseHeaders On
+Require shibboleth

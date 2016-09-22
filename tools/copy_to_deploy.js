@@ -79,7 +79,8 @@ console.log('done cloning folders');
 // copy the top level files
 source_files = ['delete.php',
                 'index.php',
-                'manage_database.php'
+                'manage_database.php',
+                '.htaccess'
                 ];
 
 for (var i = 0; i < source_files.length; i++) {
