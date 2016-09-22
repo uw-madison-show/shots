@@ -56,16 +56,20 @@ $valid_request_targets = array('entity',
 if ( !in_array($this_request["target"], $valid_request_targets) ){
   $return_array["error"] = TRUE;
   $return_array["error_messages"][] = 'Target must be on of '. implode(', ', $valid_request_targets);
-  echo json_encode($return_array);
 }
 
 if ( $this_request["target"] === 'entity' ){
   // this will handle most of the CRUD functions for the database
   try {
+    // handle potential for empty parameter array
+    $params = array();
+    if ( !empty($this_request['params']) ){
+      $params = $this_request['params'];
+    }
     // include the correct entity type
     include_once('shots/entities/'. $this_request['table'] . '.php');
     // run the specified function with the provided params   
-    $result = call_user_func_array($this_request['action'], $this_request['params'] );
+    $result = call_user_func_array($this_request['action'], $params);
     $return_array["error"] = FALSE;
     $return_array["results"][] = $result;
   } catch (Exception $e) {

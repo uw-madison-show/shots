@@ -136,7 +136,7 @@ function peopleFetchRecent( $count = 3, $return_format = 'php')
  */
 function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $options = array() )
 {
-  global $db, $people_fields;
+  global $db, $people_fields, $people_primary_key;
   if ($field_name === FALSE or $field_value === FALSE) return FALSE; 
 
   if ( !in_array($field_name, array_keys($people_fields)) ){
@@ -201,7 +201,11 @@ function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
       case 'Date':
         // add a normal input field for all four types
         $return_html .= '<div class="col-xs-8">';
-        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'"/>';
+        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'"';
+        if ($field_name === $people_primary_key) {
+          $return_html .= ' readonly';
+        } 
+        $return_html .= ' />';
         $return_html .= '</div>';
         break;
         // TODO make date fields a date picker input
@@ -232,9 +236,6 @@ function peopleCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
 
 }
 
-//viewGrant
-
-//addGrant
 function peopleAdd( $field_name = FALSE, $field_value = FALSE )
 {
   global $db, $people_fields;
@@ -256,7 +257,7 @@ function peopleAdd( $field_name = FALSE, $field_value = FALSE )
   return FALSE;
 }
 
-//updateGrant
+
 /**
  * Changes a value in the grant table.
  *
@@ -306,8 +307,66 @@ function peopleUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
   return $return_bool;
 }
 
-//deleteGrants
 
+/**
+ * Search the people table.
+ *
+ * @param string $search_field The field to search.
+ * @param mixed $search_value The value to match on. Give me a string or an array of values. If it is an array the function will use the SQL `in` operator.
+ * @param string $return_format One of json, php, csv, or native. csv may not work yet. php is a serialized string. native is a php array that hasn't been transformed. Defaults to native.
+ *
+ * @return mixed String or php array depending on the $return_format. Returns FALSE on errors.
+ */
+function peopleSearch( $search_field = FALSE, $search_value = FALSE, $return_format = 'native' )
+{
+  global $db, $people_fields;
+  $result = FALSE;
+
+  if (!$search_field or !$search_value){
+    trigger_error('Missing params for peopleSearch().');
+    return FALSE;
+  }
+
+  if ( !in_array($search_field, array_keys($people_fields)) ){
+    trigger_error($search_field . ' not found in the documents table.');
+    return FALSE;
+  }
+
+  $search_field_q = $db->quoteIdentifier($search_field);
+
+  $q = $db->createQueryBuilder();
+  $q->select('*');
+  $q->from('people');
+  
+  if (is_array($search_value)) {
+    $q->andWhere($search_field_q . ' in (?)');
+    $sql = $q->getSQL();
+    $stmt = $db->executeQuery($sql,
+                              array($search_value),
+                              array(\Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+                              );
+    $result = $stmt->fetchAll();
+  } else {
+    $q->andWhere($search_field_q . ' = :search_value');
+    $q->setParameters( array(':search_value' => $search_value) );
+    $result = $q->execute()->fetchAll();
+  }
+
+  if ( !empty($result) ){
+    if ( $return_format === 'json' ){
+      return json_encode($result);
+    } elseif ( $return_format === 'php' ){
+      return serialize($result);
+    } elseif ( $return_format === 'csv' ){
+      // TODO add the csv output support
+      return FALSE;
+    } else {
+      return $result;
+    }
+  }
+
+  return FALSE;
+}
 
 
 

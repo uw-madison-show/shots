@@ -131,28 +131,50 @@ function relationshipsAdd($from_entity_type = FALSE, $from_entity_id = FALSE, $t
   }
   // $getRecord_done = microtime(true);
 
-  // check if this relationship already exists
+  // TODO check if this relationship already exists
+  $q = $db->createQueryBuilder();
+  $q->select('count(*)')
+    ->from('relationships')
+    ->where('from_entity_type = :from_entity_type')
+    ->andWhere('from_entity_id = :from_entity_id')
+    ->andWhere('to_entity_type = :to_entity_type')
+    ->andWhere('to_entity_id = :to_entity_id')
+    ->andWhere('relationship_type = :relationship_type')
+    ;
 
-  // insert the relationship
-  $new_id = addRecord('relationships',
-                      'from_entity_type',
-                      $from_entity_type
-                      );
-  $addRecord_done = microtime(true);
-  $ck = updateRecord('relationships',
-                     array('from_entity_id'    => $from_entity_id,
-                           'to_entity_type'    => $to_entity_type,
-                           'to_entity_id'      => $to_entity_id,
-                           'relationship_type' => $relationship_type),
-                     'relationship_id',
-                     $new_id
-                     );
+  $q->setParameters( array(':from_entity_type'  => $from_entity_type,
+                           ':from_entity_id'    => $from_entity_id,
+                           ':to_entity_type'    => $to_entity_type,
+                           ':to_entity_id'      => $to_entity_id,
+                           ':relationship_type' => $relationship_type,
+                           )
+                    );
+
+  $r = $q->execute()->fetchAll();
+
+  if ( empty($r[0]['count(*)']) ){
+
+    // insert the relationship
+    $new_id = addRecord('relationships',
+                        'from_entity_type',
+                        $from_entity_type
+                        );
+    $addRecord_done = microtime(true);
+    $ck = updateRecord('relationships',
+                       array('from_entity_id'    => $from_entity_id,
+                             'to_entity_type'    => $to_entity_type,
+                             'to_entity_id'      => $to_entity_id,
+                             'relationship_type' => $relationship_type),
+                       'relationship_id',
+                       $new_id
+                       );
+    return $ck;
+  }
   // $updateRecord_done = microtime(true);
 
   // echo '<div>checks '. ($checks_done - $timer_start) . '</div>';
   // echo '<div>getRecord '. ($getRecord_done - $checks_done) . '</div>';
   // echo '<div>addRecord '. ($addRecord_done - $getRecord_done). '</div>';
   // echo '<div>updateRecord '. ($updateRecord_done - $addRecord_done) . '</div>';
-
-  return $ck;
+  return FALSE;
 }
