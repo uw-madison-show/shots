@@ -63,8 +63,14 @@ require_once('jQuery-File-Upload/UploadHandler.php');
 // include the global settings
 require_once('shots/internals/settings_global.php');
 
-// TODO session variables
+// session variables
 require_once('shots/internals/sessions.php');
+
+// authentication
+require_once('shots/internals/username.php');
+if ( empty($username) ) {
+  require_once('shots/internals/authentication.php');
+}
 
 // TODO cookies, if needed
 
