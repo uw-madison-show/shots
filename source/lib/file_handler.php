@@ -25,19 +25,7 @@ require_once('shots/entities/documents.php');
 $server_file_storage_root = '/database/files';
 
 
-// TODO these settings have to know if we are on dev/test/prod/whatever, and then set the directories accordingly.
-$options = array('upload_dir' => "C:\\Users\\moehr\\Documents\\GitHub\\shots\\source\\database\\files\\",
-                 'upload_url' => "localhost:3000/database/files/",
-                 'image_file_types' => null,
-                 );
-
-  $stuff =  "\n file_handler.php \n" .
-            print_r($_REQUEST, TRUE) . 
-            print_r($_GET, TRUE) .
-            print_r($_POST, TRUE)
-            ;
-  error_log($stuff);
-    
-$upload_handler = new ShotsUploadHandler( $options );
+   
+$upload_handler = new ShotsUploadHandler( $file_upload_options );
 
 ?>
