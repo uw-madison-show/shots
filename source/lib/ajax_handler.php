@@ -37,7 +37,8 @@ $return_array = array("request_params" => array(),
 if ( !isset($_POST['request']) ){
   $return_array["error"] = TRUE;
   $return_array["error_messages"][] = 'No parameters submitted to '. $_SERVER['SCRIPT_NAME'];
-  echo json_encode($return_array);
+  // echo json_encode($return_array);
+
 }
 
 $this_request = $_POST["request"];
@@ -114,7 +115,7 @@ if ( $this_request["target"] === 'entity' ){
     $return_array["error_messages"][] = $e->getTraceAsString();
   }
 } elseif ( $this_request["target"] === 'internals' ) {
-   try {
+  try {
     // include the correct file of functions
     include_once('shots/internals/'. $this_request['table'] . '.php');
     // run the specified function with the provided params
