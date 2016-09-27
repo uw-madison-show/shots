@@ -7,9 +7,16 @@
 
 <?php
 
+if (!function_exists('grabString')) {
+  include_once 'all_pages.php';
+}
+
+$debug_mode = grabString('debug');
+
 // if i am on a test or dev server, print all the vars
-$test_machines_pattern = '/(127\\.0\\.0\\.1)|(localhost)|(wwwtest)/i';
-if ( preg_match($test_machines_pattern, $_SERVER['SERVER_NAME']) === 1) {
+// server_type is set in the settings_global.php file
+if ( $server_type === 'development' ||
+     ( $server_type === 'test' && $debug_mode == TRUE) ) {
   echo '<pre><code>';
   $p = print_r(get_defined_vars(), TRUE);
   echo encode($p);
