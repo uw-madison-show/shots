@@ -118,9 +118,8 @@ function peopleFetchRecent( $count = 3, $return_format = 'php')
 }
 
 
-//createGrantFieldHtml
 /**
- * Returns the HTML for a field in the grants table.
+ * Returns the HTML for a field in the people table.
  *
  * Takes the field name, field value, and an array of options and returns a string
  * containing the basic HTML for this one field. Strings, integers, etc. all have
