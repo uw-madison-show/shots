@@ -633,7 +633,7 @@ function ajaxDelete(a){
 
 function getTableData(target, entity) {
   var return_data = {};
-  if (!target || !entity) { return data; }
+  if (!target || !entity) { return false; }
   
   var req = {};
   req.target = target;
@@ -651,16 +651,17 @@ function getTableData(target, entity) {
          .done() 
          .fail( ajaxFailed )
          .always(function(r) {
+                   console.log('getTableData post result = ');
+                   console.log(r);
                    if (r.error === false){
-                     console.log(r);
-                     data = JSON.parse(r.results[0]);
+                     return_data = JSON.parse(r.results[0]);
                    } else {
                      ajaxFailed(r);
                    }
                  })
          ;
 
-  return data;
+  return return_data;
 
 }
 

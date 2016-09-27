@@ -1,8 +1,5 @@
 <?php
 
-// You need to change this if you install SHOTS in another timezone; this is used for file uploads and calendar records
-date_default_timezone_set('America/Chicago');
-
 
 // handle includes paths on multiple dev/test/prod environments
 // this assumes that all_pages.php is in this location:
@@ -66,7 +63,14 @@ require_once('jQuery-File-Upload/UploadHandler.php');
 // include the global settings
 require_once('shots/internals/settings_global.php');
 
-// TODO session variables
+// session variables
+require_once('shots/internals/sessions.php');
+
+// authentication
+require_once('shots/internals/username.php');
+if ( empty($username) ) {
+  require_once('shots/internals/authentication.php');
+}
 
 // TODO cookies, if needed
 

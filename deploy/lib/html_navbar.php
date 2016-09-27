@@ -33,7 +33,11 @@ require_once 'all_pages.php';
           </ul>
         </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right"></ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="navbar-authentication-button">
+          <a href="<?php echo $app_root; ?>/lib/shots/internals/sessions.php?logout=true">Logout</a>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>
