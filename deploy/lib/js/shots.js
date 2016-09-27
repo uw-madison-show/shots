@@ -273,7 +273,7 @@ function openDeleteModal(e){
     var delete_modal = openModal();
     
     delete_modal.find('#basic-modal-label').html('Confirm Delete');
-    delete_modal.find('#modal-form').attr('action', '/delete.php');
+    delete_modal.find('#modal-form').attr('action', app_root + '/delete.php');
     delete_modal.find('#modal-form').attr('method', 'post');
 
     // add the delete_array as a hidden object

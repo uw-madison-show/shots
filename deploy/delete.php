@@ -18,17 +18,19 @@ try{
   }
 
   if ($at_least_one_deletion) {
-    header('Location: /views/table_all_' . $first_entity . '.php');
+    header('Location: ' . $app_root . '/views/table_all_' . $first_entity . '.php');
     exit();
   } else {
     // TODO maybe present the user with an error message?
     header('Location: /');
-    exit;
+    exit();
   }
 } catch (Exception $e) {
   trigger_error('Error deleting records.');
 }
 
 // print_r(get_defined_vars());
+// TODO include all the html stuff to show an empty page with the potential of having an error message.
+// If all goes according to plan this page will have already redirected to another page so this "empty" page should never really be seen by anyone.
 
 ?>
