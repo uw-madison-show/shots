@@ -1,16 +1,25 @@
-<footer class="footer">
-  <div class="container">
-    <p>This is the page footer</p>
-    <div class="message-holder"></div>
-  </div>
-</footer>
-
 <?php
 
 if (!function_exists('grabString')) {
   include_once 'all_pages.php';
 }
 
+?>
+
+<footer class="footer">
+  <div class="container">
+    <div class="float-left smaller">
+      <p>This is the page footer</p>
+    </div>
+    <div class="float-right smaller">
+      <a href="<?php echo $app_root; ?>/manage_database.php">[DB]</a>
+    </div>
+    <div class="message-holder"></div>
+  </div>
+</footer>
+
+
+<?
 $debug_mode = grabString('debug');
 
 // if i am on a test or dev server, print all the vars

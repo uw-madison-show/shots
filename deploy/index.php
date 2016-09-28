@@ -141,7 +141,7 @@ $recent_documents = encode(documentsFetchRecent(7));
                     <div class="col-xs-6 centering">
                       <a href="#" class="icon-link">
                         <div class="widget-multiple-button">
-                          <span class="fa fa-calendar"></span>
+                          <a href="<?php echo $app_root; ?>/views/calendar_month_all_events.php"><span class="fa fa-calendar"></span></a>
                         </div>
                         <p>Calender</p>
                       </a>
@@ -151,7 +151,7 @@ $recent_documents = encode(documentsFetchRecent(7));
                         <div class="widget-multiple-button">
                           <span class="fa fa-calendar-plus-o"></span>
                         </div>
-                        <p>Add Meeting</p>
+                        <p>Add Meeting (placeholder)</p>
                       </a>
                     </div>
                     <div class="col-xs-6 centering">
@@ -159,7 +159,7 @@ $recent_documents = encode(documentsFetchRecent(7));
                         <div class="widget-multiple-button">
                           <span class="fa fa-list"></span>
                         </div>
-                        <p>Upcoming Deadlines</p>
+                        <p>Upcoming Deadlines (placeholder)</p>
                       </a>
                     </div>
                   </div>  

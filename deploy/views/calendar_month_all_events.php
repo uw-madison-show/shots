@@ -24,7 +24,7 @@ include 'html_head.php';
 
     function convertToFullCalendarEvent(input) {
       console.log(input);
-      global_foo = input;
+      // global_foo = input;
       // if input is not an array of objects then error?
 
       // TODO this should be a class?
@@ -101,7 +101,7 @@ include 'html_head.php';
                 }
                 break;
               case 'url':
-                this_event_object.url = '/views/one_events.php?id=' + this_input.event_id;
+                this_event_object.url = app_root + '/views/one_events.php?id=' + this_input.event_id;
                 break;
               case 'className':
                 this_event_object.className = EventObject.className;
@@ -168,7 +168,7 @@ include 'html_head.php';
 
       // make ajax request
       console.log(req);
-      $.post('/lib/ajax_handler.php',
+      $.post(app_root + '/lib/ajax_handler.php',
              {"request": req},
              "json"
              )
