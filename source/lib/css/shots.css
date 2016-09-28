@@ -55,6 +55,14 @@ body {
   font-size: larger;
 }
 
+.float-right {
+  float: right;
+}
+
+.float-left {
+  float: left;
+}
+
 /***************************************************************/
 
 /* Tile-based index page.
