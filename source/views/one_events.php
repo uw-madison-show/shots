@@ -75,7 +75,7 @@ $related_entities = relationshipsFetch('events', $this_id, 'php');
   <script type="text/javascript">
     $(document).ready(function() {
 
-      $('input').change( ajaxChange );
+      $(':input').change( ajaxChange );
 
       $('#delete-button').click( openDeleteModal );
 
