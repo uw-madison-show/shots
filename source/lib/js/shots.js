@@ -7,7 +7,9 @@
 
 /**********************************************************/
 
-var autosave_timeout, table_data, table_handsontable, table_data_key_field;
+var autosave_timeout, table_data, 
+    table_handsontable, table_data_key_field,
+    auth2;
 
 var key_field_mapping = { 
                           "events": "event_id",
@@ -46,6 +48,7 @@ var title_field_mapping = {
 /**********************************************************/
 
 jQuery(document).ready(function(){
+  googleAuthInit();
   // handle an error message coming from the server/db
   if( $('.server-side-error-message').length ){
     $('.server-side-error-message').each(function(){
@@ -60,6 +63,54 @@ jQuery(document).ready(function(){
 // Functions
 
 /**********************************************************/
+
+function googleAuthInit() {
+  gapi.load('auth2', function(){
+    // retrieve the GoogleAuth library and set up client
+    auth2 = gapi.auth2.init({
+      client_id: '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com'
+    });
+
+    // attach the clicke handler to the sign-in button
+    $('#google-auth-button').click(function() {
+      auth2.grantOfflineAccess({'redirect_uri': 'postmessage'})
+            .then(googleAuthCallback);
+    });
+    
+  });
+}
+
+function googleAuthCallback(authResult) {
+  console.log('googleAuthCallback');
+  console.log(authResult);
+  if (authResult['code']) {
+
+    // Hide the sign-in button now that the user is authorized, for example:
+    $('#google-auth-button').attr('style', 'display: none');
+
+    // Send the code to the server
+    $.post(app_root + '/lib/shots/internals/authenticate.php',
+           authResult,
+           "json"
+           )
+          .done(googleAuthSuccess)
+          .fail(googleAuthFailure)
+          ;
+  } else {
+    googleAuthFailure(authResult);
+  }
+}
+
+function googleAuthSuccess(result) {
+  console.log('googleAuthSuccess');
+  console.log(result);
+}
+
+function googleAuthFailure(error) {
+  console.log('googleAuthFailure');
+  console.log(error);
+
+}
 
 // function showErrorMessageVisiblity(message){
 //   // console.log(message);

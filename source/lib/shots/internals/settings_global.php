@@ -34,6 +34,8 @@ if ( in_array($_SERVER['HTTP_HOST'], $servers['development']) ){
 // e.g. change your authentication credentials and upload directories
 if ( $server_type === 'development' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
+  $authentication_services['google_signin_for_websites']['secret_file'] = 'C:\\\Users\\\moehr\\\Documents\\\GitHub\\\client-secrets\\\client_secret_test_20161102.json';
+  $authentication_services['google_signin_for_websites']['token_endpoint'] = 'https://www.googleapis.com/oauth2/v4/token';
 
 } else if ( $server_type === 'test' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';

@@ -35,7 +35,7 @@ require_once 'all_pages.php';
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li class="navbar-authentication-button">
-          <a href="<?php echo $app_root; ?>/lib/shots/internals/sessions.php?logout=true">Logout</a>
+          <button id='google-auth-button'>Sign in with Google</button>
         </li>
       </ul>
     </div>

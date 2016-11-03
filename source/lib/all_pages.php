@@ -67,10 +67,7 @@ require_once('shots/internals/settings_global.php');
 require_once('shots/internals/sessions.php');
 
 // authentication
-require_once('shots/internals/username.php');
-if ( empty($username) ) {
-  require_once('shots/internals/authentication.php');
-}
+// require_once('shots/internals/authenticate.php');
 
 // TODO cookies, if needed
 
