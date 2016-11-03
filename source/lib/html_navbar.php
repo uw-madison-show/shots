@@ -33,7 +33,7 @@ require_once 'all_pages.php';
           </ul>
         </li>
       </ul>
-      <ul class="nav navbar-nav navbar-right">
+      <ul class="nav navbar-nav">
         <li class="navbar-authentication-button">
           <button id='google-auth-button'>Sign in with Google</button>
         </li>

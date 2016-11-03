@@ -12,6 +12,7 @@ date_default_timezone_set('America/Chicago');
 // if you want override or extend the auth service settings do it here
 // Set up API keys or credentials for auth services
 $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
+$authentication_services['google_signin_for_websites']['token_endpoint'] = 'https://www.googleapis.com/oauth2/v3/tokeninfo';
 
 
 // change these arrays for your own dev/test/prod servers
@@ -35,7 +36,6 @@ if ( in_array($_SERVER['HTTP_HOST'], $servers['development']) ){
 if ( $server_type === 'development' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
   $authentication_services['google_signin_for_websites']['secret_file'] = 'C:\\\Users\\\moehr\\\Documents\\\GitHub\\\client-secrets\\\client_secret_test_20161102.json';
-  $authentication_services['google_signin_for_websites']['token_endpoint'] = 'https://www.googleapis.com/oauth2/v4/token';
 
 } else if ( $server_type === 'test' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';

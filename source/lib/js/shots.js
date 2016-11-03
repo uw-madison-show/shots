@@ -68,42 +68,53 @@ function googleAuthInit() {
   gapi.load('auth2', function(){
     // retrieve the GoogleAuth library and set up client
     auth2 = gapi.auth2.init({
-      client_id: '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com'
+      client_id: google_auth_client_id,
+      scope: 'profile'
     });
 
     // attach the clicke handler to the sign-in button
-    $('#google-auth-button').click(function() {
-      auth2.grantOfflineAccess({'redirect_uri': 'postmessage'})
-            .then(googleAuthCallback);
-    });
+    $('#google-auth-button').click(googleAuthCallback);
     
   });
 }
 
-function googleAuthCallback(authResult) {
+function googleAuthCallback(event) {
   console.log('googleAuthCallback');
-  console.log(authResult);
-  if (authResult['code']) {
+  console.log(event);
+
+  if (auth2.isSignedIn.get()) {
 
     // Hide the sign-in button now that the user is authorized, for example:
-    $('#google-auth-button').attr('style', 'display: none');
+    // $('#google-auth-button').attr('style', 'display: none');
 
-    // Send the code to the server
-    $.post(app_root + '/lib/shots/internals/authenticate.php',
-           authResult,
-           "json"
-           )
-          .done(googleAuthSuccess)
-          .fail(googleAuthFailure)
-          ;
+    var current_user = auth2.currentUser.get();
+
+    if ( current_user.getBasicProfile().getId() && current_user.getBasicProfile().getEmail() ) {
+      googleAuthSuccess(current_user);
+    } else {
+      googleAuthFailure();
+    }
+    
   } else {
-    googleAuthFailure(authResult);
+    googleAuthFailure(event);
   }
 }
 
-function googleAuthSuccess(result) {
+function googleAuthSuccess(current_user) {
   console.log('googleAuthSuccess');
-  console.log(result);
+  console.log(current_user.getBasicProfile().getEmail());
+
+  var id_token = current_user.getAuthResponse().id_token;
+
+  // send id token to server
+  $.post(app_root + '/lib/shots/internals/authenticate.php',
+         {"id_token": id_token},
+         'json'
+         )
+         .always(function (r){
+                  console.log(r);
+                });
+
 }
 
 function googleAuthFailure(error) {

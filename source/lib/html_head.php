@@ -74,5 +74,12 @@ echo '
     <link rel="stylesheet" type="text/css" href="'. $app_root .'/lib/css/shots.css">
     ';
 
+// move variables from php to javascript
+echo '
+    <script>
+        var google_auth_client_id = "' . $authentication_services['google_signin_for_websites']['client_id'] . '";
+    </script>
+    ';
+
 echo '</head>';
 ?>
