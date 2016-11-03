@@ -9,7 +9,7 @@
 
 var autosave_timeout, table_data, 
     table_handsontable, table_data_key_field,
-    auth2;
+    auth2, current_user;
 
 var key_field_mapping = { 
                           "events": "event_id",
@@ -68,52 +68,67 @@ function googleAuthInit() {
   gapi.load('auth2', function(){
     // retrieve the GoogleAuth library and set up client
     auth2 = gapi.auth2.init({
-      client_id: google_auth_client_id,
-      scope: 'profile'
+      client_id: google_auth_client_id
     });
 
     // attach the clicke handler to the sign-in button
-    $('#google-auth-button').click(googleAuthCallback);
-    
+    $('#google-auth-button').click(function() {
+      auth2.grantOfflineAccess({"redirect_uri": "postmessage"})
+        .then(googleAuthCallback);
+    });
   });
 }
 
-function googleAuthCallback(event) {
+function googleAuthCallback(authResult) {
   console.log('googleAuthCallback');
-  console.log(event);
+  console.log(authResult);
 
-  if (auth2.isSignedIn.get()) {
+  if (authResult['code']) {
 
     // Hide the sign-in button now that the user is authorized, for example:
     // $('#google-auth-button').attr('style', 'display: none');
 
-    var current_user = auth2.currentUser.get();
+    current_user = auth2.currentUser.get();
 
-    if ( current_user.getBasicProfile().getId() && current_user.getBasicProfile().getEmail() ) {
-      googleAuthSuccess(current_user);
-    } else {
-      googleAuthFailure();
+    if (current_user) {
+      authResult['Id'] = current_user.getBasicProfile().getId();
+      authResult['Email'] = current_user.getBasicProfile().getEmail();
     }
+
+    // if ( current_user.getBasicProfile().getId() && current_user.getBasicProfile().getEmail() ) {
+    //   googleAuthSuccess(current_user);
+    // } else {
+    //   googleAuthFailure();
+    // }
+
+    $.post(app_root + '/lib/shots/internals/authenticate.php',
+           authResult,
+           "json"
+           )
+           .done( googleAuthSuccess )
+           .fail( googleAuthFailure )
+           ;
     
   } else {
-    googleAuthFailure(event);
+    googleAuthFailure(authResult);
   }
 }
 
-function googleAuthSuccess(current_user) {
+function googleAuthSuccess(data) {
   console.log('googleAuthSuccess');
-  console.log(current_user.getBasicProfile().getEmail());
+  console.log(data);
 
-  var id_token = current_user.getAuthResponse().id_token;
+  var response
 
+  // var id_token = current_user.getAuthResponse().id_token;
   // send id token to server
-  $.post(app_root + '/lib/shots/internals/authenticate.php',
-         {"id_token": id_token},
-         'json'
-         )
-         .always(function (r){
-                  console.log(r);
-                });
+  // $.post(app_root + '/lib/shots/internals/authenticate.php',
+  //        {"id_token": id_token},
+  //        'json'
+  //        )
+  //        .always(function (r){
+  //                 console.log(r);
+  //               });
 
 }
 
