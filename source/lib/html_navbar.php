@@ -33,9 +33,26 @@ require_once 'all_pages.php';
           </ul>
         </li>
       </ul>
-      <ul class="nav navbar-nav">
+      <ul class="nav navbar-nav navbar-right">
+        <li class="navbar-authentication-username">
+          <a id="google-auth-username">
+          </a>
+        </li>
         <li class="navbar-authentication-button">
-          <button id='google-auth-button'>Sign in with Google</button>
+          <button id="google-auth-button" class="login-button">
+            <h4>
+              <div id="google-auth-button-text">
+                Sign in with Google
+              </div>
+            </h4>
+          </button>
+          <button id="google-auth-logout-button" class="login-button" style="display: none;">
+            <h4>
+              <div id="google-auth-logout-text">
+                Logout
+              </div>
+            </h4>
+          </button>
         </li>
       </ul>
     </div>
