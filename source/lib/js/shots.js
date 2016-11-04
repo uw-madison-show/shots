@@ -166,7 +166,7 @@ function googleAuthButtons(source, data) {
     $('#google-auth-logout-button').show();
   }
 
-  window.location.reload();
+  // window.location.reload();
 }
 
 function googleAuthLogout() {

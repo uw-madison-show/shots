@@ -1,5 +1,6 @@
 <?php
 error_log('server side authentication script');
+session_start();
 require_once('settings_global.php');
 $return_array = array();
 
