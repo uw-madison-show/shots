@@ -14,6 +14,9 @@ echo '
     <script>
         var app_root = "' . $app_root .'";
         var doc_root = "' . $doc_root .'";
+        var google_auth_client_id = "' . $authentication_services['google_signin_for_websites']['client_id'] . '";
+        var username = "'. $username .'";
+        var sign_out_page = app_root + "/" + "'. $sign_out_page .'";
     </script>
     ';
 
@@ -72,13 +75,6 @@ echo '
 echo '
     <script src="'. $app_root .'/lib/js/shots.js"></script>
     <link rel="stylesheet" type="text/css" href="'. $app_root .'/lib/css/shots.css">
-    ';
-
-// move variables from php to javascript
-echo '
-    <script>
-        var google_auth_client_id = "' . $authentication_services['google_signin_for_websites']['client_id'] . '";
-    </script>
     ';
 
 echo '</head>';

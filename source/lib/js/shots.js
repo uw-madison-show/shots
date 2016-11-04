@@ -9,7 +9,7 @@
 
 var autosave_timeout, table_data, 
     table_handsontable, table_data_key_field,
-    auth2, current_user;
+    auth2, new_user;
 
 var key_field_mapping = { 
                           "events": "event_id",
@@ -48,6 +48,7 @@ var title_field_mapping = {
 /**********************************************************/
 
 jQuery(document).ready(function(){
+  // initialize the sign in buttons
   googleAuthInit();
   // handle an error message coming from the server/db
   if( $('.server-side-error-message').length ){
@@ -65,18 +66,28 @@ jQuery(document).ready(function(){
 /**********************************************************/
 
 function googleAuthInit() {
-  gapi.load('auth2', function(){
-    // retrieve the GoogleAuth library and set up client
-    auth2 = gapi.auth2.init({
-      client_id: google_auth_client_id
-    });
+  console.log('googleAuthInit');
+  console.log(username);
 
-    // attach the clicke handler to the sign-in button
-    $('#google-auth-button').click(function() {
-      auth2.grantOfflineAccess({"redirect_uri": "postmessage"})
-        .then(googleAuthCallback);
+  // attach the click handler to the logout button
+  $('#google-auth-logout-button').click(googleAuthLogout);
+
+  if (username.length > 0) {
+    googleAuthButtons('cache', username);
+  } else {
+    gapi.load('auth2', function(){
+      // retrieve the GoogleAuth library and set up client
+      auth2 = gapi.auth2.init({
+        client_id: google_auth_client_id
+      });
+
+      // attach the click handler to the sign-in button
+      $('#google-auth-button').click(function() {
+        auth2.grantOfflineAccess({"redirect_uri": "postmessage"})
+          .then(googleAuthCallback);
+      });
     });
-  });
+  } // end if username exists
 }
 
 function googleAuthCallback(authResult) {
@@ -85,56 +96,87 @@ function googleAuthCallback(authResult) {
 
   if (authResult['code']) {
 
-    // Hide the sign-in button now that the user is authorized, for example:
-    // $('#google-auth-button').attr('style', 'display: none');
+    // clear out the UI elements
+    $('#google-auth-username').empty();
+    $('#google-auth-button').hide();
 
-    current_user = auth2.currentUser.get();
+    new_user = auth2.currentUser.get();
 
-    if (current_user) {
-      authResult['Id'] = current_user.getBasicProfile().getId();
-      authResult['Email'] = current_user.getBasicProfile().getEmail();
-    }
+    if (new_user) {
+      authResult['Id'] = new_user.getBasicProfile().getId();
+      authResult['Email'] = new_user.getBasicProfile().getEmail();
 
-    // if ( current_user.getBasicProfile().getId() && current_user.getBasicProfile().getEmail() ) {
-    //   googleAuthSuccess(current_user);
-    // } else {
-    //   googleAuthFailure();
-    // }
-
-    $.post(app_root + '/lib/shots/internals/authenticate.php',
-           authResult,
-           "json"
-           )
-           .done( googleAuthSuccess )
-           .fail( googleAuthFailure )
-           ;
-    
+      $.post(app_root + '/lib/shots/internals/authenticate.php',
+             authResult,
+             'json'
+             )
+             .done( googleAuthSuccess )
+             .fail( ajaxFailed )
+             ;
+    } else {
+      googleAuthFailure(authResult);
+    }   
   } else {
     googleAuthFailure(authResult);
   }
 }
 
-function googleAuthSuccess(data) {
+function googleAuthSuccess(r) {
   console.log('googleAuthSuccess');
-  console.log(data);
+  console.log(r);
 
-  var response
+  var data = JSON.parse(r);
 
-  // var id_token = current_user.getAuthResponse().id_token;
-  // send id token to server
-  // $.post(app_root + '/lib/shots/internals/authenticate.php',
-  //        {"id_token": id_token},
-  //        'json'
-  //        )
-  //        .always(function (r){
-  //                 console.log(r);
-  //               });
+  if ( typeof data == 'object' ){
 
+    googleAuthButtons('new', data);
+
+  } else {
+    $('footer .message-holder').append('Not a valid response from authenticate.php');
+    $('footer .message-holder').append(r);
+    $('.server-side-error-message').show();
+  }
 }
 
-function googleAuthFailure(error) {
+function googleAuthFailure(authResult) {
   console.log('googleAuthFailure');
-  console.log(error);
+  console.log(authResult);
+
+  $.each(authResult, function(index, msg){
+    $('footer .message-holder').append(msg);
+  });
+  $('.server-side-error-message').show();
+
+  // TODO at this point the UI elements should be updated with something?
+}
+
+function googleAuthButtons(source, data) {
+  console.log('googleAuthButtons');
+  console.log(data);
+
+  if (source === 'new') {
+    username = new_user.getBasicProfile().getEmail();
+    // update the UI elements
+    var username_to_display = username.length > 0 ? username : 'login failed';
+    $('#google-auth-username').append(username_to_display);
+    $('#google-auth-logout-button').show();
+  } else if (source === 'cache') {
+    $('#google-auth-username').append(username);
+    $('#google-auth-button').hide();
+    $('#google-auth-logout-button').show();
+  }
+
+  window.location.reload();
+}
+
+function googleAuthLogout() {
+  console.log('googleAuthLogout');
+
+  username = "";
+  new_user = {};
+
+  window.location.replace(sign_out_page);
+
 
 }
 

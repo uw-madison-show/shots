@@ -1,7 +1,6 @@
 <?php
-
-// authenticate with google sign in
-require_once('../../all_pages.php');
+error_log('server side authentication script');
+require_once('settings_global.php');
 $return_array = array();
 
 
@@ -47,15 +46,15 @@ if ( !isset($_POST['Id']) || !isset($_POST['Email']) || !isset($_POST['code']) )
   if ( isset($_SESSION['username']) ){
     setcookie("shots-username", $_SESSION['username'],  time()+60*60*24*7, '/');
     $return_array['error']  = 'false';
-    $return_array['result'] = 'Missing auth info, but we already had a session variable so carry on then.';
+    $return_array['error_messages'][] = 'Missing auth info, but we already had a session variable so carry on then.';
   } else if ( isset($_COOKIE['shots-username']) ){
     $_SESSION['username'] = $_COOKIE['shots-username'];
     $return_array['error']  = 'false';
-    $return_array['result'] = 'Missing auth info, but we already had a cookie so carry on then.';
+    $return_array['error_messages'][] = 'Missing auth info, but we already had a cookie so carry on then.';
   } else {
     $return_array['error']  = 'true';
-    $return_array['error_message'] = 'Missing the id, email, or auth code from google.';
-    $return_array['result'] = $_POST;  
+    $return_array['error_messages'][] = 'Missing the id, email, or auth code from google.';
+    $return_array['error_messages'][] = $_POST;  
   }
 } else {
   $auth_code = $_POST['code'];
@@ -71,7 +70,7 @@ if ( !isset($_POST['Id']) || !isset($_POST['Email']) || !isset($_POST['code']) )
       !isset($authentication_services['google_signin_for_websites']['client_id']) || 
       !isset($secret_array['web']['client_secret']) ){
     $return_array['error'] = 'true';
-    $return_array['result'] = 'Could not find token endpoint, client id, or client secret in authenticate.php';
+    $return_array['error_messages'][] = 'Could not find token endpoint, client id, or client secret in authenticate.php';
   } else {
     $token_request_fields = array('code' => $auth_code,
                                   'client_id' => $authentication_services['google_signin_for_websites']['client_id'],
@@ -100,9 +99,9 @@ if ( !isset($_POST['Id']) || !isset($_POST['Email']) || !isset($_POST['code']) )
 
     if ( !isset($post_result_parsed['access_token']) ){
       $return_array['error'] = 'true';
-      $return_array['error_message'] = curl_error($post_request);
-      $return_array['request'] = curl_getinfo($post_request);
-      $return_array['result'] = 'access_token is not set';
+      $return_array['error_messages'][] = curl_error($post_request);
+      $return_array['error_messages'][] = curl_getinfo($post_request);
+      $return_array['error_messages'][] = 'access_token is not set';
     } else {
       
       $return_array['error'] = 'false';
@@ -120,6 +119,9 @@ if ( !isset($_POST['Id']) || !isset($_POST['Email']) || !isset($_POST['code']) )
   } // end if i have client_id and client_secret
 
 } // end if i have a auth code
+
+$bar = print_r(get_defined_vars(), TRUE);
+error_log($bar);
 
 
 
