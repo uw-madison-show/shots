@@ -39,21 +39,44 @@ if ( in_array($_SERVER['HTTP_HOST'], $servers['development']) ){
 
 // change up any of the settings you want to change based on which server this is running at
 // e.g. change your authentication credentials and upload directories
+
+
+/**********************************************************************/
+
+// DEVELOPMENT SERVER SETTINGS
+
+/**********************************************************************/
 if ( $server_type === 'development' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
   $authentication_services['google_signin_for_websites']['secret_file'] = 'C:\\\Users\\\moehr\\\Documents\\\GitHub\\\client-secrets\\\client_secret_test_20161102.json';
 
+
+
+/**********************************************************************/
+
+// TEST SERVER SETTINGS
+
+/**********************************************************************/
 } else if ( $server_type === 'test' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
+  $authentication_services['google_signin_for_websites']['secret_file'] = '/var/www/vhosts/wwwtest.show.wisc.edu/private/client_secrets/client_secret_test_20161102.json';
 
   $file_upload_options['upload_dir'] = '/var/www/vhosts/wwwtest.show.wisc.edu/httpdocs/shots/database/files/';
   $file_upload_options['upload_url'] = 'wwwtest.show.wisc.edu/database/files/';
 
+
+
+
+/**********************************************************************/
+
+// PRODUCTION SERVER SETTINGS
+
+/**********************************************************************/
 } else if ( $server_type === 'production' ){
 
   echo 'production server not yet configured in settings_global.php';
 
 } else {
-
+  trigger_error('I was unable to determine what type of server SHOTS is trying to run on. (Dev/Test/Production?) Maybe you should take a look at the settings in ' . __FILE__);
 }
 
