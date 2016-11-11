@@ -77,7 +77,8 @@ console.log('done cloning folders');
 
 
 // copy the top level files
-source_files = ['delete.php',
+source_files = ['sign_in.php',
+                'delete.php',
                 'index.php',
                 'manage_database.php',
                 '.htaccess'
