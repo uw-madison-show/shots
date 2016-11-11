@@ -63,17 +63,10 @@ require_once('jQuery-File-Upload/UploadHandler.php');
 // include the global settings
 require_once('shots/internals/settings_global.php');
 
-
-// authentication
-// require_once('shots/internals/authenticate.php');
-
-// TODO cookies, if needed
-
-
 // start the session
-// alternatively clear the session by sending session.php?logout=true
 require_once('shots/internals/sessions.php');
 
+// authentication
 if ( $_SERVER['SCRIPT_NAME'] !== '/' . $sign_in_page ){
   if (empty($username)) {
     header('Location: '. $app_root . '/' . $sign_in_page);
