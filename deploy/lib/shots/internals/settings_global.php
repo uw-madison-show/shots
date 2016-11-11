@@ -3,6 +3,10 @@
 // if you want to customize your own settings, you should comment out
 // this line and then write all of your settings in this file;
 
+if (!isset($app_root)) {
+  include_once '../../all_pages.php';
+}
+
 include_once 'shots/setup/default_settings.php';
 
 // You need to change this if you install SHOTS in another timezone; this is used for file uploads and calendar records
@@ -59,7 +63,7 @@ if ( $server_type === 'development' ){
 /**********************************************************************/
 } else if ( $server_type === 'test' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
-  $authentication_services['google_signin_for_websites']['secret_file'] = '/var/www/vhosts/wwwtest.show.wisc.edu/private/client_secrets/client_secret_test_20161102.json';
+  $authentication_services['google_signin_for_websites']['secret_file'] = '/var/www/vhosts/wwwtest.show.wisc.edu/private/php_sess/client_secret_test_20161102.json';
 
   $file_upload_options['upload_dir'] = '/var/www/vhosts/wwwtest.show.wisc.edu/httpdocs/shots/database/files/';
   $file_upload_options['upload_url'] = 'wwwtest.show.wisc.edu/database/files/';

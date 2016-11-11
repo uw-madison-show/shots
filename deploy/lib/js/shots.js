@@ -67,7 +67,7 @@ jQuery(document).ready(function(){
 
 function googleAuthInit() {
   console.log('googleAuthInit');
-  console.log(username);
+  console.log('username = ' + username);
 
   // attach the click handler to the logout button
   $('#google-auth-logout-button').click(googleAuthLogout);
