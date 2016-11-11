@@ -51,7 +51,7 @@ require_once('shots/internals/settings_global.php');
 require_once('shots/internals/sessions.php');
 
 // authentication
-if ( $_SERVER['SCRIPT_NAME'] !== '/' . $sign_in_page ){
+if ( $_SERVER['SCRIPT_NAME'] !== $app_root . '/' . $sign_in_page ){
   if (empty($username)) {
     header('Location: '. $app_root . '/' . $sign_in_page);
     exit;
