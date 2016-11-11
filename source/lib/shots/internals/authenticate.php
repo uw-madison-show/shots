@@ -73,8 +73,8 @@ if ( !isset($_POST['Id']) || !isset($_POST['Email']) || !isset($_POST['code']) )
     $return_array['error'] = 'true';
     $return_array['error_messages'][] = 'authenticate.php needs token enpoint, client id, and client secret to authenticate with google';
     $return_array['error_messages'][] = 'token endpoint = ' . $authentication_services['google_signin_for_websites']['token_endpoint'];
-    $return_array['error_messages'][] = 'client id = ' . $authentication_services['google_signin_for_websites']['client_id'])
-    $return_array['error_messages'][] = 'length of client secret = ' . length($secret_array['web']['client_secret']));
+    $return_array['error_messages'][] = 'client id = ' . $authentication_services['google_signin_for_websites']['client_id'];
+    $return_array['error_messages'][] = 'length of client secret = ' . length($secret_array['web']['client_secret']);
 
   } else {
     $token_request_fields = array('code' => $auth_code,
