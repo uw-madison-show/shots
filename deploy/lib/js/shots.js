@@ -127,7 +127,7 @@ function googleAuthSuccess(r) {
 
   var data = JSON.parse(r);
 
-  if ( typeof data == 'object' ){
+  if ( typeof data == 'object' && data.error !== "true" ){
 
     googleAuthButtons('new', data);
 
