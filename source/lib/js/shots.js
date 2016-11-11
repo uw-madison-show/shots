@@ -160,13 +160,14 @@ function googleAuthButtons(source, data) {
     var username_to_display = username.length > 0 ? username : 'login failed';
     $('#google-auth-username').append(username_to_display);
     $('#google-auth-logout-button').show();
+    if (username.length > 0) {
+      window.location.replace(app_root + '/');
+    }
   } else if (source === 'cache') {
     $('#google-auth-username').append(username);
     $('#google-auth-button').hide();
     $('#google-auth-logout-button').show();
   }
-
-  // window.location.reload();
 }
 
 function googleAuthLogout() {
@@ -176,8 +177,6 @@ function googleAuthLogout() {
   new_user = {};
 
   window.location.replace(sign_out_page);
-
-
 }
 
 // function showErrorMessageVisiblity(message){
