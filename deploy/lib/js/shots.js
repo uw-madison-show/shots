@@ -7,7 +7,9 @@
 
 /**********************************************************/
 
-var autosave_timeout, table_data, table_handsontable, table_data_key_field;
+var autosave_timeout, table_data, 
+    table_handsontable, table_data_key_field,
+    auth2, new_user;
 
 var key_field_mapping = { 
                           "events": "event_id",
@@ -46,6 +48,8 @@ var title_field_mapping = {
 /**********************************************************/
 
 jQuery(document).ready(function(){
+  // initialize the sign in buttons
+  googleAuthInit();
   // handle an error message coming from the server/db
   if( $('.server-side-error-message').length ){
     $('.server-side-error-message').each(function(){
@@ -60,6 +64,120 @@ jQuery(document).ready(function(){
 // Functions
 
 /**********************************************************/
+
+function googleAuthInit() {
+  console.log('googleAuthInit');
+  console.log(username);
+
+  // attach the click handler to the logout button
+  $('#google-auth-logout-button').click(googleAuthLogout);
+
+  if (username.length > 0) {
+    googleAuthButtons('cache', username);
+  } else {
+    gapi.load('auth2', function(){
+      // retrieve the GoogleAuth library and set up client
+      auth2 = gapi.auth2.init({
+        client_id: google_auth_client_id
+      });
+
+      // attach the click handler to the sign-in button
+      $('#google-auth-button').click(function() {
+        auth2.grantOfflineAccess({"redirect_uri": "postmessage"})
+          .then(googleAuthCallback);
+      });
+    });
+  } // end if username exists
+}
+
+function googleAuthCallback(authResult) {
+  console.log('googleAuthCallback');
+  console.log(authResult);
+
+  if (authResult['code']) {
+
+    // clear out the UI elements
+    $('#google-auth-username').empty();
+    $('#google-auth-button').hide();
+
+    new_user = auth2.currentUser.get();
+
+    if (new_user) {
+      authResult['Id'] = new_user.getBasicProfile().getId();
+      authResult['Email'] = new_user.getBasicProfile().getEmail();
+
+      $.post(app_root + '/lib/shots/internals/authenticate.php',
+             authResult,
+             'json'
+             )
+             .done( googleAuthSuccess )
+             .fail( ajaxFailed )
+             ;
+    } else {
+      googleAuthFailure(authResult);
+    }   
+  } else {
+    googleAuthFailure(authResult);
+  }
+}
+
+function googleAuthSuccess(r) {
+  console.log('googleAuthSuccess');
+  console.log(r);
+
+  var data = JSON.parse(r);
+
+  if ( typeof data == 'object' ){
+
+    googleAuthButtons('new', data);
+
+  } else {
+    $('footer .message-holder').append('Not a valid response from authenticate.php');
+    $('footer .message-holder').append(r);
+    $('.server-side-error-message').show();
+  }
+}
+
+function googleAuthFailure(authResult) {
+  console.log('googleAuthFailure');
+  console.log(authResult);
+
+  $.each(authResult, function(index, msg){
+    $('footer .message-holder').append(msg);
+  });
+  $('.server-side-error-message').show();
+
+  // TODO at this point the UI elements should be updated with something?
+}
+
+function googleAuthButtons(source, data) {
+  console.log('googleAuthButtons');
+  console.log(data);
+
+  if (source === 'new') {
+    username = new_user.getBasicProfile().getEmail();
+    // update the UI elements
+    var username_to_display = username.length > 0 ? username : 'login failed';
+    $('#google-auth-username').append(username_to_display);
+    $('#google-auth-logout-button').show();
+    if (username.length > 0) {
+      window.location.replace(app_root + '/');
+    }
+  } else if (source === 'cache') {
+    $('#google-auth-username').append(username);
+    $('#google-auth-button').hide();
+    $('#google-auth-logout-button').show();
+  }
+}
+
+function googleAuthLogout() {
+  console.log('googleAuthLogout');
+
+  username = "";
+  new_user = {};
+
+  window.location.replace(sign_out_page);
+}
 
 // function showErrorMessageVisiblity(message){
 //   // console.log(message);

@@ -7,8 +7,6 @@ if (!isset($app_root)) {
   require_once '../../all_pages.php';
 }
 
-
-
 $database_folder = $app_root . '/database';
 
 $file_storage_folder = $app_root . '/database/files';

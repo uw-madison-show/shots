@@ -23,7 +23,6 @@ if ( ($doc_root . DIRECTORY_SEPARATOR . 'lib') === $all_pages_directory ) {
   }
 }
 
-
 $old_include_path = get_include_path();
 $app_include_folder = $doc_root . $app_root . '/includes';
 $for_preg = '/' . preg_quote($app_include_folder, '/') . '/';
@@ -38,6 +37,7 @@ $for_preg2 = '/' . preg_quote($app_lib_folder, '/') . '/';
 if ( preg_match($for_preg2, $old_include_path) !== 1 ){
   set_include_path($old_include_path . PATH_SEPARATOR . $app_lib_folder);
 }
+
 
 // Auto class loader for Doctrine stuff
 // http://docs.doctrine-project.org/projects/doctrine-common/en/latest/reference/class-loading.html#usage
@@ -63,16 +63,27 @@ require_once('jQuery-File-Upload/UploadHandler.php');
 // include the global settings
 require_once('shots/internals/settings_global.php');
 
-// session variables
-require_once('shots/internals/sessions.php');
 
 // authentication
-require_once('shots/internals/username.php');
-if ( empty($username) ) {
-  require_once('shots/internals/authentication.php');
-}
+// require_once('shots/internals/authenticate.php');
 
 // TODO cookies, if needed
+
+
+// start the session
+// alternatively clear the session by sending session.php?logout=true
+require_once('shots/internals/sessions.php');
+
+if ( $_SERVER['SCRIPT_NAME'] !== '/' . $sign_in_page ){
+  if (empty($username)) {
+    header('Location: '. $app_root . '/' . $sign_in_page);
+    exit;
+  }
+}
+
+
+
+
 
 
 ?>

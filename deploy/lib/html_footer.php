@@ -19,7 +19,8 @@ if (!function_exists('grabString')) {
 </footer>
 
 
-<?
+<?php
+
 $debug_mode = grabString('debug');
 
 // if i am on a test or dev server, print all the vars

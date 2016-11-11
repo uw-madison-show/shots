@@ -34,8 +34,25 @@ require_once 'all_pages.php';
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
+        <li class="navbar-authentication-username">
+          <a id="google-auth-username">
+          </a>
+        </li>
         <li class="navbar-authentication-button">
-          <a href="<?php echo $app_root; ?>/lib/shots/internals/sessions.php?logout=true">Logout</a>
+          <button id="google-auth-button" class="login-button">
+            <h4>
+              <div id="google-auth-button-text">
+                Sign in with Google
+              </div>
+            </h4>
+          </button>
+          <button id="google-auth-logout-button" class="login-button" style="display: none;">
+            <h4>
+              <div id="google-auth-logout-text">
+                Logout
+              </div>
+            </h4>
+          </button>
         </li>
       </ul>
     </div>

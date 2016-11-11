@@ -14,6 +14,9 @@ echo '
     <script>
         var app_root = "' . $app_root .'";
         var doc_root = "' . $doc_root .'";
+        var google_auth_client_id = "' . $authentication_services['google_signin_for_websites']['client_id'] . '";
+        var username = "'. $username .'";
+        var sign_out_page = app_root + "/" + "'. $sign_out_page .'";
     </script>
     ';
 
@@ -59,7 +62,13 @@ echo '
     <script src="'. $app_root .'/includes/jQuery-File-Upload/jquery.ui.widget.js"></script>
     <script src="'. $app_root .'/includes/jQuery-File-Upload/jquery.iframe-transport.js"></script>
     <script src="'. $app_root .'/includes/jQuery-File-Upload/jquery.fileupload.js"></script>
-     ';
+    ';
+
+// Google sign-in for websites
+echo '
+    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+    <meta name="google-signin-client_id" content="146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com">
+    ';
 
 
 // custom JS and CSS for the shots database

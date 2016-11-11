@@ -185,15 +185,15 @@ function getLookups( $table_name, $column_name )
 
 function changelog( $table_name, $table_key_field, $key_value, $field_name, $old_value, $new_value )
 {
-  global $db;
+  global $db, $username;
   $db->insert('changelog',
-              array('table_name' => strtolower($table_name),
-                    'key_field'  => strtolower($table_key_field),
-                    'key_value'  => strtolower($key_value),
-                    'field'      => strtolower($field_name),
-                    'old_value'  => $old_value,
-                    'new_value'  => $new_value
-                    // TODO add username and datetime to the changelog record
+              array('table_name'      => strtolower($table_name),
+                    'key_field'       => strtolower($table_key_field),
+                    'key_value'       => strtolower($key_value),
+                    'field'           => strtolower($field_name),
+                    'old_value'       => $old_value,
+                    'new_value'       => $new_value,
+                    'change_username' => $username,
                     )
               );
 }

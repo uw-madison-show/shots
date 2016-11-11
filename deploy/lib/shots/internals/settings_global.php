@@ -8,10 +8,17 @@ include_once 'shots/setup/default_settings.php';
 // You need to change this if you install SHOTS in another timezone; this is used for file uploads and calendar records
 date_default_timezone_set('America/Chicago');
 
+// name of the sign in/out pages
+// relative to the <approot>; no leading/trailing slashes
+$sign_in_page  = 'sign_in.php';
+$sign_out_page = 'lib/shots/internals/sessions.php?logout=true';
+
+
 // an array called authentication_services will be created in the default_settings file
 // if you want override or extend the auth service settings do it here
 // Set up API keys or credentials for auth services
 $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
+$authentication_services['google_signin_for_websites']['token_endpoint'] = 'https://www.googleapis.com/oauth2/v4/token';
 
 
 // change these arrays for your own dev/test/prod servers
@@ -34,6 +41,7 @@ if ( in_array($_SERVER['HTTP_HOST'], $servers['development']) ){
 // e.g. change your authentication credentials and upload directories
 if ( $server_type === 'development' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
+  $authentication_services['google_signin_for_websites']['secret_file'] = 'C:\\\Users\\\moehr\\\Documents\\\GitHub\\\client-secrets\\\client_secret_test_20161102.json';
 
 } else if ( $server_type === 'test' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
