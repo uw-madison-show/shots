@@ -80,7 +80,7 @@ if ( !isset($_POST['Id']) || !isset($_POST['Email']) || !isset($_POST['code']) )
     $token_request_fields = array('code' => $auth_code,
                                   'client_id' => $authentication_services['google_signin_for_websites']['client_id'],
                                   'client_secret' => $secret_array['web']['client_secret'],
-                                  'redirect_uri' => 'http://localhost:3000',
+                                  'redirect_uri' => $authentication_services['google_signin_for_websites']['redirect_uri'],
                                   'grant_type' => 'authorization_code',
                                   );
 
@@ -104,9 +104,10 @@ if ( !isset($_POST['Id']) || !isset($_POST['Email']) || !isset($_POST['code']) )
 
     if ( !isset($post_result_parsed['access_token']) ){
       $return_array['error'] = 'true';
+      $return_array['error_messages'][] = 'access_token is not set';
       $return_array['error_messages'][] = curl_error($post_request);
       $return_array['error_messages'][] = curl_getinfo($post_request);
-      $return_array['error_messages'][] = 'access_token is not set';
+      $return_array['error_messages'][] = $post_result_parsed;
     } else {
       
       $return_array['error'] = 'false';

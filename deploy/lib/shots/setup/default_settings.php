@@ -4,7 +4,7 @@
 // we assume that the current file is located at <app_root>/lib/shots/setup/default_settings.php
 
 if (!isset($app_root)) {
-  require_once '../../all_pages.php';
+  require_once '../../app_root.php';
 }
 
 $database_folder = $app_root . '/database';
