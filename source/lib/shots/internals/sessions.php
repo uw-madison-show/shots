@@ -10,6 +10,8 @@ if (!function_exists('grabString')) {
 $logout = grabString('logout');
 
 if ($logout) {
+  $callback = '/';
+  $callback = grabString('callback');
 
   // deleting php sessions takes a lot of work
   session_start();
@@ -31,7 +33,7 @@ if ($logout) {
   }
 
   // redirect
-  header('Location: '. $app_root . '/' . $sign_in_page);
+  header('Location: '. $callback);
   exit;
 } else {
   session_start();

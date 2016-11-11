@@ -4,7 +4,7 @@
 // this line and then write all of your settings in this file;
 
 if (!isset($app_root)) {
-  include_once '../../all_pages.php';
+  include_once '../../app_root.php';
 }
 
 include_once 'shots/setup/default_settings.php';
@@ -15,7 +15,7 @@ date_default_timezone_set('America/Chicago');
 // name of the sign in/out pages
 // relative to the <approot>; no leading/trailing slashes
 $sign_in_page  = 'sign_in.php';
-$sign_out_page = 'lib/shots/internals/sessions.php?logout=true';
+$sign_out_page = 'lib/shots/internals/sessions.php?logout=true&callback='. urlencode($app_root . '/' . $sign_in_page);
 
 
 // an array called authentication_services will be created in the default_settings file
@@ -53,6 +53,7 @@ if ( in_array($_SERVER['HTTP_HOST'], $servers['development']) ){
 if ( $server_type === 'development' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
   $authentication_services['google_signin_for_websites']['secret_file'] = 'C:\\\Users\\\moehr\\\Documents\\\GitHub\\\client-secrets\\\client_secret_test_20161102.json';
+  $authentication_services['google_signin_for_websites']['redirect_uri'] = 'http://localhost:3000';
 
 
 
@@ -64,6 +65,7 @@ if ( $server_type === 'development' ){
 } else if ( $server_type === 'test' ){
   $authentication_services['google_signin_for_websites']['client_id'] = '146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com';
   $authentication_services['google_signin_for_websites']['secret_file'] = '/var/www/vhosts/wwwtest.show.wisc.edu/private/php_sess/client_secret_test_20161102.json';
+  $authentication_services['google_signin_for_websites']['redirect_uri'] = 'https://wwwtest.show.wisc.edu';
 
   $file_upload_options['upload_dir'] = '/var/www/vhosts/wwwtest.show.wisc.edu/httpdocs/shots/database/files/';
   $file_upload_options['upload_url'] = 'wwwtest.show.wisc.edu/database/files/';
