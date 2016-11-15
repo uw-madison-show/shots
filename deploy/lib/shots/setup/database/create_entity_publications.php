@@ -2,51 +2,56 @@
 
 include '../../../all_pages.php';
 
+$table_name = 'publications';
+
 $platform = $db->getDatabasePlatform();
 $shots_schema = $db->getSchemaManager();
 
-$table_exists = $shots_schema->tablesExist(array('publications'));
+$table_exists = $shots_schema->tablesExist(array($table_name));
+
+$delete_table = grabString('delete');
+
+echo '<pre>';
+
+// var_dump($delete_table);
 
 if ( $table_exists ){
-  echo 'Table already exists.';
-  echo "\n";
+
+  echo '<br><br>'. $table_name . ' table already exists.';
+
+  echo '<br><br><a href="' . $app_root .'/manage_database.php">< Return to database manager.</a>';
+
+  echo '<br><br><a href="' . $_SERVER['PHP_SELF'] .'?delete=true">Click here to delete the table.</a>';
+
+  echo '<br><br>You should probably <a href="'. $app_root . '/includes/phpLiteAdmin/phpliteadmin.php?table='. $table_name .'&action=table_export">export a copy of the data</a> before deleting the table.';
+
+  if ( $delete_table ) {
+
+    echo '<br><br>Deleting table...';
+
+    $drop_sql = 'DROP TABLE ' . $table_name;
+    $ddl = $db->prepare($drop_sql);
+    $ddl->execute();
+    $r = $ddl->fetchAll();
+    print_r($r);
+
+  }
+
 } else {
-  echo 'Creating table.';
+
+  echo 'Creating table...<br>';
 
   $schema = new \Doctrine\DBAL\Schema\Schema();
 
-  $table = $schema->createTable('publications');
+  $table = $schema->createTable($table_name);
 
-  $table->addColumn('publication_id',     'integer', array('notnull' => true, 'autoincrement' => true));
+  $table->addColumn('publication_id',     'integer', array('columnDefinition' => 'INTEGER PRIMARY KEY AUTOINCREMENT'));
   $table->addColumn('external_id_system', 'string',  array('notnull' => false));
   $table->addColumn('external_id_number', 'string',  array('notnull' => false));
   $table->addColumn('title',              'string',  array('notnull' => false));
   $table->addColumn('status',             'string',  array('notnull' => false));
 
-  $table->setPrimaryKey(array('publication_id'));
-
   $table->addUniqueIndex(array('external_id_system', 'external_id_number'));
-
-  // make lookup table if necessary and add foreign key
-  $lookup_external_id_system_exists = $shots_schema->tablesExist(array('lookup_external_id_system'));
-  if ( !$lookup_external_id_system_exists ){
-    echo 'Creating external_id_system lookup table.';
-
-    $lookup_external_id_system = $schema->createTable('lookup_external_id_system');
-
-    $lookup_external_id_system->addColumn('database_value',    'string',  array('notnull' => true));
-    $lookup_external_id_system->addColumn('html_value',        'string',  array('notnull' => false));
-    $lookup_external_id_system->addColumn('html_description',  'string',  array('notnull' => false));
-
-    $lookup_external_id_system->setPrimaryKey(array('database_value'));
-  }
-
-  $table->addForeignKeyConstraint($lookup_external_id_system, 
-                                  array('external_id_system'),
-                                  array('database_value'),
-                                  array(),
-                                  'external_id_system_refernce'
-                                  );
 
   $sql = $schema->toSql($platform);
 
@@ -55,7 +60,10 @@ if ( $table_exists ){
     $ddl = $db->prepare($this_sql);
     $ddl->execute();
     $r = $ddl->fetchAll();
+    print_r($r);
   }
 }
+
+echo '</pre>';
 
 ?>

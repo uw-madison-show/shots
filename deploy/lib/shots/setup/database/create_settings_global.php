@@ -6,36 +6,56 @@ include_once '../../../all_pages.php';
 // if there is no existing sqlite database, it will be initialized
 // with the settings_global table
 
+$table_name = 'settings_global';
+
 $platform = $db->getDatabasePlatform();
 $shots_schema = $db->getSchemaManager();
 
-$table_exists = $shots_schema->tablesExist(array('settings_global'));
+$table_exists = $shots_schema->tablesExist(array($table_name));
 
 echo '<pre>';
 
+$delete_table = grabString('delete');
+
+echo '<pre>';
+
+// var_dump($delete_table);
+
 if ( $table_exists ){
 
-  echo 'Table already exists.';
-  echo "\n";
+  echo '<br><br>'. $table_name . ' table already exists.';
 
-  $table = $shots_schema->listTableDetails('settings_global');
+  echo '<br><br><a href="' . $app_root .'/manage_database.php">< Return to database manager.</a>';
 
-  print_r($table);
+  echo '<br><br><a href="' . $_SERVER['PHP_SELF'] .'?delete=true">Click here to delete the table.</a>';
+
+  echo '<br><br>You should probably <a href="'. $app_root . '/includes/phpLiteAdmin/phpliteadmin.php?table='. $table_name .'&action=table_export">export a copy of the data</a> before deleting the table.';
+
+  if ( $delete_table ) {
+
+    echo '<br><br>Deleting table...';
+
+    $drop_sql = 'DROP TABLE ' . $table_name;
+    $ddl = $db->prepare($drop_sql);
+    $ddl->execute();
+    $r = $ddl->fetchAll();
+    print_r($r);
+
+  }
 
 } else {
 
-  echo 'Creating table.';
+
+  echo 'Creating table...<br>';
 
   $schema = new \Doctrine\DBAL\Schema\Schema();
 
-  $table = $schema->createTable('settings_global');
+  $table = $schema->createTable($table_name);
 
-  $table->addColumn('setting_id',         'integer', array('notnull' => true, 'autoincrement' => true));  
+  $table->addColumn('setting_id',         'integer', array('columnDefinition' => 'INTEGER PRIMARY KEY AUTOINCREMENT'));  
   $table->addColumn('setting_name',       'string',  array('notnull' => false));
   $table->addColumn('setting_value',      'text',  array('notnull' => false));
   $table->addColumn('setting_active',     'boolean');
-
-  $table->setPrimaryKey(array('setting_id'));
 
   $sql = $schema->toSql($platform);
 
@@ -44,7 +64,7 @@ if ( $table_exists ){
     $ddl = $db->prepare($this_sql);
     $ddl->execute();
     $r = $ddl->fetchAll();
-    //print_r($r);
+    print_r($r);
   }
 }
 
