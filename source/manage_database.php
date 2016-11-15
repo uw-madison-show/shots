@@ -31,11 +31,11 @@ $table_setup_scripts = array("Changelog"       => "create_changelog.php",
     </div>
     <div class="row">
       <div class="col-xs-4 col-xs-offset-2">
-        <h2>Create Tables:</h2>
+        <h2>Create / Delete Tables:</h2>
         <div class="list-group">
           <?php
             foreach ($table_setup_scripts as $key => $val) {
-              echo '<a class="list-group-item" href="'. $app_root .'/lib/shots/setup/database/'. $val.'" target="_blank">'. $key .'</a>';
+              echo '<a class="list-group-item" href="'. $app_root .'/lib/shots/setup/database/'. $val.'">'. $key .'</a>';
             }
           ?>
         </div>

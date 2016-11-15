@@ -1,41 +1,42 @@
 <?php
+
 include 'lib/all_pages.php';
 
-include 'shots/relationships/relationships.php';
+$platform = $db->getDatabasePlatform();
+$shots_schema = $db->getSchemaManager();
+
+$table_exists = $shots_schema->tablesExist(array('grants'));
+
+echo '<pre>';
 
 
-// encode_in_place($foo);
-// array_walk_recursive($foo, 'encode_in_place');
+  //echo 'Creating table.';
 
-$from_entity_type = 'grants';
-$from_entity_id = 3;
-$to_entity_type = 'people';
-$to_entity_id = 1;
-$relationship_type = 'is_related_to';
+  $schema = new \Doctrine\DBAL\Schema\Schema();
 
+  $table = $schema->createTable('foo');
 
-// $q = $db->createQueryBuilder();
-//   $q->select('count(*)')
-//     ->from('relationships')
-//     ->where('from_entity_type = :from_entity_type')
-//     ->andWhere('from_entity_id = :from_entity_id')
-//     ->andWhere('to_entity_type = :to_entity_type')
-//     ->andWhere('to_entity_id = :to_entity_id')
-//     ->andWhere('relationship_type = :relationship_type')
-//     ;
+  $table->addColumn('grant_id',           'integer', array('columnDefinition' => 'INTEGER PRIMARY KEY AUTOINCREMENT'));  
+  $table->addColumn('grant_body',         'string',  array('notnull' => false));
+  $table->addColumn('grant_mechanism',    'string',  array('notnull' => false));
+  $table->addColumn('grant_number',       'string',  array('notnull' => false));
 
-//   $q->setParameters( array(':from_entity_type'  => $from_entity_type,
-//                            ':from_entity_id'    => $from_entity_id,
-//                            ':to_entity_type'    => $to_entity_type,
-//                            ':to_entity_id'      => $to_entity_id,
-//                            ':relationship_type' => $relationship_type,
-//                            )
-//                     );
+  $table->setPrimaryKey(array('grant_id'));
 
-//   $r = $q->execute()->fetchAll();
+  $table->addUniqueIndex(array('grant_body', 'grant_mechanism', 'grant_number'));
 
-$foo = relationshipsAdd($from_entity_type, $from_entity_id, $to_entity_type, $to_entity_id, 'is_related_to');
+  $sql = $schema->toSql($platform);
 
-include 'html_footer.php';
+  foreach ($sql as $this_sql) {
+    echo htmlentities($this_sql);
+    $ddl = $db->prepare($this_sql);
+    $ddl->execute();
+    $r = $ddl->fetchAll();
+    print_r($r);
+  }
+
+// echo '<pre>';
+print_r(get_defined_vars());
+echo '</pre>';
+
 ?>
-
