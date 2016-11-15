@@ -346,24 +346,41 @@ function documentsFetch( $id = false, $return_format = 'php', $only_show_active_
  */
 function documentsFetchRecent( $count = 3, $return_format = 'php')
 {
-  global $db, $documents_primary_key;
+  global $db, $documents_primary_key, $username;
 
   $q = $db->createQueryBuilder();
   $q->select('key_value');
   $q->from('changelog');
   $q->where('key_field = :key_field');
+  $q->andWhere('change_username = :username');
   $q->groupBy('key_value');
   $q->orderBy('change_timestamp', 'DESC');
   $q->setMaxResults( $count );
 
-  $q->setParameters( array(':key_field' => $documents_primary_key) );
+  $q->setParameters( array(':key_field' => $documents_primary_key,
+                           ':username'  => $username,
+                           ) 
+                     );
 
   $r = $q->execute()->fetchAll();
 
   if ( !empty($r) ){
     $f = array_column($r, 'key_value');
+    // TODO if count($f) < $count then grab more rows from the table
+    if ( count($f) < $count ) {
+      $extra_records_to_get = $count - count($f);
+      $q = $db->createQueryBuilder();
+      $q->select($documents_primary_key);
+      $q->from('documents');
+      $q->orderBy('document_id', 'DESC');
+      $q->setMaxResults( $extra_records_to_get );
+
+      $r = $q->execute()->fetchAll();
+      $extra_records = array_column($r, $documents_primary_key);
+      $f = array_merge($f, $extra_records);
+    }
     if ( !empty($f) ){
-      return documentsFetch($f, $return_format);
+      return documentsFetch($f, $return_format, FALSE);
     }
   }
 
