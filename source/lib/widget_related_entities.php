@@ -66,8 +66,9 @@ if (isset($entities) && isset($related_entities)) {
     var alter_key_field = key_field_mapping[alter_data.entityName];
 
 
-    console.log(ego_entity_name);
-    console.log(ego_key_value);
+    console.log('ego entity name: ' + ego_entity_name);
+    console.log('ego key value: ' + ego_key_value);
+    console.log('alter data: ');
     console.log(alter_data);
     
     // open a modal 

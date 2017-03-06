@@ -12,20 +12,22 @@ var autosave_timeout, table_data,
     auth2, new_user;
 
 var key_field_mapping = { 
-                          "events": "event_id",
-                          "grants": "grant_id",
-                          "people": "person_id",
-                          "documents": "document_id",
+                          "events":        "event_id",
+                          "grants":        "grant_id",
+                          "people":        "person_id",
+                          "documents":     "document_id",
+                          "outreach":      "outreach_id",
                           "lookup_values": "lookup_value_id",
                         }
 
 // these fields are set to empty for the addRow function
 // just need to be string field with no constraints
 var empty_field_mapping = {
-                            "events": "title",
-                            "grants": "title",
-                            "people": "name",
-                            "documents": "title",
+                            "events":        "title",
+                            "grants":        "title",
+                            "people":        "name",
+                            "documents":     "title",
+                            "outreach":      "primary_contact",
                             "lookup_values": "lookup_value", 
                           }            
 
@@ -34,10 +36,11 @@ var empty_field_mapping = {
 // i'm calling these fields, "titles" but i am not married to that term
 // must be an array of variable names. array of 1 is ok.
 var title_field_mapping = {
-                            "events": ["datetime_start", "title"],
-                            "grants": ["title", "grant_body"],
-                            "people": ["name", "affiliation"],
-                            "documents": ["name", "extension"],
+                            "events":       ["datetime_start", "title"],
+                            "grants":       ["title", "grant_body"],
+                            "people":       ["name", "affiliation"],
+                            "documents":    ["name", "extension"],
+                            "outreach":     ["primary_contact"],
                             "lookup_value": ["column_name", "label"],
                           }
 

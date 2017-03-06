@@ -289,7 +289,7 @@ function addRecord($table_name = NULL, $field_name = NULL, $field_value = NULL)
   return FALSE;
 }
 
-/*
+/**
  * Delete a record.
  *
  * Strictly speaking you can feed in any field, but you should be submitting the key field and the key value. If you submit a non-key field this function might delete multiple records.

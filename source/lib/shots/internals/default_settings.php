@@ -34,6 +34,9 @@ $entities = array(
                   'events' => array('table_creation' => $app_root . '/lib/shots/setup/database/create_entity_events.php',
                                     'php_functions' => '/lib/shots/entities/events.php',
                                     ),
+                  'outreach' => array('table_creation' => $app_root . '/lib/shots/setup/database/create_entity_outreach.php',
+                                      'php_functions' => '/lib/shots/entities/outreach.php',
+                                      ),
                   );
 
 // array of authentication services
