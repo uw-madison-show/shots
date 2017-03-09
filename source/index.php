@@ -14,11 +14,13 @@ include 'html_doctype.php';
 include 'html_head.php';
 
 include_once 'shots/entities/grants.php';
+include_once 'shots/entities/outreach.php';
 include_once 'shots/entities/people.php';
 include_once 'shots/entities/documents.php';
 
 
 $recent_grants = encode(grantsFetchRecent(7));
+$recent_outreach = encode(outreachFetchRecent(7));
 $recent_people = encode(peopleFetchRecent(7));
 $recent_documents = encode(documentsFetchRecent(7));
 
@@ -37,6 +39,37 @@ $recent_documents = encode(documentsFetchRecent(7));
       <div class="row portal-frame">
         <div class="col-xs-12 portal-main">
           <ul class="tile-list" aria-invalid="false">
+
+            <li class="col-xs-12 col-sm-6 col-md-4 no-padding list-container">  
+              <widget>
+                <div class="widget-frame" id="portal-id-003">
+                  <div class="widget-header">
+                    <div class="widget-help">?</div>
+                    <div class="widget-remove">x</div>
+                    <div class="widget-title"><h4>Outreach</h4></div>
+                  </div>
+                  <div class="widget-body">
+                    <div class="quick-list-container">
+                      <ul class="quick-list">
+                        <?php
+                          foreach ($recent_outreach as $id => $data) { 
+                            if ( !empty($data) ){                         
+                              echo '<li class="quick-list-item align-left">';
+                              echo '<a id="outreach-' . $data['outreach_id'] . '" href="'. $app_root .'/views/one_outreach.php?id=' . $data['outreach_id'] .'"">';
+                              echo  ($data['primary_contact'] ?? 'no title');
+                              echo '</a>';
+                              echo ($data['department'] ? '<span class="smaller"> ('. $data['department'] .')</span>' : '');
+                              echo '</li>';
+                            }
+                          }
+                        ?>
+                      </ul>
+                    </div>
+                  </div>
+                  <a href="<?php echo $app_root; ?>/views/table_all_outreach.php" class="btn btn-default launch-app-button">All Outreach</a>
+                </div>
+              </widget>
+            </li>
 
             <li class="col-xs-12 col-sm-6 col-md-4 no-padding list-container">
               <widget>
