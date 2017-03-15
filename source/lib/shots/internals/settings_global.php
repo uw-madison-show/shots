@@ -10,7 +10,9 @@ if (!isset($app_root)) {
 include_once 'default_settings.php';
 
 // You need to change this if you install SHOTS in another timezone; this is used for file uploads and calendar records
-date_default_timezone_set('America/Chicago');
+$tz = 'America/Chicago';
+$shots_default_timezone = new DateTimeZone($tz);
+date_default_timezone_set($tz);
 
 // name of the sign in/out pages
 // relative to the <approot>; no leading/trailing slashes
