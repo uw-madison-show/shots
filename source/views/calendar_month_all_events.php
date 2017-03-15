@@ -15,7 +15,25 @@ include 'html_head.php';
 
   <?php include 'html_navbar.php'; ?>
 
-  <div id="my_cal"></div>
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-xs-4 col-xs-offset-4">
+        <p>buttons go here</p>
+        <select id="event-type-selector">
+          <option value="all" selected>All</option>
+          <option value="reminder">Reminders</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div id="my_cal"></div>
+      </div>
+    </div>
+
+  </div>
 
   <?php include 'html_footer.php'; ?>
 
@@ -43,9 +61,10 @@ include 'html_head.php';
           "rendering": "",
           "overlap": true,
           // "constraint": "", // passing a blank string makes it stop working
-          "color": "",
+          "color": "gray",
           "backgroundColor": "",
-          "textColor": ""
+          "textColor": "",
+          "type": ""
         };
 
         var return_array = [];
@@ -128,8 +147,12 @@ include 'html_head.php';
                 case 'color':
                   if (this_input.type === 'outreach') {
                     this_event_object.color = 'green';
-                  } else if (this_input.type === 'presentation') {
+                  } else if (this_input.type === 'meeting') {
+                    this_event_object.color = 'blue';
+                  } else if (this_input.type === 'reminder') {
                     this_event_object.color = 'orange';
+                  } else if (this_input.type === 'deadline') {
+                    this_event_object.color = 'red';
                   } else {
                     this_event_object.color = EventObject.color;
                   }
@@ -287,6 +310,10 @@ include 'html_head.php';
 
         editable: true,
 
+        eventRender: function (event, element, view){
+          return ['all', event.type].indexOf( $('#event-type-selector').val() ) >= 0;
+        },
+
         events: function(s,e,t,c){
           ajaxGetEvents(s, e, t, c)
         }
@@ -300,6 +327,10 @@ include 'html_head.php';
       // Event Listeners
 
       /**********************************************************/
+
+      $('#event-type-selector').on('change',function(){
+        $('#my_cal').fullCalendar('rerenderEvents');
+      })
 
     });
   </script>
