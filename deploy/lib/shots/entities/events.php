@@ -8,6 +8,11 @@ $sm = $db->getSchemaManager();
 $events_fields = $sm->listTableColumns('events');
 $events_primary_key = $sm->listTableIndexes('events')['primary']->getColumns()[0];
 
+// sqlite does not have a native datetime field type so store a list of the date and datetime fields in this array
+$events_datetime_fields = array('datetime_start',
+                                'datetime_end',
+                                );
+
 /**
  * Returns all events that match the ID(s).
  *
@@ -212,7 +217,7 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
  */
 function eventsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
-  global $db, $events_fields, $events_primary_key;
+  global $db, $events_fields, $events_primary_key, $events_datetime_fields;
 
   if ($id_value === FALSE
       or $field_name === FALSE
@@ -225,6 +230,18 @@ function eventsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
   if ( !in_array($field_name, array_keys($events_fields)) ){
     trigger_error($field_name .' not in events table.');
     return FALSE;
+  }
+
+  if ( in_array($field_name, $events_datetime_fields) ){
+    $temp_date_string = handleDateString($new_value,
+                                         'string'
+                                         );
+    if ( $temp_date_string === FALSE ){
+      trigger_error('Unable to convert the user input into a valid datetime string.');
+      return FALSE;
+    } else {
+      $new_value = $temp_date_string;
+    }
   }
 
   return updateRecord('events',
@@ -247,32 +264,60 @@ function eventsDelete($id_value)
 /**
  * Add a record to the events table.
  *
- * @param string $field_name The name of the field to use in the insert query. Do not use the field name of an autoincrement id field, e.g. do not use event_id.
+ * @param mixed $field Either an array of field => value pairs or a string with the field name. When a string, the name of the field to use in the insert query. Do not use the field name of an autoincrement id field, e.g. do not use event_id.
  * @param mixed $field_value The value to use in the insert query.
  *
  * @return boolean If count of affected rows is greater than 0 then return TRUE, otherwise return FALSE.
  */
-
-function eventsAdd( $field_name = FALSE, $field_value = FALSE )
+function eventsAdd( $field = FALSE, $field_value = FALSE )
 {
-  global $db, $events_fields;
+  global $db, $events_fields, $events_datetime_fields;
 
-  if ($field_name === FALSE or $field_value === FALSE) { 
-    return FALSE; 
+  $affected_rows = 0;
+
+  if ( $field === FALSE ) {
+    return FALSE;
+  } elseif ( is_array($field) ) {
+    
+    $affected_rows = $db->insert('events',
+                                 $field
+                                 );
+
+  } elseif ( is_string($field) ) {
+
+    if ( $field_value === FALSE ) { 
+      return FALSE; 
+    }
+
+    if ( !in_array($field, array_keys($events_fields)) ) { 
+      return FALSE;
+    } 
+
+    if ( in_array($field, $events_datetime_fields) ){
+      $temp_date_string = handleDateString($field_value,
+                                           'string'
+                                           );
+      if ( $temp_date_string === FALSE ){
+        trigger_error('Event not added because could not convert user input into a valid datetime string.');
+        return FALSE;
+      } else {
+        $field_value = $temp_date_string;
+      }
+    }
+
+    $affected_rows = $db->insert('events',
+                                array($field => $field_value)
+                                );
   }
 
-  if ( !in_array($field_name, array_keys($events_fields)) ) { 
-    return FALSE;
-  } 
-
-  $affected_rows = $db->insert('events',
-                              array($field_name => $field_value)
-                              );
+  
 
   if ( $affected_rows > 0 ) { return TRUE; }
 
   return FALSE;
 }
+
+
 
 /**
  * Returns all events in the database.

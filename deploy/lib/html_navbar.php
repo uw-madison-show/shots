@@ -25,7 +25,7 @@ require_once 'all_pages.php';
             <li><a href="<?php echo $app_root; ?>/views/table_all_grants.php">Grants</a></li>
             <li><a href="<?php echo $app_root; ?>/views/table_all_people.php">People</a></li>
             <li><a href="<?php echo $app_root; ?>/views/manager_all_documents.php">Documents</a></li>
-            <li><a href="#">Something else here</a></li>
+            <li><a href="<?php echo $app_root; ?>/views/table_all_outreach.php">Outreach</a></li>
             <li role="separator" class="divider"></li>
             <li class="dropdown-header">Calendars</li>
             <li><a href="<?php echo $app_root; ?>/views/calendar_month_all_events.php">Monthly</a></li>

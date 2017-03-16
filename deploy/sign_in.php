@@ -19,15 +19,18 @@ include 'html_head.php';
 
 <div class="container-fluid">
   <div class="row">
-    <div id="main-entity" class="col-md-8">
+    <div class="col-sm-2"><span></span></div>
+    <div id="main-entity" class="col-sm-6">
+      
       <h2>SHOW Output Tracking System</h2>
       <h3>Survey of the Health of Wisconsin</h3>
       <p>Please log in with a Google account. For our UW-Madison users, we strongly recommend using the Google Apps account linked to your @wisc.edu account. If you have questions contact ...</p>
+        
     </div>
   </div>
+</div> <!-- close container-fluid -->
 
 <?php include 'html_footer.php'; ?>
-</div> <!-- close container-fluid -->
 
 <script type="text/javascript">  
 </script>
