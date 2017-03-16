@@ -19,10 +19,13 @@ include 'html_head.php';
 
     <div class="row">
       <div class="col-xs-4 col-xs-offset-4">
-        <p>buttons go here</p>
+        <label for="event-type-selector">Select Event Types to View:</label>
         <select id="event-type-selector">
           <option value="all" selected>All</option>
+          <option value="meeting">Meetings</option>
+          <option value="outreach">Outreach</option>
           <option value="reminder">Reminders</option>
+          <option value="deadline">Deadlines</option>
         </select>
       </div>
     </div>
