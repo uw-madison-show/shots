@@ -125,7 +125,10 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
     $return_html .= '<label class="control-label col-xs-4" for="'. $field_name . '">'. convertFieldName($field_name) .'</label>';
 
   // e.g. drop down lookups
-  $special_fields = array('type');
+  $special_fields = array('type',
+                          'datetime_start',
+                          'datetime_end'
+                          );
   if ( in_array($field_name, $special_fields) ){
     switch ($field_name) {
       case 'type':
@@ -152,6 +155,24 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
         $return_html .= '</select>';
         $return_html .= '</div>';
         break;
+
+      case 'datetime_end':
+      case 'datetime_start':
+        // TODO make date fields a date picker input
+        $return_html .= '<div class="col-xs-8">';
+        $return_html .= '<div class="input-group date datepicker">';
+        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'"';
+        if ($field_name === $events_primary_key) {
+          $return_html .= ' readonly';
+        }
+        $return_html .= '/>';
+        $return_html .= '<span class="input-group-addon">
+                           <span class="glyphicon glyphicon-calendar"></span>
+                         </span>
+                         </div>
+                         </div>
+                         ';
+        break;
     }
   } else {
     // do stuff for normal fields
@@ -160,7 +181,7 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
     // based on the DBAL Types
     $field_type = $events_fields[$field_name]->getType();
 
-    // echo "my field type: ";
+    // echo "<br>my field type: ";
     // echo $field_type;
     switch ($field_type) {
       case 'Integer':
@@ -176,18 +197,21 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
         $return_html .= '/>';
         $return_html .= '</div>';
         break;
-        // TODO make date fields a date picker input
+        
       case 'Text':
         $return_html .= '<div class="col-xs-8">';
         $return_html .= '<textarea class="form-control" rows="2" id="'. $field_name . '" name="'. $field_name . '">' . $field_value . '</textarea>';
         $return_html .= '</div>';
         break;
+
       case 'Boolean':
         $return_html .= '<div class="col-xs-2">';
         $return_html .= '<input class="form-control" type="checkbox" value="" id="' . $field_name . '" name="' . $field_name . '" ';
         if ($field_value == true) $return_html .= ' checked ';
         $return_html .= '/>';
         $return_html .= '</div>';
+        break;
+
       default:
         // TODO add a default
         break;

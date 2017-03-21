@@ -204,9 +204,41 @@ function ajaxFailed(d) {
 }
 
 function ajaxChange(e){
-  console.log(this);
-  var html_input_type = $(this).attr('type');
-  var entity_name = $(this).parents('.record').data('entityName');
+  console.log('ajaxChange e =');
+  console.log(e);
+  // console.log('ajaxChange this =');
+  // console.log(this);
+  // console.log('ajaxChange currentTarget =');
+  // console.log(e.currentTarget);
+
+  var firing_el = $(e.currentTarget);
+  // console.log(firing_el);
+
+  var html_input_type = '';
+  var entity_name = '';
+  var html_input = '';
+  var field_name = '';
+
+  if ( firing_el.is('input') ){
+    html_input_type = firing_el.attr('type');
+    entity_name     = firing_el.parents('.record').data('entityName');
+    html_input      = getFormInputValue(firing_el);
+    field_name      = firing_el.attr('id');
+  } else if ( firing_el.is('div') ) {
+    // find the input; do i assume the first input is the real input?
+    var this_input  = firing_el.find('input').first();
+    // console.log(this_input);
+    if ( this_input ){
+      html_input_type = this_input.attr('type');
+      entity_name     = this_input.parents('.record').data('entityName');
+      html_input      = getFormInputValue(this_input);
+      field_name      = this_input.attr('id');
+    }
+  } else {
+    ajaxFailed('ajaxChange could not find an input or a div element for this change event.');
+    return false;
+  }
+
   // the ajax handler is going to include the file /lib/shots/entities/{table}.php
   // then it will use call_user_func() to pass the {params}
   // into the function named by {action}
@@ -219,15 +251,14 @@ function ajaxChange(e){
   // get record id
   // this requires knowing the key_field
   var key_field = '#' + key_field_mapping[entity_name];
-  var key_value = $(this).closest('.record').find(key_field).val();
+  var key_value = firing_el.closest('.record').find(key_field).val();
   console.log(key_field + ' = ' + key_value);
   req.params.push(key_value);
 
   // field name
-  req.params.push($(this).attr('id'));
+  req.params.push(field_name);
 
   // get the field value 
-  var html_input = getFormInputValue($(this));
   req.params.push(html_input.value);
 
   console.log(req);

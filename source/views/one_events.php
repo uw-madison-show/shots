@@ -75,6 +75,45 @@ $related_entities = relationshipsFetch('events', $this_id, 'php');
   <script type="text/javascript">
     $(document).ready(function() {
 
+      $('.datepicker').datetimepicker({format: 'YYYY-MM-DD h:mm a',
+                                       extraFormats: ['YYYY-MM-DD HH:mm:ss',
+                                                      'YYYY-MM-DD HH:mm',
+                                                      'YYYY-MM-DD h:mm a',
+                                                      'YYYY-MM-DD h a',
+                                                      'YYYY-MM-DD',
+                                                      'M/D/YY',
+                                                      'M/D/YYYY',
+                                                      'MM/DD/YYYY',
+                                                      'M/D/YY h:mm a',
+                                                      'M/D/YYYY h:mm a',
+                                                      'MM/DD/YYYY h:mm a',
+                                                      'M/D/YY h a',
+                                                      'M/D/YYYY h a',
+                                                      'MM/DD/YYYY h a',
+                                                      ],
+                                       sideBySide: true,
+                                       defaultDate: $(this).val()
+                                       });
+
+      $('.datepicker').on('dp.show', function(e){
+        // console.log(e);
+        // keep track of the changes done in the datepicker dialog
+        var most_recent_change_event = {};
+        $(this).on('dp.change', function(change_event){
+          most_recent_change_event = change_event;
+        });
+        // fire a database update when the dialog closes; send in the last change we have
+        $(this).on('dp.hide', function(e2){
+          // console.log('hide');
+          // console.log(e2);
+          if ( most_recent_change_event ){
+            ajaxChange(most_recent_change_event);
+          }
+        });
+      });
+
+      $('#datetime_start, #datetime_end').on('focusout', ajaxChange);
+
       $(':input').change( ajaxChange );
 
       $('#delete-button').click( openDeleteModal );

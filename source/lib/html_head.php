@@ -21,15 +21,27 @@ echo '
     ';
 
 
+
 // jQuery from Google cdn
 echo '
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    ';
+
+// jquery does not have a good datetime picker, try this instead:
+// https://github.com/Eonasdan/bootstrap-datetimepicker
+
+/*
+// jQuery UI CSS from Google 
+// or maybe use a bootstrapy dropin for just the datepicker UI? https://gist.github.com/miwahall/7028640
+echo '
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
     ';
 
 // jQuery UI from Google cdn
 echo '
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     ';
+*/
 
 // Bootstrap JS and CSS from MaxCDN
 echo '
@@ -75,8 +87,17 @@ echo '
     <meta name="google-signin-client_id" content="146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com">
     ';
 
+// datetime picker from https://github.com/Eonasdan/bootstrap-datetimepicker
+echo '
+    <link rel="stylesheet" href="'. $app_root .'/includes/bootstrap-datetimejs/bootstrap-datetimepicker-4-17-47.css" />
+    <script src="'. $app_root .'/includes/bootstrap-datetimejs/bootstrap-datetimepicker-4-17-47.js"></script>
+    ';
+
+
 
 // custom JS and CSS for the shots database
+// TODO i need to deal with browsers caching the shots js/css so when i push updates, users will actually see the updated version
+// good summary of js caching: https://jakearchibald.com/2016/caching-best-practices/
 echo '
     <script src="'. $app_root .'/lib/js/shots.js"></script>
     <link rel="stylesheet" type="text/css" href="'. $app_root .'/lib/css/shots.css">
