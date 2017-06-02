@@ -212,19 +212,14 @@ function ajaxChange(e){
   // console.log(e.currentTarget);
 
   var firing_el = $(e.currentTarget);
-  // console.log(firing_el);
+  console.log(firing_el);
 
   var html_input_type = '';
   var entity_name = '';
   var html_input = '';
   var field_name = '';
 
-  if ( firing_el.is('input') ){
-    html_input_type = firing_el.attr('type');
-    entity_name     = firing_el.parents('.record').data('entityName');
-    html_input      = getFormInputValue(firing_el);
-    field_name      = firing_el.attr('id');
-  } else if ( firing_el.is('div') ) {
+  if ( firing_el.is('div') ) {
     // find the input; do i assume the first input is the real input?
     var this_input  = firing_el.find('input').first();
     // console.log(this_input);
@@ -235,6 +230,13 @@ function ajaxChange(e){
       field_name      = this_input.attr('id');
     }
   } else {
+    html_input_type = firing_el.attr('type');
+    entity_name     = firing_el.parents('.record').data('entityName');
+    html_input      = getFormInputValue(firing_el);
+    field_name      = firing_el.attr('id');
+  }
+
+  if ( field_name === '' ){
     ajaxFailed('ajaxChange could not find an input or a div element for this change event.');
     return false;
   }

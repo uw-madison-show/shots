@@ -75,27 +75,21 @@ $related_entities = relationshipsFetch('events', $this_id, 'php');
   <script type="text/javascript">
     $(document).ready(function() {
 
-      $('.datepicker').datetimepicker({format: 'YYYY-MM-DD h:mm a',
-                                       extraFormats: ['YYYY-MM-DD HH:mm:ss',
-                                                      'YYYY-MM-DD HH:mm',
-                                                      'YYYY-MM-DD h:mm a',
-                                                      'YYYY-MM-DD h a',
-                                                      'YYYY-MM-DD',
-                                                      'M/D/YY',
+      $('.datepicker').datetimepicker({format: 'YYYY-MM-DD',
+                                       extraFormats: ['M/D/YY',
                                                       'M/D/YYYY',
                                                       'MM/DD/YYYY',
-                                                      'M/D/YY h:mm a',
-                                                      'M/D/YYYY h:mm a',
-                                                      'MM/DD/YYYY h:mm a',
-                                                      'M/D/YY h a',
-                                                      'M/D/YYYY h a',
-                                                      'MM/DD/YYYY h a',
+                                                      'M/D/YY',
+                                                      'M/D/YYYY'
                                                       ],
-                                       sideBySide: true,
                                        defaultDate: $(this).val()
                                        });
 
-      $('.datepicker').on('dp.show', function(e){
+      $('.timepicker').datetimepicker({format: 'LT',
+                                       defaultDate: $(this).val()
+                                       });
+
+      $('.datepicker, .timepicker').on('dp.show', function(e){
         // console.log(e);
         // keep track of the changes done in the datepicker dialog
         var most_recent_change_event = {};
@@ -112,7 +106,7 @@ $related_entities = relationshipsFetch('events', $this_id, 'php');
         });
       });
 
-      $('#datetime_start, #datetime_end').on('focusout', ajaxChange);
+      $('#date_start, #date_end, #time_start, #time_end').on('focusout', ajaxChange);
 
       $(':input').change( ajaxChange );
 

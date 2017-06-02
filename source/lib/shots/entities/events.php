@@ -8,10 +8,13 @@ $sm = $db->getSchemaManager();
 $events_fields = $sm->listTableColumns('events');
 $events_primary_key = $sm->listTableIndexes('events')['primary']->getColumns()[0];
 
-// sqlite does not have a native datetime field type so store a list of the date and datetime fields in this array
-$events_datetime_fields = array('datetime_start',
-                                'datetime_end',
-                                );
+// sqlite does not have native date, time, or datetime field types so store a list of the date and datetime fields in this array; they will get special processing in the handleDateString() function
+$events_date_fields = array('date_start',
+                            'date_end',
+                            );
+$events_time_fields = array('time_start',
+                            'time_end',
+                            );
 
 /**
  * Returns all events that match the ID(s).
@@ -54,10 +57,10 @@ function eventsFetch( $id = false, $return_format = 'php' )
 /**
  * Returns all events within date range.
  *
- * For now this is using a SQLite function datetime() to convert strings into datetime values for the comparison. Need to in the future abstract the query so that it can run on any db.
+ * For now this is using a SQLite function date() to convert strings into datetime values for the comparison. Need to in the future abstract the query so that it can run on any db.
  *
- * @param string $start_date A string that SQLite can format into a datetime value.
- * @param string $end_date A string that SQLite can format ito a datetime value.
+ * @param string $start_date A string that SQLite can format into a date value.
+ * @param string $end_date A string that SQLite can format ito a date value.
  *
  * @return array Holding all of the events in the specified range. json_encode() will turn it into a JSON formatted string which can be passed to FullCalendar.
  */
@@ -70,15 +73,15 @@ function eventsFetchDateRange($start_date = FALSE, $end_date = FALSE)
   $q->select('*');
   $q->from('events');
   // TODO make these not be sqlite specific datetime functions; how?
-  $q->where('datetime(datetime_start) > datetime(:start_date)');
-  $q->andWhere('datetime(datetime_start) < datetime(:end_date)');
+  $q->where('date(date_start) >= date(:start_date)');
+  $q->andWhere('date(date_start) <= date(:end_date)');
 
   $q->setParameter(':start_date', $start_date);
   $q->setParameter(':end_date',   $end_date);
 
   $r = $q->execute()->fetchAll();
 
-  // convert the event records into FullCalendar json object format?
+  // TODO convert the event records into FullCalendar json object format?
 
   $return_array = $r;
   return $return_array;
@@ -126,8 +129,10 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
 
   // e.g. drop down lookups
   $special_fields = array('type',
-                          'datetime_start',
-                          'datetime_end'
+                          'date_start',
+                          'date_end',
+                          'time_start',
+                          'time_end'
                           );
   if ( in_array($field_name, $special_fields) ){
     switch ($field_name) {
@@ -156,18 +161,27 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
         $return_html .= '</div>';
         break;
 
-      case 'datetime_end':
-      case 'datetime_start':
+      case 'date_end':
+      case 'date_start':
         // TODO make date fields a date picker input
         $return_html .= '<div class="col-xs-8">';
         $return_html .= '<div class="input-group date datepicker">';
-        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'"';
-        if ($field_name === $events_primary_key) {
-          $return_html .= ' readonly';
-        }
-        $return_html .= '/>';
+        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'" />';
         $return_html .= '<span class="input-group-addon">
                            <span class="glyphicon glyphicon-calendar"></span>
+                         </span>
+                         </div>
+                         </div>
+                         ';
+        break;
+
+      case 'time_end':
+      case 'time_start':
+        $return_html .= '<div class="col-xs-8">';
+        $return_html .= '<div class="input-group date timepicker">';
+        $return_html .= '<input class="form-control" type="text" id="' . $field_name . '" name="'. $field_name .'" value="'. $field_value .'" />';
+        $return_html .= '<span class="input-group-addon">
+                           <span class="glyphicon glyphicon-time"></span>
                          </span>
                          </div>
                          </div>
@@ -241,7 +255,7 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
  */
 function eventsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL )
 {
-  global $db, $events_fields, $events_primary_key, $events_datetime_fields;
+  global $db, $events_fields, $events_primary_key, $events_date_fields, $events_time_fields;
 
   if ($id_value === FALSE
       or $field_name === FALSE
@@ -256,15 +270,31 @@ function eventsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
     return FALSE;
   }
 
-  if ( in_array($field_name, $events_datetime_fields) ){
+  if ( in_array($field_name, $events_date_fields) ){
     $temp_date_string = handleDateString($new_value,
-                                         'string'
+                                         'string',
+                                         'date'
                                          );
+    // var_dump($temp_date_string);
     if ( $temp_date_string === FALSE ){
-      trigger_error('Unable to convert the user input into a valid datetime string.');
+      trigger_error('Unable to convert the user input into a valid date string.');
       return FALSE;
     } else {
       $new_value = $temp_date_string;
+    }
+  }
+
+  if ( in_array($field_name, $events_time_fields) ){
+    $temp_time_string = handleDateString($new_value,
+                                         'string',
+                                         'time'
+                                         );
+    // var_dump($temp_date_string);
+    if ( $temp_time_string === FALSE ){
+      trigger_error('Unable to convert the user input into a valid time string.');
+      return FALSE;
+    } else {
+      $new_value = $temp_time_string;
     }
   }
 
@@ -295,7 +325,7 @@ function eventsDelete($id_value)
  */
 function eventsAdd( $field = FALSE, $field_value = FALSE )
 {
-  global $db, $events_fields, $events_datetime_fields;
+  global $db, $events_fields, $events_date_fields, $events_time_fields;
 
   $affected_rows = 0;
 
@@ -317,15 +347,29 @@ function eventsAdd( $field = FALSE, $field_value = FALSE )
       return FALSE;
     } 
 
-    if ( in_array($field, $events_datetime_fields) ){
+    if ( in_array($field, $events_date_fields) ){
       $temp_date_string = handleDateString($field_value,
-                                           'string'
+                                           'string',
+                                           'date'
                                            );
       if ( $temp_date_string === FALSE ){
         trigger_error('Event not added because could not convert user input into a valid datetime string.');
         return FALSE;
       } else {
         $field_value = $temp_date_string;
+      }
+    }
+
+    if ( in_array($field, $events_time_fields) ){
+      $temp_time_string = handleDateString($field_value,
+                                           'string',
+                                           'time'
+                                           );
+      if ( $temp_time_string === FALSE ){
+        trigger_error('Event not added because could not convert user input into a valid datetime string.');
+        return FALSE;
+      } else {
+        $field_value = $temp_time_string;
       }
     }
 

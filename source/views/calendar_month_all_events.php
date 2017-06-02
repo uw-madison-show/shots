@@ -79,7 +79,7 @@ include 'html_head.php';
           // loop over all properites in the default EventObject
           $.each(EventObject, function(key, value){
             if ( this_input.hasOwnProperty(key) ){
-              // if there is an exact mathc between input and EventObject just use it and move to the next property
+              // if there is an exact match between input and EventObject just use it and move to the next property
               this_event_object[key] = this_input[key];
               return true;
             } else {
@@ -98,17 +98,19 @@ include 'html_head.php';
                   }
                   break;
                 case 'allDay':
-                  if (this_input.all_day === 'true') {
+                  if (this_input.all_day === '1') {
                     this_event_object.allDay = true;
-                  } else if (this_input.all_day === 'false') {
+                  } else if (this_input.all_day === '0') {
                     this_event_object.allDay = false;
                   } else {
                     this_event_object.allDay = EventObject.allDay;
                   }
                   break;
                 case 'start':
-                  if (this_input.datetime_start !== ''){
-                    this_event_object.start = this_input.datetime_start;
+                  if ( this_input.date_start && this_input.time_start ){
+                    this_event_object.start = this_input.date_start + ' ' + this_input.time_start;
+                  } else if ( this_input.date_start ){
+                    this_event_object.start = this_input.date_start;
                   } else {
                     // this is a non-sense default, but i guess it should never happen
                     this_event_object.start = EventObject.start;
@@ -117,10 +119,14 @@ include 'html_head.php';
                 case 'end':
                   if (this_input.all_day === 'true') {
                     this_event_object.end = '';
-                  } else if (this_input.datetime_end !== '') {
-                    this_event_object.end = this_input.datetime_end;
                   } else {
-                    this_event_object.end = EventObject.end;
+                    if ( this_input.date_end && this_input.time_end ) {
+                      this_event_object.end = this_input.date_end + ' ' + this_input.time_end;
+                    } else if ( this_input.date_end ) {
+                      this_event_object.end = this_input.datetime_end;
+                    } else {
+                      this_event_object.end = EventObject.end;
+                    }
                   }
                   break;
                 case 'url':
@@ -209,10 +215,7 @@ include 'html_head.php';
                          } else {
                            ajaxFailed();
                          }
-               })
-
-
-
+               });
       }
 
       function newEventOnClick(date, jsEvent, view) {
@@ -233,7 +236,7 @@ include 'html_head.php';
           req.table = 'events';
           req.params = [ {
                           "title": new_title,
-                          "datetime_start": date.format('YYYY-MM-DD'),
+                          "date_start": date.format('YYYY-MM-DD'),
                           "all_day": 1
                          }
                        ];
@@ -248,7 +251,7 @@ include 'html_head.php';
                           if ( d.error === false ){
                             // update the calendar UI or just refresh?
                             // TODO the faster and cleaner way to do this is to just render the new event on the calendar without doing a full reload; however, at this point the code does not know the id number of the newly created event so it can not construct the url for the event; could do another ajax request using eventsSearch() but at that point why not just reload???
-                            location.reload();
+                            // location.reload();
                           }
                         })
                  ;
@@ -282,18 +285,14 @@ include 'html_head.php';
             // console.log('delta.days() = ' + delta.days());
             // console.log(this);
 
-            if ( event.start.hasTime() ){
-              console.log('datetime');
-              var new_date_string = event.start.format('YYYY-MM-DD LT');
-            } else {
-              var new_date_string = event.start.format('YYYY-MM-DD');
-            }
+            var new_date_string = event.start.format('YYYY-MM-DD');
+            
 
             var req = {};
             req.target = 'entity';
             req.action = 'eventsUpdate';
             req.table = 'events';
-            req.params = [ event.id, 'datetime_start', new_date_string ];
+            req.params = [ event.id, 'date_start', new_date_string ];
 
             console.log(req);
 

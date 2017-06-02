@@ -52,9 +52,11 @@ if ( $table_exists ){
   $table->addColumn('repeat_id',      'integer', array('notnull' => false));
 
   $table->addColumn('title',          'string',  array('notnull' => false));
-  $table->addColumn('datetime_start', 'string',  array('notnull' => false));
-  $table->addColumn('datetime_end',   'string',  array('notnull' => false));
+  $table->addColumn('date_start',     'string',  array('notnull' => false));
+  $table->addColumn('date_end',       'string',  array('notnull' => false));
   $table->addColumn('all_day',        'boolean', array('notnull' => false));
+  $table->addColumn('time_start',     'string',  array('notnull' => false));
+  $table->addColumn('time_end',       'string',  array('notnull' => false));
   $table->addColumn('type',           'string',  array('notnull' => false));
   $table->addColumn('show_presenter', 'string',  array('notnull' => false));
   $table->addColumn('audience',       'string',  array('notnull' => false));
