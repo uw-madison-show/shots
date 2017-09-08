@@ -83,7 +83,7 @@ echo '
 
 // Google sign-in for websites
 echo '
-    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=start"></script>
     <meta name="google-signin-client_id" content="146936374460-leoa054enovpuksq875b9ignedeqnhsr.apps.googleusercontent.com">
     ';
 
