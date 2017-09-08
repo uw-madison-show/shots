@@ -9,10 +9,9 @@ include 'html_head.php';
 
 include 'shots/entities/events.php';
 
-$foo = eventsFetchAll();
+$foo = eventsFetch('8');
 
-$bar = handleDateString('2017-06-14 12:22:99', 'string', 'date');
-$baz = handleDateString('<alert>is this an alert?</alert>', 'string', 'time');
+$bar = eventsValidate('8', 'date_end', '2017-06-08');
 
 ?>
 
