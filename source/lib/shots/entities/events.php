@@ -243,6 +243,77 @@ function eventsCreateFieldHtml( $field_name = FALSE, $field_value = FALSE, $opti
 }
 
 /**
+ * Validate the event start and end fields.
+ *
+ * @param integer $id_value The id value for the event to validate.
+ * @param string $field_name Optional. If you are using eventsValidate from within the eventsUpdate() function, you would pass in the field that is getting updated.
+ * @param string $new_value Optional. If you are using eventsValidate from within the eventsUpdate() function, you would pass in the value that is getting updated.
+ *
+ * @return boolean|string Returns TRUE when the event has valid fields. Returns a string with the warning message when there is invalid fields. Returns FALSE when there is unexpected errors.
+ */
+function eventsValidate( int $id_value, $field_name = FALSE, $new_value = FALSE )
+{
+  global $db, $events_fields, $events_primary_key, $events_date_fields, $events_time_fields;
+
+  if ( $id_value === FALSE ){
+    trigger_error('Missing params for eventsValidate().');
+    return FALSE;
+  }
+
+  // de-ref the return array to make the code a little clearner
+  $this_event = eventsFetch($id_value)[$id_value];
+
+  if ( !$this_event ){
+    trigger_error('Could not find event with id: '. encode($id_value));
+    return FALSE;
+  }
+
+  if ( $field_name && $new_value &&
+       (in_array($field_name, $events_date_fields) or
+        in_array($field_name, $events_time_fields)
+        )
+      ) {
+    // we are validating an event with new data
+    // replace the existing value with the new value
+    $this_event[$field_name] = $new_value;
+  } else {
+    // we do not have any new data so we are validating the existing data
+    // do nothing?
+  }
+
+  // things to validate:
+
+  // date_start is not null
+  if ( empty($this_event['date_start']) ) {
+    trigger_error('Start date can not be empty.');
+    return FALSE;
+  }
+
+  // if all_day is checked then time_start and time_end should be null
+  if ( $this_event['all_day'] === 1 ) {
+
+    // if ( $this_event['time_start'] ) {}
+
+    // if ( $this_event['time_end'] ) {}
+
+  }
+
+  // if date_end is not null, then date_end should be equal to or after date_start
+  if ( $this_event['date_end'] ) {
+    if ( strtotime($this_event['date_start']) > strtotime($this_event['date_end']) ) {
+      trigger_error('End date must be after start date.');
+      return FALSE;
+    }
+  }
+
+  // if time_end is not null, then date_end should be not null
+
+  // if date_end, time_start, and time_end are all not null, then the computed datetime of the end should be after the computed datetime for the start
+
+  return TRUE;
+}
+
+/**
  * Changes a value in the events table.
  *
  * You provide the key value, the field name, and the new value.
@@ -270,7 +341,11 @@ function eventsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
     return FALSE;
   }
 
+  $to_be_validated = FALSE;
+
   if ( in_array($field_name, $events_date_fields) ){
+    $to_be_validated = TRUE;
+
     $temp_date_string = handleDateString($new_value,
                                          'string',
                                          'date'
@@ -285,6 +360,8 @@ function eventsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
   }
 
   if ( in_array($field_name, $events_time_fields) ){
+    $to_be_validated = TRUE;
+
     $temp_time_string = handleDateString($new_value,
                                          'string',
                                          'time'
@@ -298,11 +375,20 @@ function eventsUpdate( $id_value = FALSE, $field_name = FALSE, $new_value = NULL
     }
   }
 
-  return updateRecord('events',
-                      array($field_name => $new_value),
-                      $events_primary_key,
-                      $id_value
-                      );
+  // TODO make sure start date/time, end date/time, and all day fields make sense
+  if ( $to_be_validated ){
+    $is_valid = eventsValidate($id_value, $field_name, $new_value);
+  }
+
+  if ( $to_be_validated && ($is_valid !== TRUE) ){
+    return $is_valid;
+  } else {
+    return updateRecord('events',
+                        array($field_name => $new_value),
+                        $events_primary_key,
+                        $id_value
+                        );
+  }
 }
 
 //delete Event
